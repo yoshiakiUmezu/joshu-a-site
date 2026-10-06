@@ -131,3 +131,35 @@ ChatGPTの会話窓が変わっても、助手Aの販売・公開・販促判断
 > 会話窓が変わっても、販促窓の挙動はGitHub文書から再構築できる状態を維持する。
 
 新しい重要判断や運用変更が発生した場合、この文書または関連する正本文書へ反映し、会話だけに残さない。
+
+
+## A.I. TERMINAL統合方針
+
+設計相談の結論として、販売・公開工程は既存Development Orchestratorへ直書きせず、Product Lifecycle配下の独立した **Commercialization Pipeline** として統合する方針を採用する。
+
+想定構造:
+- Development Pipeline
+- Commercialization Pipeline
+- Post-Launch Pipeline
+
+販促窓が所有する正本ロジック:
+- 価格候補計算
+- チャネル適合
+- 手数料/損益
+- 人手負担
+- GO / CONDITIONAL GO / NO-GOの商用判断ルール
+- KPI診断ルール
+
+A.I. TERMINAL側が所有するもの:
+- lifecycle state
+- task dependency
+- evidence
+- approval
+- mutation protection
+- progress tracking
+- publication readiness
+- checkpoint scheduling
+
+P21のExecutionProviderとは衝突しない。P21は実行主体の抽象化、Commercializationは販売工程の内容定義として分離する。
+
+実装候補はP21完了後の独立項目（例: P22 Commercialization Pipeline）として扱う。
