@@ -12,6 +12,8 @@ Official website for 助手A
 - `404.html`で未知のURLを404として扱います。SPA fallbackは使いません。
 - `_headers`はリポジトリ内のMarkdown文書だけをnoindexにします。
 
+ホスティングはCloudflare Pagesを継続する。[ChatGPT Sites](https://help.openai.com/en/articles/20001339-creating-and-using-chatgpt-sites)は監視対象とし、独自ドメイン、SEO/OG、カスタムヘッダー、GitHub/コード連携、export/import、公開上限、料金、ホスティング制御、移行性を再評価する。これらがCloudflare Pagesと同等以上と確認できた場合に限り、移行を検討する。
+
 ## 公開方針
 
 - [集客・コンテンツ導線戦略](ACQUISITION_STRATEGY.md)

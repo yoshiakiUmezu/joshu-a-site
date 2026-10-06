@@ -13,9 +13,11 @@
 | robots / sitemap | どちらも公開環境で200。`robots.txt` はsitemapを記載。`sitemap.xml` は現時点ではトップだけ。製品公開時に実在する正規製品URLを追加する。 |
 | 404 | 未知のURLが公開環境で404を返すことを確認。 |
 | metadata | トップのtitle、description、canonical、OG、Xカード、WebSite/Brand JSON-LDを確認。製品ごとは公開時に個別設定する。 |
-| Cloudflare Pages | `main`をproduction、buildなし、output `.`。ルート直下の検証ファイルと`index.html`の`<head>`が公開される構成。`*.pages.dev`の本番別名が公開されている場合は、別途apexへの301またはnoindexを確認する。 |
+| Cloudflare Pages | `main`をproduction、buildなし、output `.`。ルート直下の検証ファイルと`index.html`の`<head>`が公開される構成。2026-10-06時点で`https://joshu-a-site.pages.dev/`は200・`index,follow`で表示され、canonicalは`https://joshu-a.com/`を指す。転送は未設定。検索エンジンが採用したcanonicalは管理画面で別途確認する。 |
 
 公開環境の検証は2026-10-06時点のHTTP応答。登録前と製品公開後に再確認する。sitemap提出先は **`https://joshu-a.com/sitemap.xml`**。提出するプロパティはGoogleでは `joshu-a.com`（Domain）または `https://joshu-a.com/`（URLプレフィックス）、Bingでは `https://joshu-a.com/`。製品公開後は `https://joshu-a.com/products/<slug>/` をURL検査する。
+
+`pages.dev`の重複配信を解消する場合は、[Cloudflare公式の手順](https://developers.cloudflare.com/pages/how-to/redirect-to-custom-domain/)に沿って管理者がBulk Redirectを設定し、パス・クエリを保持した301を本番ドメインへ向ける。Cloudflare Pagesの`_redirects`はホスト単位の転送を扱えないため、サイト内の一律転送ルールを追加しない。設定前後に`pages.dev`と独自ドメイン双方のトップ・実製品URLを確認する。現状のcanonicalは正規URLの強いヒントだが、検索エンジン側の選択を保証しない。
 
 ## Google Search Console：管理者の操作（目安5分、DNS伝播待ちを除く）
 
