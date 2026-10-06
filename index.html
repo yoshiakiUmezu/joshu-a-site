@@ -3,158 +3,549 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>助手A</title>
-  <meta name="description" content="助手A - 個人開発のプロダクトと実験を公開するサイトです。" />
+  <title>助手A — Independent Development</title>
+  <meta name="description" content="助手A。ソフトウェア、ゲーム、小さな実験をつくる個人開発ブランド。" />
   <style>
     :root {
       color-scheme: dark;
-      --bg: #07090d;
-      --panel: #0f131a;
-      --text: #f5f7fb;
-      --muted: #9aa4b2;
-      --line: #232a36;
-      --accent: #dce7ff;
+      --bg: #05070a;
+      --bg2: #0a0e14;
+      --panel: rgba(12, 16, 23, .72);
+      --panel-strong: rgba(16, 21, 30, .92);
+      --text: #f7f9fc;
+      --muted: #98a3b3;
+      --muted2: #697587;
+      --line: rgba(180, 199, 225, .12);
+      --line-strong: rgba(196, 214, 240, .22);
+      --glow: rgba(112, 152, 230, .22);
+      --accent: #dbe7ff;
+      --max: 1240px;
     }
+
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
     body {
       margin: 0;
       min-height: 100vh;
+      overflow-x: hidden;
       background:
-        radial-gradient(circle at 75% 20%, rgba(90, 120, 180, .18), transparent 34%),
-        linear-gradient(180deg, #090c12 0%, var(--bg) 55%);
+        radial-gradient(circle at 78% 15%, rgba(73, 107, 176, .18), transparent 30%),
+        radial-gradient(circle at 10% 84%, rgba(47, 72, 126, .13), transparent 26%),
+        linear-gradient(180deg, #070a0f 0%, var(--bg) 46%, #07090d 100%);
       color: var(--text);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
     }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .16;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: linear-gradient(to bottom, black, transparent 78%);
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 24px 6vw;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: rgba(5, 7, 10, .66);
       border-bottom: 1px solid var(--line);
     }
-    .brand {
+
+    .nav {
+      height: 74px;
       display: flex;
-      gap: 12px;
       align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 13px;
+      text-decoration: none;
       font-weight: 700;
       letter-spacing: .08em;
     }
+
     .mark {
-      width: 28px;
-      height: 28px;
-      border: 1px solid var(--accent);
-      transform: rotate(45deg);
-      box-shadow: 0 0 24px rgba(220, 231, 255, .18);
+      position: relative;
+      width: 31px;
+      height: 31px;
+      filter: drop-shadow(0 0 18px rgba(181, 204, 255, .18));
     }
+
+    .mark::before,
+    .mark::after {
+      content: "";
+      position: absolute;
+      inset: 4px 8px;
+      border-left: 2px solid var(--accent);
+      border-top: 2px solid var(--accent);
+      transform: skewY(-28deg) rotate(45deg);
+      opacity: .96;
+    }
+
+    .mark::after {
+      inset: 11px 6px 2px 15px;
+      opacity: .38;
+    }
+
+    nav {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+
     nav a {
-      color: var(--muted);
       text-decoration: none;
-      margin-left: 24px;
-      font-size: 14px;
-    }
-    main {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 12vh 6vw 10vh;
-    }
-    .eyebrow {
       color: var(--muted);
-      letter-spacing: .22em;
+      font-size: 13px;
+      letter-spacing: .12em;
+      transition: color .2s ease;
+    }
+
+    nav a:hover { color: var(--text); }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--muted);
       font-size: 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 13px;
+      background: rgba(255,255,255,.02);
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #bdcdf2;
+      box-shadow: 0 0 14px rgba(189,205,242,.75);
+    }
+
+    .hero {
+      min-height: 78vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(360px, .9fr);
+      align-items: center;
+      gap: 70px;
+      padding: 110px 0 90px;
+    }
+
+    .eyebrow {
+      color: #9aa8bd;
+      font-size: 11px;
+      letter-spacing: .28em;
       text-transform: uppercase;
+      margin-bottom: 22px;
     }
+
     h1 {
-      font-size: clamp(48px, 8vw, 96px);
-      line-height: 1.05;
-      margin: 18px 0 24px;
-      letter-spacing: -.04em;
-      font-weight: 700;
+      font-size: clamp(58px, 8vw, 112px);
+      line-height: .98;
+      margin: 0;
+      letter-spacing: -.055em;
+      font-weight: 650;
     }
+
+    h1 span {
+      display: block;
+      margin-top: 13px;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(219, 231, 255, .52);
+    }
+
     .lead {
       max-width: 680px;
+      margin: 30px 0 0;
       color: var(--muted);
-      font-size: 18px;
-      line-height: 1.9;
+      font-size: clamp(16px, 1.5vw, 19px);
+      line-height: 1.95;
     }
-    .cta {
-      display: inline-block;
-      margin-top: 36px;
-      padding: 14px 22px;
-      border: 1px solid var(--accent);
-      color: var(--text);
-      text-decoration: none;
+
+    .actions {
+      display: flex;
+      gap: 14px;
+      margin-top: 38px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 20px;
       border-radius: 999px;
-      background: rgba(255,255,255,.03);
+      text-decoration: none;
+      border: 1px solid var(--line-strong);
+      font-size: 14px;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
     }
-    .cards {
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn.primary {
+      color: #0c1118;
+      background: linear-gradient(180deg, #f5f8ff, #cfdcf5);
+      border-color: transparent;
+      box-shadow: 0 8px 30px rgba(175, 199, 244, .16);
+    }
+
+    .btn.secondary { color: var(--text); background: rgba(255,255,255,.025); }
+
+    .hero-art {
+      position: relative;
+      min-height: 480px;
+      border: 1px solid var(--line);
+      border-radius: 32px;
+      background:
+        radial-gradient(circle at 72% 28%, rgba(112, 152, 230, .18), transparent 30%),
+        linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.01));
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 40px 80px rgba(0,0,0,.28);
+    }
+
+    .hero-art::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(transparent 65%, rgba(0,0,0,.28)),
+        repeating-linear-gradient(90deg, transparent 0 79px, rgba(255,255,255,.025) 80px);
+    }
+
+    .orbit {
+      position: absolute;
+      width: 330px;
+      height: 330px;
+      border: 1px solid rgba(190, 211, 255, .16);
+      border-radius: 50%;
+      right: -70px;
+      top: 30px;
+    }
+
+    .orbit::before,
+    .orbit::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(190, 211, 255, .11);
+    }
+
+    .orbit::before { inset: 54px; }
+    .orbit::after { inset: 110px; }
+
+    .terminal-card {
+      position: absolute;
+      left: 38px;
+      right: 38px;
+      bottom: 38px;
+      padding: 22px 22px 20px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(6, 9, 14, .78);
+      backdrop-filter: blur(12px);
+    }
+
+    .terminal-top {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted2);
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .terminal-line {
+      height: 9px;
+      border-radius: 20px;
+      background: linear-gradient(90deg, rgba(213,227,255,.82) 0 18%, rgba(255,255,255,.07) 18% 100%);
+      margin: 11px 0;
+    }
+
+    .terminal-line:nth-child(3) { width: 84%; }
+    .terminal-line:nth-child(4) { width: 67%; }
+    .terminal-line:nth-child(5) { width: 42%; }
+
+    .section {
+      padding: 90px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 30px;
+      margin-bottom: 34px;
+    }
+
+    .section-kicker {
+      font-size: 11px;
+      letter-spacing: .24em;
+      color: var(--muted2);
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 8px 0 0;
+      font-size: clamp(32px, 4vw, 54px);
+      letter-spacing: -.035em;
+      font-weight: 620;
+    }
+
+    .section-copy {
+      max-width: 520px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .product-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 18px;
-      margin-top: 96px;
     }
-    .card {
-      min-height: 180px;
-      padding: 24px;
+
+    .product {
+      position: relative;
+      min-height: 265px;
       border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(15, 19, 26, .72);
+      border-radius: 22px;
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.012));
+      overflow: hidden;
     }
-    .card h2 {
-      margin-top: 0;
-      font-size: 20px;
+
+    .product::after {
+      content: "";
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      right: -35px;
+      bottom: -45px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(121, 155, 224, .14), transparent 68%);
     }
-    .card p {
+
+    .tag {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      color: var(--muted2);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 10px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .product h3 {
+      font-size: 24px;
+      margin: 70px 0 8px;
+      font-weight: 600;
+    }
+
+    .product p {
+      margin: 0;
       color: var(--muted);
       line-height: 1.7;
+      font-size: 14px;
     }
-    footer {
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+    }
+
+    .info-card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 28px;
+      background: var(--panel);
+    }
+
+    .info-card h3 {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .info-card p {
       color: var(--muted);
-      border-top: 1px solid var(--line);
-      padding: 28px 6vw 40px;
-      font-size: 13px;
+      line-height: 1.85;
+      margin: 0;
     }
-    @media (max-width: 760px) {
+
+    .contact-link {
+      display: inline-flex;
+      margin-top: 20px;
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(219,231,255,.3);
+      padding-bottom: 4px;
+    }
+
+    footer {
+      padding: 34px 0 48px;
+      border-top: 1px solid var(--line);
+      color: var(--muted2);
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 78px;
+      }
+      .hero-art { min-height: 360px; }
+      .product-grid, .info-grid { grid-template-columns: 1fr; }
+      .section-head { align-items: start; flex-direction: column; }
+    }
+
+    @media (max-width: 680px) {
+      .shell { width: min(100% - 28px, var(--max)); }
       nav { display: none; }
-      .cards { grid-template-columns: 1fr; }
-      main { padding-top: 9vh; }
+      .status { display: none; }
+      .hero { gap: 42px; }
+      h1 { font-size: clamp(52px, 17vw, 78px); }
+      .hero-art { min-height: 320px; border-radius: 24px; }
+      .terminal-card { left: 18px; right: 18px; bottom: 18px; }
+      .section { padding: 66px 0; }
     }
   </style>
 </head>
 <body>
   <header>
-    <div class="brand"><div class="mark"></div><span>助手A</span></div>
-    <nav>
-      <a href="#products">PRODUCTS</a>
-      <a href="#about">ABOUT</a>
-      <a href="#contact">CONTACT</a>
-    </nav>
+    <div class="shell nav">
+      <a class="brand" href="#top" aria-label="助手A ホーム">
+        <span class="mark" aria-hidden="true"></span>
+        <span>助手A</span>
+      </a>
+      <nav>
+        <a href="#products">PRODUCTS</a>
+        <a href="#about">ABOUT</a>
+        <a href="#contact">CONTACT</a>
+      </nav>
+      <div class="status"><span class="dot"></span> IN DEVELOPMENT</div>
+    </div>
   </header>
 
-  <main>
-    <div class="eyebrow">Independent development / software / experiments</div>
-    <h1>創る。磨く。届ける。</h1>
-    <p class="lead">
-      助手Aは、個人開発のプロダクトや実験を公開していくための拠点です。
-      使いやすく、少し面白く、長く残るものをつくります。
-    </p>
-    <a class="cta" href="#products">製品を見る</a>
+  <main id="top">
+    <section class="shell hero">
+      <div>
+        <div class="eyebrow">Independent development / software / games / experiments</div>
+        <h1>創る。磨く。<span>届ける。</span></h1>
+        <p class="lead">
+          助手Aは、ソフトウェアやゲーム、小さな実験をつくる個人開発ブランドです。
+          便利さだけで終わらない、触って少し気分が上がるものを目指します。
+        </p>
+        <div class="actions">
+          <a class="btn primary" href="#products">製品を見る <span>→</span></a>
+          <a class="btn secondary" href="#about">助手Aについて</a>
+        </div>
+      </div>
 
-    <section class="cards" id="products">
-      <article class="card">
-        <h2>Products</h2>
-        <p>公開した製品をここに追加していきます。</p>
-      </article>
-      <article class="card" id="about">
-        <h2>About</h2>
-        <p>助手A名義で、ソフトウェア・ゲーム・小さな実験を制作します。</p>
-      </article>
-      <article class="card" id="contact">
-        <h2>Contact</h2>
-        <p>問い合わせ窓口は準備中です。</p>
-      </article>
+      <div class="hero-art" aria-hidden="true">
+        <div class="orbit"></div>
+        <div class="terminal-card">
+          <div class="terminal-top">
+            <span>JOSHU-A / BUILD LOG</span>
+            <span>001</span>
+          </div>
+          <div class="terminal-line"></div>
+          <div class="terminal-line"></div>
+          <div class="terminal-line"></div>
+          <div class="terminal-line"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="products">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">Products</div>
+            <h2>つくったもの</h2>
+          </div>
+          <p class="section-copy">
+            現在、公開準備中です。製品が完成したら、ここから詳細・価格・対応環境・購入先まで確認できるようにします。
+          </p>
+        </div>
+
+        <div class="product-grid">
+          <article class="product">
+            <span class="tag">Software</span>
+            <h3>Product 01</h3>
+            <p>最初の製品をここに掲載します。</p>
+          </article>
+          <article class="product">
+            <span class="tag">Game</span>
+            <h3>Product 02</h3>
+            <p>ゲームや実験的な作品も同じ場所から案内します。</p>
+          </article>
+          <article class="product">
+            <span class="tag">Experiment</span>
+            <h3>Next</h3>
+            <p>小さく試し、良いものだけを残していきます。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="shell info-grid">
+        <article class="info-card">
+          <div class="section-kicker">About</div>
+          <h3>助手Aについて</h3>
+          <p>
+            個人で開発し、公開し、改善していくための名前です。
+            ジャンルを固定せず、ソフトウェア・ゲーム・ツールなど、その時に作る価値があるものを形にします。
+          </p>
+        </article>
+
+        <article class="info-card" id="contact">
+          <div class="section-kicker">Contact</div>
+          <h3>お問い合わせ</h3>
+          <p>
+            製品・不具合・その他のお問い合わせはこちらから受け付けています。
+          </p>
+          <a class="contact-link" href="mailto:contact@joshu-a.com">contact@joshu-a.com</a>
+        </article>
+      </div>
     </section>
   </main>
 
-  <footer>© 2026 助手A</footer>
+  <div class="shell">
+    <footer>
+      <span>© 2026 助手A</span>
+      <span>joshu-a.com</span>
+    </footer>
+  </div>
 </body>
 </html>
