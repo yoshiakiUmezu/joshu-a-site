@@ -10,6 +10,8 @@
 4. リポジトリ直下で `node scripts/check-release.mjs`、`node --test tests/check-release.test.mjs` を実行。プレビューでスマホ幅、文字/CTA/画像、キーボード操作、OG、実際の外部CTA先を人間が確認する。Cloudflare Pages本番反映後に `node scripts/check-release.mjs --live` を実行する。GitHub PRレビューを経て`main`へ反映するのはサイト管理者の判断。
 5. Search Console/Bingにsitemapを提出済みなら、製品の正規URLを検査する。X・note・itch.io等に公開するリンクは必ず製品の正規URLを使う。
 
+公開前に`contact@joshu-a.com`で受信・返信できること、製品ページと販売ストアのサポート/返金窓口が正しいことを人が確認する。問い合わせの分類・情報の扱い・エスカレーションは[サポート運用](support-operations.md)を参照する。
+
 チェックは**1コマンド**でローカル公開物を検査する。Node.js標準機能だけを使用し、依存パッケージや有料APIは不要。ページ追加時はcanonical、title/description、OG/X、1200×630 PNGの有無・容量、単一h1、JSON-LD構文とSoftwareApplication/VideoGame、Offer、主CTA、実画面、alt、内部リンク、sitemap掲載、noindex、localhost/CloudflareプレビューURL/プレースホルダー、ホームの準備中文言を調べる。404.html、robots.txt、Markdownのnoindexも確認する。`--live`は本番デプロイ後のHTTP 200/404、HTTPS転送、noindexとOG画像の応答を確認する。
 
 自動チェックは価格・対応OS・説明・スクリーンショットが**真実か**、外部ストアの決済/DL/利用が正常か、OGの見た目が良いか、モバイルで読めるか、法務・ライセンス・プライバシー表記が製品に必要かまでは判断できない。ここは人間の公開承認に残す。販売前紹介ページを先に出したい場合は、このテンプレートとrelease gateを流用せず、公開URL・sitemap・noindex・CTA・検証方法を別途決めてから実装する。正式公開を装う架空Offerは作らない。
