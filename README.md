@@ -15,6 +15,7 @@ Official website for 助手A
 ## 公開方針
 
 - [集客・コンテンツ導線戦略](ACQUISITION_STRATEGY.md)
+- [X・note・itch.ioの運用とコンテンツ再利用](docs/social-operations.md)
 - [2026-10-06の監査・公開前/公開時チェックリスト](SITE_AUDIT.md)
 
 製品は `/products/<slug>/index.html`、実記事は `/journal/<slug>/index.html`。

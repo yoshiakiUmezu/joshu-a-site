@@ -188,10 +188,12 @@ Google / AI Search / note
 
 URLには必要に応じてUTMを使用する。
 
+媒体別の投稿判断、テンプレート、承認手順とUTMの正本は[外部チャネル運用](docs/social-operations.md)を参照。
+
 例:
-?utm_source=note&utm_medium=referral&utm_campaign=<product-launch>
-?utm_source=x&utm_medium=social&utm_campaign=<product-launch>
-?utm_source=itchio&utm_medium=referral&utm_campaign=<product>
+`?utm_source=note&utm_medium=referral&utm_campaign=<slug>-launch`
+`?utm_source=x&utm_medium=social&utm_campaign=<slug>-launch`
+`?utm_source=itchio&utm_medium=referral&utm_campaign=<slug>-launch`
 
 ## 実装順
 
