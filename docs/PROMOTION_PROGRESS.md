@@ -55,6 +55,9 @@ A.I. TERMINAL側の開発進行とは分離して、joshu-a.com を中心とし�
 - [ ] contact@joshu-a.com の受信・返信を実運用で確認
 
 ### P1 — 最初の実製品が確定したら即実行
+
+- [x] 24時間販売開始ルールを `COMMERCIALIZATION_PLAYBOOK.md` として準備
+
 - [ ] `/products/<slug>/index.html` を作成
 - [ ] 一文価値 / 対象者 / 価格 / OS / 提供状態を確定
 - [ ] 本物の購入 / DL / 利用CTAを設置
