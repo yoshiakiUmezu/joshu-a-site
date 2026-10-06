@@ -20,6 +20,7 @@ Official website for 助手A
 - [Search Console / Bing Webmasterの登録準備と管理者手順](docs/search-console-bing.md)
 - [非公開の製品ページHTMLテンプレート](docs/product-page-template.md)
 - [製品公開手順と外部媒体からの導線](docs/product-launch.md)
+- [製品公開時の法務・プライバシー確認](docs/legal-release-checklist.md)
 
 正式公開製品のrelease gateは `node scripts/check-release.mjs`、チェッカーのテストは `node --test tests/check-release.test.mjs`。本番反映後のHTTP確認は `node scripts/check-release.mjs --live`。Node.js標準機能だけを使用します。`products/<slug>/` は購入・DL・利用が可能な製品だけを対象とし、販売前紹介ページはこのテンプレートとチェッカーの対象外です。実情報が揃うまで製品ページを公開しません。
 
