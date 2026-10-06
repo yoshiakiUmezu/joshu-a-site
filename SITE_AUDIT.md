@@ -88,6 +88,7 @@
 - sitemapのXML構造・トップURL、robotsの全体Allow / OAI-SearchBot Allow / Sitemap、metadata・画像参照・JSON-LDを確認。
 - 本番の既存404はHTTP404。ローカルのトップ・robots・sitemapは200、存在しない通常/製品/記事パスは404。ローカルHTTPサーバーは404配信を模擬するもので、Cloudflare実環境の検証と区別する。
 - `wrangler pages dev .` のローカル配信でも、トップ・robots・sitemap・両PNGの200 / 適切なContent-Typeと、存在しない製品・記事パスの404 / 404本文noindexを確認。header rule 1件の解析成功。README / 戦略 / 監査のMarkdownだけX-Robots-Tag: noindex、トップ・robots・sitemap・画像にnoindexなし。リモートdeployやCloudflare APIは実行していない。
+- Git pushに連動したCloudflare Pagesのpreview deployが成功（ソースcommit `2f4a8b40b5ed7453cf2ad01cf905561467df90ce`）。`https://d93a09c0.joshu-a-site.pages.dev` でトップ・robots・sitemap・両PNG・監査Markdownの200とContent-Type、未知の製品/記事URLの404とカスタム404本文を確認。previewの200応答はX-Robots-Tag: noindex。404には同ヘッダーがないが、HTML本文のnoindex,followがある。本番mainへはmergeしていない。
 
 Lighthouseは同じローカルHTTPサーバーで変更前1回・変更後2回のmobile lab測定。最初の修正後はPerformance 88、200%文字拡大への追加修正を含む最終ソースは下表の87。都合の良い値だけを採用しない。圧縮・CDN・キャッシュがないローカル条件のため、本番のフィールドCore Web VitalsやCVRの証拠にはならない。
 
@@ -116,13 +117,13 @@ Lighthouseは同じローカルHTTPサーバーで変更前1回・変更後2回�
 - HTML / CSS / JS / 保守性: semantic headings、ランドマーク、aria-labelledbyがある。CSSは小規模で依存なし。未使用の仮カード用規則を除去し、フレームワーク移行は不要。
 - 表示速度 / CWV: 外部フォント・動画・第三者JSなし。表示用画像の過大サイズを是正。sticky blurは実機GPU次第で負荷があり得るが、測定された問題がない段階で好みの変更をしない。
 - 信頼性 / セキュリティ: 個人開発という実態を記載し、誇大な実績・企業規模・レビュー・導入社数を捏造していない。問い合わせフォームやアカウント・決済処理は未実装。メール受信と実製品の提供先を公開前に確認する。
-- Cloudflare: 静的ルートとroot 404に適合。build空欄 / output `.`を維持。SPA fallbackや全URL→トップのリダイレクトは追加しない。`_headers`でMarkdownだけnoindexにする。ダッシュボードおよびpreview HTTPヘッダーは別途確認が必要。
+- Cloudflare: 静的ルートとroot 404に適合。build空欄 / output `.`を維持。SPA fallbackや全URL→トップのリダイレクトは追加しない。`_headers`でMarkdownだけnoindexにする。previewの正常配信とnoindexをHTTPで確認。ダッシュボードの設定値は別途確認が必要。
 
 ### 製品公開前に残すタスク
 
 1. Draft PRの差分とCloudflare previewを確認し、運営者の判断でmainへmergeする。今回はmergeしない。
 2. スマホ実機（iOS Safari / Android Chrome）、キーボード、スクリーンリーダーでCTA・ナビ・メールを確認。実際にcontact@で受信・返信できることを運営者が確認。
-3. previewのnoindex、production branch、framework、build command、output、独自ドメイン・HTTPS、AI botの設定をダッシュボードとHTTP応答で確認。
+3. production branch、framework、build command、output、独自ドメイン・HTTPS、AI botの設定をダッシュボードで確認。previewのnoindexは今回HTTPで確認済み。
 4. merge後のOG画像200・PNGのContent-Type、X/OGの共有表示、トップ200・未知パス404、MarkdownのX-Robots-Tagを確認。SNSキャッシュの反映はサイトソースだけでは保証できない。
 5. 検索登録・sitemap送信・canonicalの採用状況を運営者のSearch Consoleで確認。ローカルLighthouseのSEO100でindex済みとは判断しない。
 
@@ -140,6 +141,12 @@ Lighthouseは同じローカルHTTPサーバーで変更前1回・変更後2回�
 ### モデルとツール
 
 監査・SEO/情報設計・CV導線の判断・実装判断・最終レビューはこのセッションのGPT-6系モデルで実施。SEO・ブランドの事実・公開前後の導線を一貫して判断する必要があるため、このモデルで担当した。このセッション内のモデル切替機能がないため、軽量/中位/高性能モデルを別々に起動した実績はない。機械的走査・構文・リンク・レイアウト・a11y・性能検証はGit、Node、html-validate、PostCSS、Playwright、axe、Lighthouse、Wrangler等で実行し、別LLMへの反復投入は行っていない。
+
+### 最終Git状態と後片付け
+
+- [Draft PR #1](https://github.com/yoshiakiUmezu/joshu-a-site/pull/1) を作成。mainは変更前の `db3a29becb85df8668955f94709ee1b4ad422a0a` のまま。
+- 作業branchをpush済み。最終commit SHAはPRとGit logで確認可能（この文書自身の追記commitを自己参照しない）。
+- ローカル検証サーバーは停止済み。自動承認レビューが生成フォルダー `.wrangler/` の再帰削除をポリシーにより拒否したため、Git除外の状態で残した。詳細理由は返されていない。サイトの追跡ファイルに未コミット変更は残さない。
 
 ### 参照した一次資料
 
