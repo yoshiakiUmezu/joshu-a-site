@@ -4,7 +4,7 @@
 
 ## 公開までの最短手順
 
-1. 実製品の名称、slug、一言価値、対象者、機能、公開状況、価格と課金条件、OS/利用条件、購入/DL/利用URL、実画面・OG画像を確定する。[法務・プライバシー確認](legal-release-checklist.md)で販売主体、データ収集、同梱物を判定し、必要な表示だけを揃える。CTA先を人間が実際に開いて完了まで試す。実画像を `assets/` に配置する。OG画像は1200×630 PNG。
+1. 実製品の名称、slug、一言価値、対象者、機能、公開状況、価格と課金条件、OS/利用条件、購入/DL/利用URL、実画面・OG画像を確定する。[法務・プライバシー確認](legal-release-checklist.md)で販売主体、データ収集、同梱物を判定し、必要な表示だけを揃える。CTA先を人間が実際に開いて完了まで試す。実画像を `assets/` に配置する。OG画像は1200×630 PNG。ロゴ/実画面の構成は[販促素材ガイド](promotional-assets.md)に従う。
 2. `data/products/<slug>.json`を新規作成し、下の必須項目と該当する任意項目へ実情報だけを入力する。準備中の下書きは`"publish": false`にする。公開できる情報と稼働するCTAが揃った正式製品だけ`true`にする。ロゴ形状とfaviconには触れない。
 3. リポジトリ直下で `node scripts/build-products.mjs` を実行する。ジェネレーターが製品HTML、トップの製品カード、sitemapを更新する。次に `node scripts/check-release.mjs` と `node --test tests/build-products.test.mjs tests/check-release.test.mjs` を実行する。
 4. プレビューでスマホ幅、文字/CTA/画像、キーボード操作、OG、実際の外部CTA先を人間が確認する。GitHub PRレビューを経て`main`へ反映するのはサイト管理者の判断。本番反映後に `node scripts/check-release.mjs --live` を実行し、Search Console/Bingにsitemapを提出済みなら製品の正規URLを検査する。
