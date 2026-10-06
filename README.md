@@ -25,7 +25,7 @@ Official website for 助手A
 - [製品公開時の法務・プライバシー確認](docs/legal-release-checklist.md)
 - [問い合わせ・サポート運用](docs/support-operations.md)
 
-正式公開製品のrelease gateは `node scripts/check-release.mjs`、チェッカーのテストは `node --test tests/check-release.test.mjs`。本番反映後のHTTP確認は `node scripts/check-release.mjs --live`。Node.js標準機能だけを使用します。`products/<slug>/` は購入・DL・利用が可能な製品だけを対象とし、販売前紹介ページはこのテンプレートとチェッカーの対象外です。実情報が揃うまで製品ページを公開しません。
+製品情報は `data/products/<slug>.json` に記入し、`node scripts/build-products.mjs` で製品ページ・トップの製品カード・sitemapを生成します。生成後は `node scripts/check-release.mjs` と `node --test tests/build-products.test.mjs tests/check-release.test.mjs` を実行します。入力仕様は[製品公開手順](docs/product-launch.md)を参照してください。いずれもNode.js標準機能だけを使用し、npm依存はありません。本番反映後のHTTP確認は `node scripts/check-release.mjs --live`。`products/<slug>/` とrelease gateは購入・DL・利用可能な正式公開製品だけを対象にし、販売前紹介ページは対象外です。実情報が揃うまで製品ページを生成しません。
 
 製品は `/products/<slug>/index.html`、実記事は `/journal/<slug>/index.html`。
 faviconとロゴ形状は維持します。`assets/brand-mark.png`はfavicon原本の比例縮小版、`assets/og-home.png`は既存ロゴとブランドコピーを配置した共有画像です。生成AIによるロゴ生成は行いません。

@@ -4,11 +4,21 @@
 
 ## 公開までの最短手順
 
-1. 実製品の名称、slug、一言価値、対象者、主機能、公開状況、価格と課金条件、OS/利用条件、購入/DL/利用URL、実画面・OG画像を確定する。[法務・プライバシー確認](legal-release-checklist.md)で販売主体、データ収集、同梱物を判定し、該当する表示だけを揃える。CTA先を人間が実際に開いて完了まで試す。
-2. テンプレートを `products/<slug>/index.html` にコピーして全`{{...}}`を置換。実体のない動画・FAQ・更新情報・関連記事は節ごと削除。ソフトウェア/ゲームのJSON-LD種別と実際のOfferを合わせる。OG画像は `assets/<slug>-og.png` に1200×630 PNGで置く。ロゴ形状とfaviconには触れない。
-3. トップのPRODUCTSを準備中表示から実製品カードへ更新し、そのカードを `/products/<slug>/` にリンクする。`sitemap.xml`へ `https://joshu-a.com/products/<slug>/` を1件追加し、内容の実更新日を`lastmod`へ入れる。
-4. リポジトリ直下で `node scripts/check-release.mjs`、`node --test tests/check-release.test.mjs` を実行。プレビューでスマホ幅、文字/CTA/画像、キーボード操作、OG、実際の外部CTA先を人間が確認する。Cloudflare Pages本番反映後に `node scripts/check-release.mjs --live` を実行する。GitHub PRレビューを経て`main`へ反映するのはサイト管理者の判断。
-5. Search Console/Bingにsitemapを提出済みなら、製品の正規URLを検査する。X・note・itch.io等に公開するリンクは必ず製品の正規URLを使う。
+1. 実製品の名称、slug、一言価値、対象者、機能、公開状況、価格と課金条件、OS/利用条件、購入/DL/利用URL、実画面・OG画像を確定する。[法務・プライバシー確認](legal-release-checklist.md)で販売主体、データ収集、同梱物を判定し、必要な表示だけを揃える。CTA先を人間が実際に開いて完了まで試す。実画像を `assets/` に配置する。OG画像は1200×630 PNG。
+2. `data/products/<slug>.json`を新規作成し、下の必須項目と該当する任意項目へ実情報だけを入力する。準備中の下書きは`"publish": false`にする。公開できる情報と稼働するCTAが揃った正式製品だけ`true`にする。ロゴ形状とfaviconには触れない。
+3. リポジトリ直下で `node scripts/build-products.mjs` を実行する。ジェネレーターが製品HTML、トップの製品カード、sitemapを更新する。次に `node scripts/check-release.mjs` と `node --test tests/build-products.test.mjs tests/check-release.test.mjs` を実行する。
+4. プレビューでスマホ幅、文字/CTA/画像、キーボード操作、OG、実際の外部CTA先を人間が確認する。GitHub PRレビューを経て`main`へ反映するのはサイト管理者の判断。本番反映後に `node scripts/check-release.mjs --live` を実行し、Search Console/Bingにsitemapを提出済みなら製品の正規URLを検査する。
+
+### 製品データの入力項目
+
+JSONファイルを1製品1ファイルで管理する。`slug`はファイル名と一致させ、URL公開後は変更しない。
+
+- 必須（公開時）: `slug`, `publish`, `productType`（`SoftwareApplication`または`VideoGame`）, `name`, `oneLineValue`, `audience`, `description`, `status`, `priceDisplay`, `priceAmount`, `currency`, `platforms`, `ctaLabel`, `ctaUrl`, `ogImage`, `screenshot`（`src`, `alt`, `caption`, `width`, `height`）, `features`, `releaseDate`, `lastModified`。
+- 任意: `title`（省略時に製品名から生成）, `ogAlt`（省略時に製品名と一言価値から生成）, `video`（MP4 URLと任意のposter）, `faq`, `updates`, `relatedArticles`, `legalLinks`（`privacy`, `terms`, `license`, `refund`, `sellerInformation`, `support`）。実在する内容とリンクだけを記述する。法的要否の判断は人が行い、生成器は法律判断を確定しない。
+- `publish:false`ならslug・ファイル名とpublish型だけ確認し、ページ、トップカード、sitemapを生成しない。公開済みジェネレーター管理ページがあってpublishをfalseに戻した場合はそのページを除去する。
+- URLはHTTPSまたは既存のサイト内パスを使う。画像は`/assets/`内の既存ファイル。sitemapの`lastmod`は実際のページ内容更新日に合わせる。
+
+トップページの`PRODUCTS:COPY` / `PRODUCTS:CARDS`、sitemapの`PRODUCTS:GENERATED`マーカー内だけがジェネレーターの管理領域。そこへ手編集しない。マーカー外の本文や手書きページは保持する。生成器は既存の手書き製品ページを上書きしない。X・note・itch.io等に公開するリンクは必ず製品の正規URLを使う。
 
 公開前に`contact@joshu-a.com`で受信・返信できること、製品ページと販売ストアのサポート/返金窓口が正しいことを人が確認する。問い合わせの分類・情報の扱い・エスカレーションは[サポート運用](support-operations.md)を参照する。
 

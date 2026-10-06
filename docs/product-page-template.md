@@ -1,6 +1,6 @@
 # 製品ページの正式テンプレート
 
-これは**購入・DL・利用が可能になった正式公開製品専用**の非公開テンプレート。実製品の事実・稼働するCTA・実画像が揃った時だけ `products/<slug>/index.html` にコピーする。`node scripts/check-release.mjs` は、このパスの全ページを正式公開製品として検査するrelease gateであり、販売前の紹介ページには対応しない。現在このパスに製品ページは作らない。`{{...}}` はすべて置換し、不要な任意セクションは削除する。
+これは**購入・DL・利用が可能になった正式公開製品専用**の非公開テンプレート。実製品の事実・稼働するCTA・実画像が揃った時だけ `data/products/<slug>.json` に入力し、`node scripts/build-products.mjs` で `products/<slug>/index.html` を生成する。`node scripts/check-release.mjs` は生成されたページを正式公開製品として検査するrelease gateであり、販売前の紹介ページには対応しない。実製品情報や架空fixtureはここへ追加しない。手編集は行わず、このHTMLをジェネレーターの元テンプレートとして保守する。
 
 ## 必須入力と判断
 
@@ -17,7 +17,7 @@
 
 公開前に[法務・プライバシー確認](legal-release-checklist.md)で必要性を判定する。利用規約、プライバシー、ライセンス、返金条件、販売者情報、サポートのリンクは、該当する条件があり、実際の文書またはストアの案内先が用意できたものだけを製品ページに加える。リンクを置く位置と内容は販売先の規則に合わせ、未作成のリンクや空の節を残さない。
 
-公開時はホームの製品カードを実製品の名前・短い説明・正規URLへ更新し、準備中の文言を事実に合わせて直す。sitemapには、**公開済みで200・indexable・自己canonicalの製品URLだけ**を追加する。未公開/プレビュー/削除済みページを載せない。製品情報を大きく変更した日だけ`lastmod`を更新する。`/products/<slug>/`を外部媒体に配布する正規URLとし、`/products/<slug>/index.html`は内部ファイル名としてだけ扱う。
+生成時はホームの製品一覧マーカー領域だけを更新し、公開製品が0件なら準備中表示を維持する。sitemapには、**publishがtrueの正式公開製品だけ**をcanonical URLと実際の`lastModified`で追加する。UTMやpreview URLは生成しない。`/products/<slug>/`を外部媒体に配布する正規URLとし、`/products/<slug>/index.html`は内部ファイル名としてだけ扱う。
 
 ## HTML（製品情報を入れてから公開）
 
@@ -40,14 +40,14 @@
   <meta property="og:url" content="https://joshu-a.com/products/{{SLUG}}/" />
   <meta property="og:title" content="{{TITLE}}" />
   <meta property="og:description" content="{{DESCRIPTION}}" />
-  <meta property="og:image" content="https://joshu-a.com/assets/{{SLUG}}-og.png" />
+  <meta property="og:image" content="{{OG_IMAGE_URL}}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="{{OG_ALT}}" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{{TITLE}}" />
   <meta name="twitter:description" content="{{DESCRIPTION}}" />
-  <meta name="twitter:image" content="https://joshu-a.com/assets/{{SLUG}}-og.png" />
+  <meta name="twitter:image" content="{{OG_IMAGE_URL}}" />
   <meta name="twitter:image:alt" content="{{OG_ALT}}" />
 
   <script type="application/ld+json">
@@ -55,15 +55,16 @@
     "@context": "https://schema.org",
     "@type": {{SCHEMA_TYPE_JSON}},
     "@id": "https://joshu-a.com/products/{{SLUG}}/#product",
-    "name": "{{PRODUCT_NAME}}",
-    "description": "{{DESCRIPTION}}",
-    "url": "https://joshu-a.com/products/{{SLUG}}/",
-    "image": "https://joshu-a.com/assets/{{SLUG}}-og.png",
-    "operatingSystem": "{{OS_SCHEMA}}",
+    "name": {{PRODUCT_NAME_JSON}},
+    "description": {{DESCRIPTION_JSON}},
+    "url": {{CANONICAL_JSON}},
+    "image": {{OG_IMAGE_JSON}},
+    "operatingSystem": {{OS_SCHEMA_JSON}},
+    "datePublished": {{RELEASE_DATE_JSON}},
     "isPartOf": { "@id": "https://joshu-a.com/#website" },
     "offers": {
       "@type": "Offer",
-      "url": "{{CTA_URL}}",
+      "url": {{CTA_URL_JSON}},
       "price": "{{PRICE_AMOUNT}}",
       "priceCurrency": "{{PRICE_CURRENCY}}"
     }
@@ -131,11 +132,11 @@
     </section>
     <section aria-labelledby="screenshots-heading">
       <h2 id="screenshots-heading">画面・体験</h2>
-      <figure><img data-screenshot src="/assets/{{SLUG}}-screenshot.png" width="{{SCREENSHOT_WIDTH}}" height="{{SCREENSHOT_HEIGHT}}" alt="{{SCREENSHOT_ALT}}" loading="lazy" /><figcaption>{{SCREENSHOT_CAPTION}}</figcaption></figure>
+      <figure><img data-screenshot src="{{SCREENSHOT_SRC}}" width="{{SCREENSHOT_WIDTH}}" height="{{SCREENSHOT_HEIGHT}}" alt="{{SCREENSHOT_ALT}}" loading="lazy" /><figcaption>{{SCREENSHOT_CAPTION}}</figcaption></figure>
     </section>
     <section aria-labelledby="video-heading">
       <h2 id="video-heading">デモ動画</h2>
-      <video controls preload="none" poster="/assets/{{SLUG}}-video-poster.png"><source src="/assets/{{SLUG}}-demo.mp4" type="video/mp4" />動画を再生できない場合は<a href="/assets/{{SLUG}}-demo.mp4">動画ファイル</a>をご覧ください。</video>
+      <video controls preload="none" poster="{{VIDEO_POSTER}}"><source src="{{VIDEO_SRC}}" type="video/mp4" />動画を再生できない場合は<a href="{{VIDEO_SRC}}">動画ファイル</a>をご覧ください。</video>
     </section>
     <section aria-labelledby="faq-heading">
       <h2 id="faq-heading">よくある質問</h2>
@@ -152,6 +153,7 @@
     <section aria-labelledby="contact-heading">
       <h2 id="contact-heading">お問い合わせ</h2>
       <p>ご質問や不具合のご連絡は<a href="mailto:contact@joshu-a.com">contact@joshu-a.com</a>へ。</p>
+      {{LEGAL_LINKS}}
     </section>
   </main>
   <footer><div class="wrap"><span>© 2026 助手A</span><a href="/">公式サイト</a></div></footer>

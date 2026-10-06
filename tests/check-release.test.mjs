@@ -80,15 +80,18 @@ test('documented HTML template can be filled into a passing product page', t => 
   assert.ok(template, 'HTML code block exists');
   template = template.replace(/<section aria-labelledby="(?:video|faq|updates|related)-heading">[\s\S]*?<\/section>/g, '');
   const values = {
-    TITLE: '検証用製品 | 助手A', DESCRIPTION: '公開チェックのテスト専用。',
+    TITLE: '検証用製品 | 助手A', DESCRIPTION: '公開チェックのテスト専用。', OG_IMAGE_URL: 'https://joshu-a.com/assets/fixture-og.png',
     SLUG: 'fixture', OG_ALT: '検証用画像', SCHEMA_TYPE_JSON: '"SoftwareApplication"',
+    PRODUCT_NAME_JSON: JSON.stringify('検証用製品'), DESCRIPTION_JSON: JSON.stringify('公開チェックのテスト専用。'),
+    CANONICAL_JSON: JSON.stringify('https://joshu-a.com/products/fixture/'), OG_IMAGE_JSON: JSON.stringify('https://joshu-a.com/assets/fixture-og.png'), OS_SCHEMA_JSON: JSON.stringify('Web'),
+    RELEASE_DATE_JSON: JSON.stringify('2026-01-01'), CTA_URL_JSON: JSON.stringify(fixtureCta),
     PRODUCT_NAME: '検証用製品', OS_SCHEMA: 'Web', CTA_URL: fixtureCta,
     PRICE_AMOUNT: '0', PRICE_CURRENCY: 'JPY', ONE_LINE_VALUE: 'テスト用の一言。',
     WHAT_IT_DOES: 'テストの構造を検証する。', AUDIENCE: 'テスト利用者',
     PUBLIC_STATUS: '公開', PRICE_DISPLAY: '無料', OS_DISPLAY: 'Web',
     CTA_LABEL: '利用する', FEATURE_TITLE: '検証機能', FEATURE_DESCRIPTION: '検証用。',
-    SCREENSHOT_WIDTH: '1200', SCREENSHOT_HEIGHT: '630', SCREENSHOT_ALT: '検証画面',
-    SCREENSHOT_CAPTION: '検証画面の説明'
+    SCREENSHOT_SRC: '/assets/fixture-screenshot.png', SCREENSHOT_WIDTH: '1200', SCREENSHOT_HEIGHT: '630', SCREENSHOT_ALT: '検証画面',
+    SCREENSHOT_CAPTION: '検証画面の説明', LEGAL_LINKS: ''
   };
   template = template.replace(/\{\{([A-Z_]+)\}\}/g, (whole, key) => {
     assert.ok(Object.hasOwn(values, key), `unmapped token ${key}`);
