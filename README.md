@@ -25,6 +25,7 @@ Official website for 助手A
 - [製品公開時の法務・プライバシー確認](docs/legal-release-checklist.md)
 - [問い合わせ・サポート運用](docs/support-operations.md)
 - [製品公開後の計測と改善ループ](docs/measurement-improvement.md)
+- [製品公開・更新時の販促素材](docs/promotional-assets.md)
 
 製品情報は `data/products/<slug>.json` に記入し、`node scripts/build-products.mjs` で製品ページ・トップの製品カード・sitemapを生成します。生成後は `node scripts/check-release.mjs` と `node --test tests/build-products.test.mjs tests/check-release.test.mjs` を実行します。入力仕様は[製品公開手順](docs/product-launch.md)を参照してください。いずれもNode.js標準機能だけを使用し、npm依存はありません。本番反映後のHTTP確認は `node scripts/check-release.mjs --live`。`products/<slug>/` とrelease gateは購入・DL・利用可能な正式公開製品だけを対象にし、販売前紹介ページは対象外です。実情報が揃うまで製品ページを生成しません。
 
