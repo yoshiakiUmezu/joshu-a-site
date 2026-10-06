@@ -4,7 +4,7 @@
 
 ## 公開までの最短手順
 
-1. 実製品の名称、slug、一言価値、対象者、主機能、公開状況、価格と課金条件、OS/利用条件、購入/DL/利用URL、実画面・OG画像を確定する。CTA先を人間が実際に開いて完了まで試す。
+1. 実製品の名称、slug、一言価値、対象者、主機能、公開状況、価格と課金条件、OS/利用条件、購入/DL/利用URL、実画面・OG画像を確定する。[法務・プライバシー確認](legal-release-checklist.md)で販売主体、データ収集、同梱物を判定し、該当する表示だけを揃える。CTA先を人間が実際に開いて完了まで試す。
 2. テンプレートを `products/<slug>/index.html` にコピーして全`{{...}}`を置換。実体のない動画・FAQ・更新情報・関連記事は節ごと削除。ソフトウェア/ゲームのJSON-LD種別と実際のOfferを合わせる。OG画像は `assets/<slug>-og.png` に1200×630 PNGで置く。ロゴ形状とfaviconには触れない。
 3. トップのPRODUCTSを準備中表示から実製品カードへ更新し、そのカードを `/products/<slug>/` にリンクする。`sitemap.xml`へ `https://joshu-a.com/products/<slug>/` を1件追加し、内容の実更新日を`lastmod`へ入れる。
 4. リポジトリ直下で `node scripts/check-release.mjs`、`node --test tests/check-release.test.mjs` を実行。プレビューでスマホ幅、文字/CTA/画像、キーボード操作、OG、実際の外部CTA先を人間が確認する。Cloudflare Pages本番反映後に `node scripts/check-release.mjs --live` を実行する。GitHub PRレビューを経て`main`へ反映するのはサイト管理者の判断。
