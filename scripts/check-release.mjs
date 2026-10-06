@@ -4,7 +4,24 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ORIGIN = 'https://joshu-a.com';
 const DEFAULT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PLACEHOLDER = /\{\{[^}]+\}\}|\b(?:TODO|TBD)\b|example\.(?:com|invalid)|localhost|127\.0\.0\.1|\.pages\.dev\b/i;
+const PLACEHOLDER = /\{\{[^}]+\}\}|\b(?:TODO|TBD)\b|example\.(?:com|org|net)|localhost|127\.0\.0\.1|\.pages\.dev\b|https?:\/\/[^\s"'<>]*\.(?:test|invalid)\b/i;
+
+function visibleText(html) {
+  return (html ?? '').replace(/<[^>]+>/g, '').replace(/&nbsp;|&#160;/gi, ' ').trim();
+}
+
+function releaseFact(body, label) {
+  const match = body.match(new RegExp(`<dt\\b[^>]*>\\s*${label}\\s*</dt>\\s*<dd\\b[^>]*>([\\s\\S]*?)<\\/dd>`, 'i'));
+  return visibleText(match?.[1]);
+}
+
+function actionTarget(url, page) {
+  try {
+    const target = new URL(url);
+    if (target.protocol !== 'https:') return false;
+    return target.origin !== ORIGIN || !['/', new URL(page).pathname].includes(target.pathname);
+  } catch { return false; }
+}
 
 function attrs(tag) {
   const result = {};
@@ -93,7 +110,7 @@ export function checkSite(root = DEFAULT_ROOT) {
     if ((body.match(/<h1\b/gi) ?? []).length !== 1) report(`${label}: expected exactly one h1`);
     const og = Object.fromEntries(tags(head, 'meta').filter(item => item.property?.startsWith('og:')).map(item => [item.property, item.content?.trim()]));
     if (og['og:url'] !== expected) report(`${label}: og:url must match canonical`);
-    for (const key of ['og:title', 'og:description', 'og:image', 'og:image:alt']) if (!og[key]) report(`${label}: missing ${key}`);
+    for (const key of ['og:type', 'og:title', 'og:description', 'og:image', 'og:image:alt']) if (!og[key]) report(`${label}: missing ${key}`);
     if (og['og:image']) checkPng(root, og['og:image'], report, label);
     if (og['og:image:width'] !== '1200' || og['og:image:height'] !== '630') report(`${label}: OG dimensions metadata must be 1200x630`);
     for (const key of ['twitter:card', 'twitter:title', 'twitter:description', 'twitter:image', 'twitter:image:alt']) if (!meta(head, 'name', key)) report(`${label}: missing ${key}`);
@@ -121,16 +138,25 @@ export function checkSite(root = DEFAULT_ROOT) {
         if (types.includes('VideoGame') && !types.includes('SoftwareApplication')) report(`${label}: VideoGame should also include SoftwareApplication`);
         if (schema.url !== expected || !schema.name || !schema.description || !schema.operatingSystem) report(`${label}: JSON-LD identity/platform missing or URL mismatch`);
         if (schema.name !== h1) report(`${label}: JSON-LD name and h1 differ`);
+        if (schema.description !== description) report(`${label}: JSON-LD and meta descriptions differ`);
         if (schema.image !== og['og:image']) report(`${label}: JSON-LD image mismatch`);
-        if (!schema.offers || schema.offers['@type'] !== 'Offer' || !schema.offers.url || !/^\d+(?:\.\d{1,2})?$/.test(String(schema.offers.price ?? '')) || !/^[A-Z]{3}$/.test(schema.offers.priceCurrency ?? '')) report(`${label}: real Offer URL/price/currency required`);
+        if (!schema.offers || schema.offers['@type'] !== 'Offer' || !schema.offers.url || !/^\d+(?:\.\d{1,2})?$/.test(String(schema.offers.price ?? '')) || !/^[A-Z]{3}$/.test(schema.offers.priceCurrency ?? '')) report(`${label}: release gate requires real Offer URL/price/currency`);
         else if (!/^https:\/\//.test(schema.offers.url)) report(`${label}: Offer URL must use HTTPS`);
       }
       if (og['og:title'] !== title || og['og:description'] !== description || meta(head, 'name', 'twitter:title') !== title || meta(head, 'name', 'twitter:description') !== description) report(`${label}: title/description must match OG and X`);
       const ctas = tags(body, 'a').filter(item => Object.hasOwn(item, 'data-primary-cta'));
       if (ctas.length !== 1 || !ctas[0].href?.trim() || ctas[0].href === '#') report(`${label}: exactly one nonempty primary CTA required`);
       else if (!/^https:\/\//.test(ctas[0].href)) report(`${label}: primary CTA must use an absolute HTTPS URL`);
+      else if (!actionTarget(ctas[0].href, expected)) report(`${label}: release CTA must lead beyond the homepage and current product page`);
       else if (schema?.offers?.url && schema.offers.url !== ctas[0].href) report(`${label}: CTA and Offer URLs differ`);
-      if (!/対象[：:]/.test(body) || !/価格/.test(body) || !/対応環境/.test(body) || !/公開状況/.test(body)) report(`${label}: audience/status/price/platform must be visible`);
+      const ctaText = body.match(/<a\b(?=[^>]*\bdata-primary-cta\b)[^>]*>([\s\S]*?)<\/a>/i)?.[1];
+      if (!visibleText(ctaText)) report(`${label}: primary CTA label is empty`);
+      const audience = visibleText(body.match(/<p\b[^>]*>\s*対象[：:]\s*([^<]*)<\/p>/i)?.[1]);
+      if (!audience) report(`${label}: audience must be visible and nonempty`);
+      for (const fact of ['公開状況', '価格', '対応環境']) {
+        const value = releaseFact(body, fact);
+        if (!value || /未定|未公開|準備中|近日公開|発売前|開発中|予約|プレリリース|予定|検討中|coming soon|\bTBA\b/i.test(value)) report(`${label}: released product needs actual ${fact}`);
+      }
       const screenshots = tags(body, 'img').filter(item => Object.hasOwn(item, 'data-screenshot'));
       if (!screenshots.length) report(`${label}: real screenshot required`);
       for (const screenshot of screenshots) if (!screenshot.alt?.trim()) report(`${label}: screenshot needs descriptive alt text`);
@@ -184,7 +210,8 @@ export function checkSite(root = DEFAULT_ROOT) {
     const home = fs.existsSync(path.join(root, 'index.html')) ? fs.readFileSync(path.join(root, 'index.html'), 'utf8') : '';
     if (/現在は公開準備中です|現在、購入・ダウンロードできる製品はありません|最初の製品を準備しています/.test(home)) report('index.html: prelaunch wording remains after product publication');
     for (const relative of pages.filter(file => file.startsWith('products/'))) {
-      if (!home.includes(`/${relative.replace(/index\.html$/, '')}`)) report(`index.html: product link missing for ${relative}`);
+      const url = `/${relative.replace(/index\.html$/, '')}`;
+      if (!tags(home, 'a').some(link => link.href === url || link.href === `${ORIGIN}${url}`)) report(`index.html: product link missing for ${relative}`);
     }
   }
   return { errors, pages, productCount };
@@ -237,6 +264,6 @@ if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.ar
     for (const error of errors) console.error(`- ${error}`);
     process.exitCode = 1;
   } else {
-    console.log(`PASS: ${pages.length} page(s), ${productCount} product(s), sitemap/robots/metadata/links checked${live ? ', live HTTP checked' : ''}.`);
+    console.log(`PASS: release gate checked ${pages.length} page(s), ${productCount} released product(s)${productCount ? '' : ' (homepage-only baseline)'}, sitemap/robots/metadata/links${live ? ', live HTTP' : ''}.`);
   }
 }

@@ -1,6 +1,6 @@
 # 製品ページの正式テンプレート
 
-これは**非公開の設計資料**。下のHTMLを、実製品の事実・公開済みCTA・実画像が揃った時だけ `products/<slug>/index.html` にコピーする。現在このパスに製品ページは作らない。`{{...}}` はすべて置換し、不要な任意セクションは削除する。`node scripts/check-release.mjs` が公開前の構造とリンクを検査する。
+これは**購入・DL・利用が可能になった正式公開製品専用**の非公開テンプレート。実製品の事実・稼働するCTA・実画像が揃った時だけ `products/<slug>/index.html` にコピーする。`node scripts/check-release.mjs` は、このパスの全ページを正式公開製品として検査するrelease gateであり、販売前の紹介ページには対応しない。現在このパスに製品ページは作らない。`{{...}}` はすべて置換し、不要な任意セクションは削除する。
 
 ## 必須入力と判断
 
@@ -8,9 +8,9 @@
 | --- | --- |
 | `SLUG` / `PRODUCT_NAME` | 短く恒久的なASCII slug、正式名称。公開後のURL変更は原則避ける。 |
 | `ONE_LINE_VALUE` / `AUDIENCE` / `WHAT_IT_DOES` | 直接流入した人が、何・誰向け・何ができるかを数秒で判断できる実際の説明。 |
-| `PUBLIC_STATUS` / `PRICE_DISPLAY` / `OS_DISPLAY` | 現実の提供状態、税込/税別や購入形態まで明確な価格表記、実際に対応する環境。公開して買える/使えると言うならCTA先が稼働していること。 |
-| `CTA_URL` / `CTA_LABEL` | 購入・DL・利用の実際の次の一歩。外部決済/ストアなら正しい商品ページへ。未提供なら公開ページに架空リンクを置かない。 |
-| `TITLE` / `DESCRIPTION` / `OG_IMAGE` / `OG_ALT` | 製品固有の検索・SNS文言と実際の1200×630 PNG。ブランドの共有画像をそのまま使い回さない。 |
+| `PUBLIC_STATUS` / `PRICE_DISPLAY` / `OS_DISPLAY` | 現在利用できる事実に合う公開状況、税込/税別や購入形態まで明確な価格表記、実際に対応する環境。未定・準備中のまま公開しない。 |
+| `CTA_URL` / `CTA_LABEL` | 購入・DL・利用の実際の次の一歩。トップや製品ページ自身へのリンクではなく、稼働する正しい入手・利用先へ。 |
+| `TITLE` / `DESCRIPTION` / `OG_ALT` | 製品固有の検索・SNS文言と実際の `assets/<slug>-og.png`（1200×630 PNG）。ブランドの共有画像をそのまま使い回さない。 |
 | `SCHEMA_TYPE_JSON` | ソフトウェアは `"SoftwareApplication"`、ゲームは `["VideoGame", "SoftwareApplication"]` とJSONとして入力。`PRICE_AMOUNT`、`PRICE_CURRENCY`、`OS_SCHEMA`、`CTA_URL`は表示と一致。価格が未確定なら公開前に決定し、虚偽のOfferを出さない。 |
 | `SCREENSHOT_*` / `FEATURE_*` | 実画面・実機能のみ。画像に用途が伝わるaltを付ける。 |
 | `VIDEO_*` / FAQ / 更新情報 / 関連記事 | 実体がある項目だけ残す。動画・記事・更新情報がない時はセクションごと削除する。空のJournalを作らない。 |
@@ -157,4 +157,4 @@
 </html>
 ```
 
-動画・FAQ・更新情報・関連記事は内容がないなら節ごと削除する。スクリーンショットも実画面が用意できるまで公開しない。JSON-LDの`offers`は実際の購入/入手条件と一致させる。販売前に紹介ページだけ公開する場合は`offers`を削除し、公開状況とCTAを正直な案内へ変えた上で、チェックの公開ゲートをどう扱うか人間が判断する。架空の評価・レビュー・ダウンロード数は追加しない。Googleの[SoftwareApplication仕様](https://developers.google.com/search/docs/appearance/structured-data/software-app)ではゲームを他のアプリ種別と併記する例があり、レビューまたは評価がない場合はアプリのリッチリザルト対象にならない。構造化データは検索表示を保証しない。
+動画・FAQ・更新情報・関連記事は内容がないなら節ごと削除する。スクリーンショットも実画面が用意できるまで公開しない。JSON-LDの`offers`は必須で、実際の購入/入手条件とCTAに一致させる。無料でも実際に入手できる場合は価格を`0`とする。販売前紹介ページを将来公開する場合は、このテンプレートやrelease gateを流用せず、ページの扱いと検証方法を別途設計する。`offers`を削除して正式公開チェックを迂回しない。架空の評価・レビュー・ダウンロード数は追加しない。Googleの[SoftwareApplication仕様](https://developers.google.com/search/docs/appearance/structured-data/software-app)ではゲームを他のアプリ種別と併記する例があり、レビューまたは評価がない場合はアプリのリッチリザルト対象にならない。構造化データは検索表示を保証しない。
