@@ -78,6 +78,32 @@
 
     a { color: inherit; }
 
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+      border-radius: 6px;
+    }
+
+    .skip-link {
+      position: fixed;
+      left: 16px;
+      top: 12px;
+      z-index: 100;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #fff;
+      color: #07090d;
+      text-decoration: none;
+      font-weight: 700;
+      transform: translateY(-180%);
+      transition: transform .16s ease;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
     .shell {
       width: min(var(--max), calc(100% - 48px));
       margin: 0 auto;
@@ -412,6 +438,20 @@
       .section-head { gap: 18px; }
     }
 
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+
+      .btn:hover { transform: none; }
+    }
+
     @media (max-width: 680px) {
       .shell { width: min(var(--max), calc(100% - 28px)); }
       nav { display: none; }
@@ -428,9 +468,10 @@
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#main-content">本文へ移動</a>
   <header>
     <div class="shell nav">
-      <a class="brand" href="#top" aria-label="助手A ホーム">
+      <a class="brand" href="#main-content" aria-label="助手A ホーム">
         <img class="mark" src="/favicon.png" alt="" aria-hidden="true" />
         <span>助手A</span>
       </a>
@@ -443,7 +484,7 @@
     </div>
   </header>
 
-  <main id="top">
+  <main id="main-content">
     <section class="shell hero" aria-labelledby="site-title">
       <div>
         <div class="eyebrow">Independent development / software / games</div>
