@@ -128,3 +128,25 @@ A.I. TERMINAL / dot が販売候補を出した時点で、販促窓が追加ヒ
 - NO-GOでは公開系だけを停止し、修正タスクへ戻せるようにする
 
 A.I. TERMINAL側の実装設計・状態機械・承認境界への組み込みは、ターミナル設計相談側で決定する。
+
+
+## 統合時の二段階Handoff
+
+### Draft Handoff
+RELEASE_CANDIDATE到達時に自動生成する。
+
+まだ価格・販売先は確定しない。製品facts、build、依存、ライセンス、対応環境、known limitations、保守情報、素材などを収集する。
+
+### Final Handoff
+Verification完了後にfreezeする。
+
+最低限:
+- releaseCandidateSha
+- verificationEvidence
+- artifactHashes
+- securityVerdict
+- commercializationInputVersion
+
+販売側が開発完了後に情報を探し直さず、RCと同時に販売判断へ移れることを目的とする。
+
+外部チャネル条件は静的コードへ埋め込まず、販売時にfresh evidenceを取得し、Research Evidence SnapshotとしてGitHubへ保存する。
