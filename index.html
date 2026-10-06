@@ -17,10 +17,16 @@
   <meta property="og:url" content="https://joshu-a.com/" />
   <meta property="og:title" content="助手A | 個人開発のソフトウェア・ゲーム" />
   <meta property="og:description" content="ソフトウェアやゲームを個人で企画・開発・公開。使いやすさと体験の質を重視したプロダクトを届けます。" />
+  <meta property="og:image" content="https://joshu-a.com/assets/og-home.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="助手A — 使いやすく、少し面白いものを。個人開発のソフトウェア・ゲーム" />
 
-  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="助手A | 個人開発のソフトウェア・ゲーム" />
   <meta name="twitter:description" content="ソフトウェアやゲームを個人で企画・開発・公開。使いやすさと体験の質を重視したプロダクトを届けます。" />
+  <meta name="twitter:image" content="https://joshu-a.com/assets/og-home.png" />
+  <meta name="twitter:image:alt" content="助手A — 使いやすく、少し面白いものを。個人開発のソフトウェア・ゲーム" />
 
   <script type="application/ld+json">
   {
@@ -65,6 +71,7 @@
 
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
+    [id] { scroll-margin-top: 96px; }
 
     body {
       margin: 0;
@@ -150,6 +157,9 @@
     }
 
     nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
       color: var(--muted);
       text-decoration: none;
       font-size: 13px;
@@ -242,8 +252,10 @@
 
     .hero-panel-top {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
       color: var(--muted-2);
       font-size: 11px;
       letter-spacing: .13em;
@@ -328,24 +340,12 @@
       line-height: 1.85;
     }
 
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
     .product {
-      min-height: 245px;
       padding: 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
       border: 1px solid var(--line);
       border-radius: 18px;
       background: var(--panel-2);
     }
-
-    .product:hover { border-color: var(--line-strong); }
 
     .tag {
       display: inline-flex;
@@ -360,7 +360,7 @@
     }
 
     .product h3 {
-      margin: 52px 0 8px;
+      margin: 18px 0 8px;
       font-size: 23px;
       font-weight: 620;
     }
@@ -369,15 +369,6 @@
       margin: 0;
       color: var(--muted);
       font-size: 14px;
-    }
-
-    .product-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 18px;
-      color: var(--muted-2);
-      font-size: 12px;
     }
 
     .info-grid {
@@ -404,7 +395,11 @@
     }
 
     .contact-link {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      max-width: 100%;
+      overflow-wrap: anywhere;
       margin-top: 18px;
       color: var(--text);
       text-decoration: none;
@@ -426,13 +421,12 @@
 
     @media (max-width: 900px) {
       .hero {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: 42px;
         padding-top: 74px;
       }
 
       .section-head,
-      .product-grid,
       .info-grid { grid-template-columns: 1fr; }
 
       .section-head { gap: 18px; }
@@ -454,7 +448,10 @@
 
     @media (max-width: 680px) {
       .shell { width: min(var(--max), calc(100% - 28px)); }
-      nav { display: none; }
+      [id] { scroll-margin-top: 116px; }
+      .nav { flex-direction: column; align-items: flex-start; gap: 0; padding: 8px 0; }
+      .brand { min-height: 36px; }
+      nav { width: 100%; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
       .hero { padding: 48px 0 52px; }
       h1 { font-size: clamp(34px, 10.5vw, 46px); }
       .lead { font-size: 15px; }
@@ -463,7 +460,6 @@
       .hero-panel { min-height: 340px; padding: 22px; }
       .mini-grid { grid-template-columns: 1fr; }
       .section { padding: 64px 0; }
-      .product { min-height: 210px; }
     }
   </style>
 </head>
@@ -472,7 +468,7 @@
   <header>
     <div class="shell nav">
       <a class="brand" href="#main-content" aria-label="助手A ホーム">
-        <img class="mark" src="/favicon.png" alt="" aria-hidden="true" />
+        <img class="mark" src="/assets/brand-mark.png" width="30" height="30" alt="" aria-hidden="true" />
         <span>助手A</span>
       </a>
 
@@ -495,7 +491,7 @@
         </p>
 
         <div class="actions">
-          <a class="btn primary" href="#products">製品を見る</a>
+          <a class="btn primary" href="#products">製品の公開状況を見る</a>
           <a class="btn secondary" href="#about">助手Aについて</a>
         </div>
       </div>
@@ -529,7 +525,7 @@
         <div class="section-head">
           <div>
             <div class="section-kicker">Products</div>
-            <h2 id="products-title">つくったもの</h2>
+            <h2 id="products-title">製品</h2>
           </div>
 
           <p class="section-copy">
@@ -537,42 +533,11 @@
           </p>
         </div>
 
-        <div class="product-grid">
-          <article class="product">
-            <div>
-              <span class="tag">Software</span>
-              <h3>Product 01</h3>
-              <p>最初のソフトウェア製品をここに掲載します。</p>
-            </div>
-            <div class="product-meta">
-              <span>Price: —</span>
-              <span>Platform: —</span>
-            </div>
-          </article>
-
-          <article class="product">
-            <div>
-              <span class="tag">Game</span>
-              <h3>Product 02</h3>
-              <p>ゲーム作品も同じサイトから案内します。</p>
-            </div>
-            <div class="product-meta">
-              <span>Price: —</span>
-              <span>Platform: —</span>
-            </div>
-          </article>
-
-          <article class="product">
-            <div>
-              <span class="tag">Next</span>
-              <h3>Coming later</h3>
-              <p>新しい製品は、完成後に順次ここへ追加します。</p>
-            </div>
-            <div class="product-meta">
-              <span>Status: Planning</span>
-            </div>
-          </article>
-        </div>
+        <article class="product">
+          <span class="tag">公開準備中</span>
+          <h3>最初の製品を準備しています</h3>
+          <p>現在、購入・ダウンロードできる製品はありません。公開できる製品ができ次第、ここからご案内します。</p>
+        </article>
       </div>
     </section>
 
