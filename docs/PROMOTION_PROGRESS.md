@@ -57,6 +57,8 @@ A.I. TERMINAL側の開発進行とは分離して、joshu-a.com を中心とし�
 ### P1 — 最初の実製品が確定したら即実行
 
 - [x] 24時間販売開始ルールを `COMMERCIALIZATION_PLAYBOOK.md` として準備
+- [x] A.I. TERMINAL / dot → 販促窓の引き渡し仕様を `PRODUCT_SALES_HANDOFF_SPEC.md` として準備
+- [x] 販売可否の GO / CONDITIONAL GO / NO-GO 判定を `SALES_GO_NO_GO_GATE.md` として準備
 
 - [ ] `/products/<slug>/index.html` を作成
 - [ ] 一文価値 / 対象者 / 価格 / OS / 提供状態を確定
