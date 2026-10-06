@@ -3,9 +3,49 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>助手A — Independent Development</title>
-  <meta name="description" content="助手A。ソフトウェア、ゲーム、小さな実験をつくる個人開発ブランド。" />
+  <title>助手A | 個人開発のソフトウェア・ゲーム</title>
+  <meta name="description" content="助手Aは、ソフトウェアやゲームを個人で企画・開発・公開するブランドです。使いやすさと体験の質を重視したプロダクトを届けます。" />
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+  <meta name="theme-color" content="#07090d" />
+
+  <link rel="canonical" href="https://joshu-a.com/" />
   <link rel="icon" type="image/png" href="/favicon.png" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="助手A" />
+  <meta property="og:locale" content="ja_JP" />
+  <meta property="og:url" content="https://joshu-a.com/" />
+  <meta property="og:title" content="助手A | 個人開発のソフトウェア・ゲーム" />
+  <meta property="og:description" content="ソフトウェアやゲームを個人で企画・開発・公開。使いやすさと体験の質を重視したプロダクトを届けます。" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="助手A | 個人開発のソフトウェア・ゲーム" />
+  <meta name="twitter:description" content="ソフトウェアやゲームを個人で企画・開発・公開。使いやすさと体験の質を重視したプロダクトを届けます。" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://joshu-a.com/#website",
+        "url": "https://joshu-a.com/",
+        "name": "助手A",
+        "inLanguage": "ja",
+        "description": "ソフトウェアやゲームを個人で企画・開発・公開する個人開発ブランド。"
+      },
+      {
+        "@type": "Brand",
+        "@id": "https://joshu-a.com/#brand",
+        "name": "助手A",
+        "url": "https://joshu-a.com/",
+        "logo": "https://joshu-a.com/favicon.png",
+        "description": "ソフトウェア、ゲーム、ツールを個人で開発・公開するブランド。"
+      }
+    ]
+  }
+  </script>
+
   <style>
     :root {
       color-scheme: dark;
@@ -185,9 +225,7 @@
       text-transform: uppercase;
     }
 
-    .hero-panel-copy {
-      max-width: 420px;
-    }
+    .hero-panel-copy { max-width: 420px; }
 
     .hero-panel-copy strong {
       display: block;
@@ -370,9 +408,7 @@
 
       .section-head,
       .product-grid,
-      .info-grid {
-        grid-template-columns: 1fr;
-      }
+      .info-grid { grid-template-columns: 1fr; }
 
       .section-head { gap: 18px; }
     }
@@ -409,10 +445,10 @@
   </header>
 
   <main id="top">
-    <section class="shell hero">
+    <section class="shell hero" aria-labelledby="site-title">
       <div>
         <div class="eyebrow">Independent development / software / games</div>
-        <h1>使いやすく、少し面白いものを。</h1>
+        <h1 id="site-title">使いやすく、少し面白いものを。</h1>
         <p class="lead">
           助手Aは、ソフトウェアやゲームを個人で企画・開発・公開するブランドです。
           便利さだけでなく、触れたときの心地よさまで含めてプロダクトをつくります。
@@ -448,12 +484,12 @@
       </aside>
     </section>
 
-    <section class="section" id="products">
+    <section class="section" id="products" aria-labelledby="products-title">
       <div class="shell">
         <div class="section-head">
           <div>
             <div class="section-kicker">Products</div>
-            <h2>つくったもの</h2>
+            <h2 id="products-title">つくったもの</h2>
           </div>
 
           <p class="section-copy">
@@ -500,20 +536,20 @@
       </div>
     </section>
 
-    <section class="section" id="about">
+    <section class="section" id="about" aria-labelledby="about-title">
       <div class="shell info-grid">
         <article class="info-card">
           <div class="section-kicker">About</div>
-          <h3>助手Aについて</h3>
+          <h2 id="about-title">助手Aについて</h2>
           <p>
             ソフトウェア、ゲーム、ツールなどを個人で開発・公開していくための名前です。
             ジャンルではなく、使いやすさと体験の質を基準に制作します。
           </p>
         </article>
 
-        <article class="info-card" id="contact">
+        <article class="info-card" id="contact" aria-labelledby="contact-title">
           <div class="section-kicker">Contact</div>
-          <h3>お問い合わせ</h3>
+          <h2 id="contact-title">お問い合わせ</h2>
           <p>製品、不具合、その他のお問い合わせはこちらから受け付けています。</p>
           <a class="contact-link" href="mailto:contact@joshu-a.com">contact@joshu-a.com</a>
         </article>
