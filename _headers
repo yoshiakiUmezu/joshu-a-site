@@ -1,0 +1,3 @@
+# Repository notes are not landing pages. Allow crawling to read noindex.
+/*.md
+  X-Robots-Tag: noindex
