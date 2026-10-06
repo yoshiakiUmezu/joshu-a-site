@@ -188,7 +188,7 @@ Google / AI Search / note
 
 URLには必要に応じてUTMを使用する。
 
-媒体別の投稿判断、テンプレート、承認手順とUTMの正本は[外部チャネル運用](docs/social-operations.md)を参照。
+媒体別の投稿判断、テンプレートと承認手順は[外部チャネル運用](docs/social-operations.md)、製品公開時のURL・UTM規則は[製品公開手順](docs/product-launch.md)を参照。
 
 例:
 `?utm_source=note&utm_medium=referral&utm_campaign=<slug>-launch`

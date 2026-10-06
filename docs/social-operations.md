@@ -2,6 +2,8 @@
 
 この文書は[集客・コンテンツ導線戦略](../ACQUISITION_STRATEGY.md)の実行手順。X、note、itch.ioは発見の入口、`https://joshu-a.com/products/<slug>/` は製品を理解して次の行動を選ぶ正本とする。実製品・実測・実際の制作過程だけを扱い、投稿数を目標にしない。ゲームの購入・DLなど、その媒体内で完結すべき行動は無理に公式サイトへ迂回させない。
 
+[製品公開手順](product-launch.md)と`node scripts/check-release.mjs`は、購入・DL・利用が可能な正式公開製品のページとCTAを検査する。この文書は外部媒体への投稿判断・原稿・導線を扱い、release gateの代わりにはならない。公開前デモでは未公開を明記し、実在しない製品URLや購入先を作らない。
+
 ## 公開前の共通判断
 
 投稿の材料を「1回の製品更新」として記録し、次を確認する。1つでも欠ければ投稿しないか、事実確認できる範囲に縮める。
@@ -98,7 +100,7 @@
 - 公式サイト内のリンク、canonical、OG URL、sitemap、検索結果用URLにはUTMを付けない。外部媒体から公式製品ページへのリンクにだけ付ける。
 - `utm_source`: `x` / `note` / `itchio`。将来の媒体は短い一貫した小文字名を追加。
 - `utm_medium`: Xは `social`、note・itch.ioは `referral`。媒体ごとに表記を増やさない。
-- `utm_campaign`: 同じリリース横断で `slug-launch`、更新横断で `slug-update-YYYYMM`。同じ更新なら各媒体で同じ値を使う。別の施策を区別する必要が出るまでは追加パラメータを使わない。
+- `utm_campaign`: 公開告知は `<slug>-launch`、大型更新だけ `<slug>-update-YYYYMM` に切り替える。小型更新では既存キャンペーンを使い、投稿単位で細分化しない。同じ施策なら各媒体で同じ値を使う。[製品公開手順](product-launch.md)と揃える。
 - 例: `https://joshu-a.com/products/<slug>/?utm_source=x&utm_medium=social&utm_campaign=<slug>-launch`。`<slug>` は実公開製品の値に置き換える。URLを公開前に実際に開いて確認する。
 
 評価は **媒体露出 → 製品ページ到達 → 主CTAクリック → DL/購入/利用** の順。最初はリンク到達とCTAが動くかを確認し、利用可能な計測が整ったら媒体/キャンペーン別の到達数・CTA率・完了数を見る。noteのリンククリックやitch.io側の数値は利用できる場合だけ補助指標にする。フォロワー数、インプレッション、投稿数は診断用であって目標の中心にしない。計測できない段階では数値を推定しない。
