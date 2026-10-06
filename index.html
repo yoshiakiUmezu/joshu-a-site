@@ -112,9 +112,9 @@
     .mark {
       width: 30px;
       height: 30px;
-      border: 1px solid var(--accent);
-      transform: rotate(45deg);
-      box-shadow: 0 0 22px rgba(220, 231, 251, .10);
+      display: block;
+      object-fit: contain;
+      filter: drop-shadow(0 0 14px rgba(220, 231, 251, .10));
     }
 
     nav {
@@ -134,12 +134,11 @@
     nav a:hover { color: var(--text); }
 
     .hero {
-      min-height: 72vh;
       display: grid;
-      grid-template-columns: minmax(0, 1.08fr) minmax(340px, .92fr);
-      gap: 64px;
+      grid-template-columns: minmax(0, 1.18fr) minmax(320px, .82fr);
+      gap: 56px;
       align-items: center;
-      padding: 104px 0 86px;
+      padding: 72px 0 64px;
     }
 
     .eyebrow {
@@ -152,26 +151,26 @@
 
     h1 {
       margin: 0;
-      max-width: 700px;
-      font-size: clamp(54px, 7.4vw, 96px);
-      line-height: 1.03;
-      letter-spacing: -.045em;
+      max-width: 680px;
+      font-size: clamp(38px, 4.8vw, 62px);
+      line-height: 1.12;
+      letter-spacing: -.035em;
       font-weight: 650;
     }
 
     .lead {
-      max-width: 650px;
-      margin: 28px 0 0;
+      max-width: 620px;
+      margin: 22px 0 0;
       color: var(--muted);
-      font-size: clamp(16px, 1.4vw, 18px);
-      line-height: 1.95;
+      font-size: 16px;
+      line-height: 1.9;
     }
 
     .actions {
       display: flex;
-      gap: 14px;
+      gap: 12px;
       flex-wrap: wrap;
-      margin-top: 34px;
+      margin-top: 28px;
     }
 
     .btn {
@@ -202,13 +201,13 @@
     }
 
     .hero-panel {
-      min-height: 420px;
+      min-height: 330px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 28px;
+      padding: 24px;
       border: 1px solid var(--line);
-      border-radius: 24px;
+      border-radius: 20px;
       background:
         radial-gradient(circle at 76% 25%, rgba(111, 143, 198, .13), transparent 34%),
         linear-gradient(160deg, rgba(255,255,255,.025), rgba(255,255,255,.008));
@@ -229,8 +228,8 @@
 
     .hero-panel-copy strong {
       display: block;
-      margin-bottom: 12px;
-      font-size: 28px;
+      margin-bottom: 10px;
+      font-size: 24px;
       letter-spacing: -.02em;
     }
 
@@ -270,7 +269,7 @@
     }
 
     .section {
-      padding: 88px 0;
+      padding: 72px 0;
       border-top: 1px solid var(--line);
     }
 
@@ -291,7 +290,7 @@
 
     h2 {
       margin: 6px 0 0;
-      font-size: clamp(34px, 4vw, 50px);
+      font-size: clamp(30px, 3.4vw, 42px);
       letter-spacing: -.035em;
       font-weight: 640;
     }
@@ -416,9 +415,9 @@
     @media (max-width: 680px) {
       .shell { width: min(var(--max), calc(100% - 28px)); }
       nav { display: none; }
-      .hero { min-height: auto; padding: 68px 0 64px; }
-      h1 { font-size: clamp(48px, 15vw, 68px); }
-      .lead { font-size: 16px; }
+      .hero { padding: 48px 0 52px; }
+      h1 { font-size: clamp(34px, 10.5vw, 46px); }
+      .lead { font-size: 15px; }
       .actions { flex-direction: column; }
       .btn { width: 100%; }
       .hero-panel { min-height: 340px; padding: 22px; }
@@ -432,7 +431,7 @@
   <header>
     <div class="shell nav">
       <a class="brand" href="#top" aria-label="助手A ホーム">
-        <span class="mark" aria-hidden="true"></span>
+        <img class="mark" src="/favicon.png" alt="" aria-hidden="true" />
         <span>助手A</span>
       </a>
 
@@ -467,8 +466,8 @@
         </div>
 
         <div class="hero-panel-copy">
-          <strong>Small products. Clear value.</strong>
-          <p>必要なものを、過剰に大きくせず、分かりやすく届けることを重視しています。</p>
+          <strong>必要なものを、分かりやすく。</strong>
+          <p>ソフトウェアとゲームを中心に、小さく作り、磨き、公開していきます。</p>
 
           <div class="mini-grid">
             <div class="mini-card">
