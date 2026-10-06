@@ -157,3 +157,21 @@ Last updated: 2026-10-07
 - 不明項目だけを局所ブロッカーにする
 - 法務/セキュリティ/赤字構造は例外なく厳格に扱う
 - 売れる保証ではなく、販売してよい状態かを判定する
+
+
+## Terminal統合時の表現
+
+GO / CONDITIONAL GO / NO-GO はOrchestratorの巨大な直書きstateではなく、versionedな `CommercialGateResult` として保存する。
+
+最低限:
+- decision
+- blockers
+- conditions
+- warnings
+- evidence
+- evaluatedAt
+- policyVersion
+
+CONDITIONAL GOは「公開してよい」の意味ではなく、条件未達の公開系だけを止め、非公開作業を継続できる状態とする。
+
+Gate ResultはGitHub正本へ保存し、AI会話状態だけに保持しない。
