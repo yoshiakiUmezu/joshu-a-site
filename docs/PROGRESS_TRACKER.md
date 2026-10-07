@@ -5,9 +5,7 @@
 
 ## STAY / PC操作待ち
 
-| 項目 | 状態 | 再開条件 | 次の操作 |
-| --- | --- | --- | --- |
-| pages.dev → joshu-a.com 301転送 | STAY | CloudflareのPC操作が可能になったら | Cloudflare Pages/Redirect設定を確認し、必要なら恒久転送を設定 |
+現在なし。
 
 ## WATCH
 
@@ -21,6 +19,7 @@
 | --- | --- |
 | Google Search Console | ユーザー確認: joshu-a.com Domain property登録・所有権確認・sitemap.xml送信済み。URL検査でトップはインデックス済み、Googlebot取得成功、canonical正常。 |
 | Bing Webmaster Tools | ユーザー確認: joshu-a.com追加・所有権確認・sitemap.xml送信済み。URL InspectionでトップはIndexed successfully。 |
+| pages.dev → joshu-a.com 301転送 | ユーザー確認: Cloudflare Bulk Redirectを設定し、https://joshu-a-site.pages.dev/ から https://joshu-a.com/ への301転送が動作。 |
 
 ## 運用ルール
 
