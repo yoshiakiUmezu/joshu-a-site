@@ -7,10 +7,20 @@
 
 | 項目 | 状態 | 再開条件 | 次の操作 |
 | --- | --- | --- | --- |
-| Google Search Console | STAY | PC操作可能になったら | joshu-a.com のDomain property追加 → Cloudflare DNSへ実TXT追加 → 所有権確認 → sitemap.xml送信 → URL検査 |
-| Bing Webmaster Tools | STAY | PC操作可能になったら | サインイン → joshu-a.com追加 → 所有権確認 → sitemap.xml送信 → URL検査 |
-| pages.dev → joshu-a.com 301転送 | STAY | PC操作可能かつSEO登録確認後 | Cloudflare Pages/Redirect設定を確認し、必要なら恒久転送を設定 |
+| pages.dev → joshu-a.com 301転送 | STAY | CloudflareのPC操作が可能になったら | Cloudflare Pages/Redirect設定を確認し、必要なら恒久転送を設定 |
+
+## WATCH
+
+| 項目 | 状態 | 再開条件 | 次の操作 |
+| --- | --- | --- | --- |
 | GPT Sites再評価 | WATCH | OpenAI側に意味のある仕様変更が出たら | 独自ドメイン、SEO/OG、カスタムヘッダー、GitHub/コード連携、export/import、上限、料金、制御、移行性をCloudflare Pagesと比較 |
+
+## DONE
+
+| 項目 | 完了内容 |
+| --- | --- |
+| Google Search Console | ユーザー確認: joshu-a.com Domain property登録・所有権確認・sitemap.xml送信済み。URL検査でトップはインデックス済み、Googlebot取得成功、canonical正常。 |
+| Bing Webmaster Tools | ユーザー確認: joshu-a.com追加・所有権確認・sitemap.xml送信済み。URL InspectionでトップはIndexed successfully。 |
 
 ## 運用ルール
 
