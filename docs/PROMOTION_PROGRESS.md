@@ -1,6 +1,6 @@
 # 助手A 販促・公開進捗トラッカー
 
-Last updated: 2026-10-06
+Last updated: 2026-10-07
 
 ## 目的
 
@@ -11,6 +11,7 @@ A.I. TERMINAL側の開発進行とは分離して、joshu-a.com を中心とし�
 ## 現在地
 
 ### 母艦サイト
+- [x] pages.dev → joshu-a.com 301転送
 - [x] joshu-a.com 公開
 - [x] Cloudflare Pages / main 自動デプロイ
 - [x] HTTPS / 独自ドメイン
@@ -49,9 +50,9 @@ A.I. TERMINAL側の開発進行とは分離して、joshu-a.com を中心とし�
 ## 現在の実行順
 
 ### P0 — 人間操作が必要
-- [ ] Google Search Consoleで `https://joshu-a.com/` を登録
-- [ ] `sitemap.xml` を送信
-- [ ] Bing Webmaster Toolsへ登録
+- [x] Google Search Consoleで `https://joshu-a.com/` を登録
+- [x] `sitemap.xml` をGoogle Search Console / Bing Webmaster Toolsへ送信
+- [x] Bing Webmaster Toolsへ登録
 - [ ] contact@joshu-a.com の受信・返信を実運用で確認
 
 ### P1 — 最初の実製品が確定したら即実行
