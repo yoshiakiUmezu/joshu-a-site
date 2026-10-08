@@ -72,6 +72,6 @@ q('time').addEventListener('input',e=>{state.time=clampTime(Number(e.target.valu
 q('play').addEventListener('click',()=>{if(state.playing){pause();return}if(state.time>=10)state.time=0;state.playing=true;state.last=null;paint()});
 q('reset').addEventListener('click',()=>{state.time=0;pause()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pause()});
-function frame(now){if(!document.isConnected)return;if(state.playing){if(state.last!==null)state.time=clampTime(state.time+Math.max(0,(now-state.last)/1000));state.last=now;if(state.time>=10){state.time=10;state.playing=false;state.last=null}paint()}requestAnimationFrame(frame)}
+function frame(now){if(state.playing){if(state.last!==null)state.time=clampTime(state.time+Math.max(0,(now-state.last)/1000));state.last=now;if(state.time>=10){state.time=10;state.playing=false;state.last=null}paint()}requestAnimationFrame(frame)}
 paint();requestAnimationFrame(frame);
 </script></body></html>
