@@ -341,7 +341,7 @@ test('learning catalog mobile layout, filters, lesson links, and return path', a
           assert.ok(initial.scrollWidth <= initial.width, 'catalog should not scroll horizontally');
           assert.ok(initial.filters.every(filter => filter.height >= 44 && filter.left >= 0 && filter.right <= viewport.width), 'filter buttons should be visible 44px tap targets');
           assert.ok(initial.card.height >= 44 && initial.card.left >= 0 && initial.card.right <= viewport.width, 'lesson card should be a visible tap target');
-          assert.equal(initial.visibleLessons, 7);
+          assert.equal(initial.visibleLessons, 8);
 
           await page.locator('#subject-math').tap();
           assert.equal(await page.locator('#subject-math').getAttribute('aria-pressed'), 'true');
@@ -362,7 +362,7 @@ test('learning catalog mobile layout, filters, lesson links, and return path', a
           ]);
           assert.equal(new URL(page.url()).pathname, '/learning/');
           assert.equal(await page.locator('[data-filter="all"]').getAttribute('aria-pressed'), 'true');
-          assert.equal(await page.locator('[data-learning-item]:visible').count(), 7);
+          assert.equal(await page.locator('[data-learning-item]:visible').count(), 8);
         } finally {
           await context.close();
         }
