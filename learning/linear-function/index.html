@@ -21,4 +21,3 @@ q('riseLabel').setAttribute('x',gx(1)+8);q('riseLabel').setAttribute('y',Math.ma
 q('equation').textContent=expression(a,b);q('aValue').textContent=a;q('bValue').textContent=b;q('slopeText').textContent=d.slope;q('interceptText').textContent=d.intercept;q('a').value=a;q('b').value=b}
 q('a').addEventListener('input',e=>{st.a=Number(e.target.value);render()});q('b').addEventListener('input',e=>{st.b=Number(e.target.value);render()});q('reset').addEventListener('click',()=>{st.a=2;st.b=3;render()});render();
 </script></body></html>
-

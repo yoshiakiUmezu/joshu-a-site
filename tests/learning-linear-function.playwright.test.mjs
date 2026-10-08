@@ -121,4 +121,3 @@ test('mobile layout and synchronized controls at six viewport/text-size conditio
     await new Promise(resolve => server.close(resolve));
   }
 });
-
