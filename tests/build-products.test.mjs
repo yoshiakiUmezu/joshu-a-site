@@ -16,6 +16,7 @@ function fixture(t) {
   fs.cpSync(path.join(source, 'assets'), path.join(root, 'assets'), { recursive: true });
   fs.cpSync(path.join(source, 'learning', 'speed-distance-time'), path.join(root, 'learning', 'speed-distance-time'), { recursive: true });
   fs.cpSync(path.join(source, 'learning', 'point-p'), path.join(root, 'learning', 'point-p'), { recursive: true });
+  fs.cpSync(path.join(source, 'learning', 'linear-function'), path.join(root, 'learning', 'linear-function'), { recursive: true });
   fs.copyFileSync(path.join(source, 'learning', 'index.html'), path.join(root, 'learning', 'index.html'));
   fs.mkdirSync(path.join(root, 'docs'), { recursive: true });
   fs.copyFileSync(path.join(source, 'docs', 'product-page-template.md'), path.join(root, 'docs', 'product-page-template.md'));

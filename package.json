@@ -5,7 +5,9 @@
     "test:motion": "node --test tests/learning-speed-distance.test.mjs",
     "test:mobile-browser": "node --test tests/learning-speed-distance.playwright.test.mjs",
     "test:point-p": "node --test tests/learning-point-p.test.mjs",
-    "test:point-p-mobile": "node --test tests/learning-point-p.playwright.test.mjs"
+    "test:point-p-mobile": "node --test tests/learning-point-p.playwright.test.mjs",
+    "test:linear-function": "node --test tests/learning-linear-function.test.mjs",
+    "test:linear-function-mobile": "node --test tests/learning-linear-function.playwright.test.mjs"
   },
   "devDependencies": {
     "playwright": "1.64.0"
