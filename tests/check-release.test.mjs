@@ -14,7 +14,7 @@ function fixture(t) {
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   for (const file of ['index.html', '404.html', 'robots.txt', 'sitemap.xml', '_headers']) fs.copyFileSync(path.join(source, file), path.join(root, file));
   fs.mkdirSync(path.join(root, 'assets'));
-  for (const file of ['og-home.png', 'og-learning-speed-distance-time.png', 'og-learning-point-p.png', 'brand-mark.png']) fs.copyFileSync(path.join(source, 'assets', file), path.join(root, 'assets', file));
+  for (const file of ['og-home.png', 'og-learning-speed-distance-time.png', 'og-learning-point-p.png', 'og-learning-linear-function.png', 'brand-mark.png']) fs.copyFileSync(path.join(source, 'assets', file), path.join(root, 'assets', file));
   const learning = path.join(root, 'learning', 'speed-distance-time');
   fs.mkdirSync(learning, { recursive: true });
   fs.mkdirSync(path.join(root, 'learning'), { recursive: true });
@@ -258,8 +258,8 @@ test('linear function lesson has public metadata and catalog/home integration', 
   const page = fs.readFileSync(path.join(root, 'learning', 'linear-function', 'index.html'), 'utf8');
   assert.match(page, /name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"/);
   assert.match(page, /rel="canonical" href="https:\/\/joshu-a\.com\/learning\/linear-function\/"/);
-  assert.match(page, /property="og:image" content="https:\/\/joshu-a\.com\/assets\/og-home\.png"/);
-  assert.match(page, /name="twitter:image" content="https:\/\/joshu-a\.com\/assets\/og-home\.png"/);
+  assert.match(page, /property="og:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-linear-function\.png"/);
+  assert.match(page, /name="twitter:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-linear-function\.png"/);
   assert.match(page, /"@type":"WebPage"/);
   assert.match(page, /data-learning-subject="math"/);
   assert.match(fs.readFileSync(path.join(root, 'learning', 'index.html'), 'utf8'), /data-learning-card href="\/learning\/linear-function\/"/);
