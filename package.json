@@ -1,0 +1,11 @@
+{
+  "name": "joshu-a-site",
+  "private": true,
+  "scripts": {
+    "test:motion": "node --test tests/learning-speed-distance.test.mjs",
+    "test:mobile-browser": "node --test tests/learning-speed-distance.playwright.test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.64.0"
+  }
+}
