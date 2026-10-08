@@ -45,26 +45,26 @@
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "点P・面積とグラフ",
-          "url": "https://joshu-a.com/learning/point-p/"
+          "name": "月の満ち欠け",
+          "url": "https://joshu-a.com/learning/moon-phases/"
         },
         {
           "@type": "ListItem",
           "position": 3,
-          "name": "速さ・距離・時間",
-          "url": "https://joshu-a.com/learning/speed-distance-time/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 4,
           "name": "確率",
           "url": "https://joshu-a.com/learning/probability/"
         },
         {
           "@type": "ListItem",
+          "position": 4,
+          "name": "点P・面積とグラフ",
+          "url": "https://joshu-a.com/learning/point-p/"
+        },
+        {
+          "@type": "ListItem",
           "position": 5,
-          "name": "月の満ち欠け",
-          "url": "https://joshu-a.com/learning/moon-phases/"
+          "name": "速さ・距離・時間",
+          "url": "https://joshu-a.com/learning/speed-distance-time/"
         },
         {
           "@type": "ListItem",
@@ -89,6 +89,12 @@
           "position": 9,
           "name": "図形の展開図",
           "url": "https://joshu-a.com/learning/geometry-nets/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 10,
+          "name": "日本のあの頃、世界では？",
+          "url": "https://joshu-a.com/learning/japan-and-world-history/"
         }
       ]
     }
@@ -170,6 +176,7 @@
               <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7" stroke="currentColor"/><path d="M10 3v14M3 10h14" stroke="currentColor"/></svg>
               理科
             </button>
+            <button class="filter" id="subject-history" type="button" data-filter="history" aria-pressed="false" aria-controls="learning-list">社会</button>
           </div>
         </div>
         <p id="filter-status" class="sr-only" aria-live="polite">公開中の教材 5件</p>
@@ -249,6 +256,13 @@
               <span class="card-arrow" aria-hidden="true">→</span>
             </a>
           </li>
+          <li class="lesson-card" data-learning-item data-subject="history">
+            <a data-learning-card href="/learning/japan-and-world-history/">
+              <span class="subject-mark" aria-hidden="true">⌛</span>
+              <span class="lesson-copy"><span class="lesson-meta">社会 / 無料Web教材</span><h3>日本のあの頃、世界では？</h3><span class="lesson-description">弥生から大正まで、日本と世界の出来事を年代で見比べます。</span></span>
+              <span class="card-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
         </ul>
       </section>
     </main>
@@ -270,7 +284,8 @@
       if (updateLocation) history.replaceState(null, '', filter === 'all' ? '/learning/' : `/learning/#subject-${filter}`);
     }
     filterButtons.forEach(button => button.addEventListener('click', () => applyFilter(button.dataset.filter, true)));
-    const initialFilter = location.hash === '#subject-math' ? 'math' : 'all';
+    const requestedFilter = location.hash.slice('#subject-'.length);
+    const initialFilter = filterButtons.some(button => button.dataset.filter === requestedFilter) ? requestedFilter : 'all';
     applyFilter(initialFilter);
   </script>
 </body>

@@ -321,6 +321,20 @@ test('geometry nets lesson has public math metadata and catalog integration', t 
   assert.deepEqual(checkSite(root).errors, []);
 });
 
+test('Japan and world history lesson has public metadata, subject filter, and paired timeline', t => {
+  const root = fixture(t);
+  const page = fs.readFileSync(path.join(root, 'learning', 'japan-and-world-history', 'index.html'), 'utf8');
+  assert.match(page, /name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"/);
+  assert.match(page, /rel="canonical" href="https:\/\/joshu-a\.com\/learning\/japan-and-world-history\/"/);
+  assert.match(page, /property="og:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-japan-and-world-history\.png"/);
+  assert.match(page, /name="twitter:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-japan-and-world-history\.png"/);
+  assert.match(page, /data-learning-subject="history"/);
+  assert.match(page, /href="\/learning\/#subject-history"/);
+  assert.match(fs.readFileSync(path.join(root, 'learning', 'index.html'), 'utf8'), /id="subject-history" type="button" data-filter="history"/);
+  assert.match(fs.readFileSync(path.join(root, 'learning', 'index.html'), 'utf8'), /data-learning-card href="\/learning\/japan-and-world-history\/"/);
+  assert.deepEqual(checkSite(root).errors, []);
+});
+
 test('learning catalog links only published lessons and exposes only published subjects', t => {
   const root = fixture(t);
   const catalog = path.join(root, 'learning', 'index.html');
@@ -341,6 +355,17 @@ test('learning catalog rejects placeholder and unapproved sample lessons', t => 
   const catalog = path.join(root, 'learning', 'index.html');
   fs.writeFileSync(catalog, fs.readFileSync(catalog, 'utf8').replace('</main>', '<p>光と植物の成長</p></main>'));
   assert.match(checkSite(root).errors.join('\n'), /placeholder or unpublished learning content remains/);
+});
+
+test('learning catalog JSON-LD ItemList matches visible card order and names', t => {
+  const root = fixture(t);
+  const catalog = path.join(root, 'learning', 'index.html');
+  const html = fs.readFileSync(catalog, 'utf8');
+  const script = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+  const schema = JSON.parse(script[1]);
+  [schema.mainEntity.itemListElement[0], schema.mainEntity.itemListElement[1]] = [schema.mainEntity.itemListElement[1], schema.mainEntity.itemListElement[0]];
+  fs.writeFileSync(catalog, html.replace(script[0], `<script type="application/ld+json">${JSON.stringify(schema, null, 2)}</script>`));
+  assert.match(checkSite(root).errors.join('\n'), /JSON-LD ItemList must match catalog card order/);
 });
 
 test('learning category anchor targets are checked', t => {
