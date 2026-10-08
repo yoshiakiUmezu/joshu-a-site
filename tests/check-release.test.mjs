@@ -357,6 +357,17 @@ test('learning catalog rejects placeholder and unapproved sample lessons', t => 
   assert.match(checkSite(root).errors.join('\n'), /placeholder or unpublished learning content remains/);
 });
 
+test('learning catalog JSON-LD ItemList matches visible card order and names', t => {
+  const root = fixture(t);
+  const catalog = path.join(root, 'learning', 'index.html');
+  const html = fs.readFileSync(catalog, 'utf8');
+  const script = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+  const schema = JSON.parse(script[1]);
+  [schema.mainEntity.itemListElement[0], schema.mainEntity.itemListElement[1]] = [schema.mainEntity.itemListElement[1], schema.mainEntity.itemListElement[0]];
+  fs.writeFileSync(catalog, html.replace(script[0], `<script type="application/ld+json">${JSON.stringify(schema, null, 2)}</script>`));
+  assert.match(checkSite(root).errors.join('\n'), /JSON-LD ItemList must match catalog card order/);
+});
+
 test('learning category anchor targets are checked', t => {
   const root = fixture(t);
   const catalog = path.join(root, 'learning', 'index.html');

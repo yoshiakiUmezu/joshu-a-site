@@ -246,6 +246,22 @@ export function checkSite(root = DEFAULT_ROOT) {
     if (cardLinks.length !== lessonUrls.size) report('learning/index.html: each published lesson must have exactly one catalog card');
     for (const link of cardLinks) if (!lessonUrls.has(new URL(link.href ?? '', ORIGIN).href)) report(`learning/index.html: unpublished or duplicate lesson card ${link.href ?? ''}`);
     if (LEARNING_PLACEHOLDER.test(learningIndex)) report('learning/index.html: placeholder or unpublished learning content remains');
+    let collectionPage;
+    for (const match of learningIndex.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+      try {
+        const value = JSON.parse(match[1]);
+        collectionPage = [...(value['@graph'] ?? [value])].find(item => item['@type'] === 'CollectionPage' && item.url === pageUrl('learning/index.html')) ?? collectionPage;
+      } catch { /* The page-level JSON-LD check reports malformed data. */ }
+    }
+    const items = collectionPage?.mainEntity?.itemListElement;
+    const catalogUrls = cardLinks.map(link => new URL(link.href ?? '', ORIGIN).href);
+    const catalogNames = [...learningIndex.matchAll(/<a\b(?=[^>]*\bdata-learning-card\b)[^>]*>([\s\S]*?)<\/a>/gi)]
+      .map(match => visibleText(match[1].match(/<h3\b[^>]*>([\s\S]*?)<\/h3>/i)?.[1]));
+    let structuredUrls = [];
+    try { structuredUrls = Array.isArray(items) ? items.map(item => new URL(item.url ?? '', ORIGIN).href) : []; } catch { /* Report the mismatch below. */ }
+    if (!Array.isArray(items) || items.length !== catalogUrls.length || structuredUrls.some((url, index) => url !== catalogUrls[index]) || items.some((item, index) => item.position !== index + 1 || item.name !== catalogNames[index])) {
+      report('learning/index.html: JSON-LD ItemList must match catalog card order');
+    }
 
     const subjects = new Set();
     for (const relative of learningPages) {
