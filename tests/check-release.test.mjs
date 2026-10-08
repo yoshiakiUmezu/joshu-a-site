@@ -216,6 +216,13 @@ test('published learning page requires indexability, sitemap entry, and homepage
   assert.match(errors, /sitemap.xml: missing https:\/\/joshu-a\.com\/learning\/speed-distance-time\//);
 });
 
+test('learning page requires a return link to the learning section', t => {
+  const root = fixture(t);
+  const learning = path.join(root, 'learning', 'speed-distance-time', 'index.html');
+  fs.writeFileSync(learning, fs.readFileSync(learning, 'utf8').replace('<a class="back-link" href="/#learning">← LEARNINGへ戻る</a>', ''));
+  assert.match(checkSite(root).errors.join('\n'), /return link to \/#learning missing/);
+});
+
 test('learning page shares a lesson-specific social image', t => {
   const root = fixture(t);
   const page = fs.readFileSync(path.join(root, 'learning', 'speed-distance-time', 'index.html'), 'utf8');
