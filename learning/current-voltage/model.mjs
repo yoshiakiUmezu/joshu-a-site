@@ -1,0 +1,2 @@
+export function ohmsLawCurrent(voltage,resistance){if(!Number.isFinite(voltage)||voltage<0||!Number.isFinite(resistance)||resistance<=0)throw new RangeError('voltage must be nonnegative and resistance positive');return voltage/resistance;}
+export function voltageFromCurrent(current,resistance){if(!Number.isFinite(current)||current<0||!Number.isFinite(resistance)||resistance<=0)throw new RangeError('current must be nonnegative and resistance positive');return current*resistance;}

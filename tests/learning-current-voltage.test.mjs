@@ -1,0 +1,2 @@
+import assert from 'node:assert/strict';import {test} from 'node:test';import {ohmsLawCurrent,voltageFromCurrent} from '../learning/current-voltage/model.mjs';
+test('Ohm law and physical domain boundaries',()=>{assert.equal(ohmsLawCurrent(6,3),2);assert.equal(ohmsLawCurrent(0,3),0);assert.equal(ohmsLawCurrent(12,2),6);assert.equal(voltageFromCurrent(2,3),6);assert.throws(()=>ohmsLawCurrent(1,0),RangeError);assert.throws(()=>ohmsLawCurrent(-1,2),RangeError);});

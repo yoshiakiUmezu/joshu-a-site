@@ -297,6 +297,18 @@ test('proportion lesson has public math metadata, a catalog card, and dedicated 
   assert.deepEqual(checkSite(root).errors, []);
 });
 
+test('current and voltage lesson has public science metadata and catalog integration', t => {
+  const root = fixture(t);
+  const page = fs.readFileSync(path.join(root, 'learning', 'current-voltage', 'index.html'), 'utf8');
+  assert.match(page, /name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"/);
+  assert.match(page, /rel="canonical" href="https:\/\/joshu-a\.com\/learning\/current-voltage\/"/);
+  assert.match(page, /property="og:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-current-voltage\.png"/);
+  assert.match(page, /name="twitter:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-current-voltage\.png"/);
+  assert.match(page, /data-learning-subject="science"/);
+  assert.match(fs.readFileSync(path.join(root, 'learning', 'index.html'), 'utf8'), /data-learning-card href="\/learning\/current-voltage\/"/);
+  assert.deepEqual(checkSite(root).errors, []);
+});
+
 test('learning catalog links only published lessons and exposes only published subjects', t => {
   const root = fixture(t);
   const catalog = path.join(root, 'learning', 'index.html');
