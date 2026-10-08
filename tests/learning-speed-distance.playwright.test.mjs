@@ -341,13 +341,20 @@ test('learning catalog mobile layout, filters, lesson links, and return path', a
           assert.ok(initial.scrollWidth <= initial.width, 'catalog should not scroll horizontally');
           assert.ok(initial.filters.every(filter => filter.height >= 44 && filter.left >= 0 && filter.right <= viewport.width), 'filter buttons should be visible 44px tap targets');
           assert.ok(initial.card.height >= 44 && initial.card.left >= 0 && initial.card.right <= viewport.width, 'lesson card should be a visible tap target');
-          assert.equal(initial.visibleLessons, 9);
+          assert.equal(initial.visibleLessons, 10);
 
           await page.locator('#subject-math').tap();
           assert.equal(await page.locator('#subject-math').getAttribute('aria-pressed'), 'true');
           assert.equal(new URL(page.url()).hash, '#subject-math');
           assert.equal(await page.locator('[data-learning-item]:visible').count(), 6);
           assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'filtered catalog should not scroll horizontally');
+
+          await page.locator('#subject-history').tap();
+          assert.equal(await page.locator('#subject-history').getAttribute('aria-pressed'), 'true');
+          assert.equal(new URL(page.url()).hash, '#subject-history');
+          assert.equal(await page.locator('[data-learning-item]:visible').count(), 1);
+          assert.equal(await page.locator('[data-learning-card][href="/learning/japan-and-world-history/"]').count(), 1);
+          await page.locator('[data-filter="all"]').tap();
 
           await Promise.all([
             page.waitForURL(url => url.pathname === lessonPath),
@@ -362,7 +369,7 @@ test('learning catalog mobile layout, filters, lesson links, and return path', a
           ]);
           assert.equal(new URL(page.url()).pathname, '/learning/');
           assert.equal(await page.locator('[data-filter="all"]').getAttribute('aria-pressed'), 'true');
-          assert.equal(await page.locator('[data-learning-item]:visible').count(), 9);
+          assert.equal(await page.locator('[data-learning-item]:visible').count(), 10);
         } finally {
           await context.close();
         }

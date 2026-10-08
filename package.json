@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "test:motion": "node --test tests/learning-speed-distance.test.mjs tests/learning-probability.test.mjs",
-    "test:learning-models": "node --test tests/learning-probability.test.mjs tests/learning-moon-phases.test.mjs tests/learning-light-reflection.test.mjs tests/learning-proportion.test.mjs tests/learning-current-voltage.test.mjs tests/learning-geometry-nets.test.mjs",
+    "test:learning-models": "node --test tests/learning-probability.test.mjs tests/learning-moon-phases.test.mjs tests/learning-light-reflection.test.mjs tests/learning-proportion.test.mjs tests/learning-current-voltage.test.mjs tests/learning-geometry-nets.test.mjs tests/learning-japan-and-world-history.test.mjs",
     "test:mobile-browser": "node --test tests/learning-speed-distance.playwright.test.mjs tests/learning-lessons.playwright.test.mjs tests/learning-added-lessons.playwright.test.mjs",
     "test:point-p": "node --test tests/learning-point-p.test.mjs",
     "test:point-p-mobile": "node --test tests/learning-point-p.playwright.test.mjs",
