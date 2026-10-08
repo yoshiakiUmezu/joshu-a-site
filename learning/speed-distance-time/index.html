@@ -15,7 +15,7 @@
 *{box-sizing:border-box}body{margin:0}main{max-width:590px;margin:auto;min-height:100dvh;padding:max(8px,env(safe-area-inset-top)) 12px max(8px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:clamp(5px,1vh,12px)}
 h1{font-size:clamp(16px,2.6vh,23px);margin:0}p{margin:0}.hint{color:#aebed2;font-size:12px}.panel{background:#111d30;border:1px solid var(--line);border-radius:13px;padding:clamp(7px,1.2vh,12px)}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.metric{text-align:center}.metric small{display:block;color:#b7c5d7;font-size:11px}.metric strong{font-size:clamp(17px,3.2vh,27px);font-variant-numeric:tabular-nums}.metric em{font-size:11px;font-style:normal}.blue{color:var(--blue)}.orange{color:var(--orange)}svg{display:block;width:100%;height:auto;overflow:visible}.visuals{display:grid;gap:6px}.label{font-size:12px;font-weight:650;margin-bottom:3px}.road{height:clamp(74px,13vh,116px)}.chart{height:clamp(135px,24vh,235px)}.controls{display:grid;gap:5px}.control-row{display:grid;grid-template-columns:66px 1fr 69px;align-items:center;gap:7px}.control-row label{font-size:13px;font-weight:650}.control-row output{text-align:right;font-size:12px;font-variant-numeric:tabular-nums}.control-row input{width:100%;min-height:36px;accent-color:#38bdf8;touch-action:pan-x}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}button{min-height:44px;border:1px solid #56657b;border-radius:10px;background:#223149;color:white;font-size:14px;font-weight:650;cursor:pointer}button.primary{background:#0369a1;border-color:#0ea5e9}.explain{font-size:13px;line-height:1.45}.more{font-size:12px;color:#b7c5d7}details summary{cursor:pointer;min-height:28px;font-size:12px;color:#b7c5d7}details p{font-size:12px;line-height:1.6;padding:5px 0}
 @media(min-width:650px){main{gap:12px;padding:18px}.chart{height:240px}.road{height:116px}}
-@media(max-height:640px){main{gap:4px}.panel{padding:6px}.chart{height:clamp(105px,21vh,150px)}.road{height:66px}.hint{display:none}}
+@media(max-height:640px){main{gap:3px}.panel{padding:4px}.chart{height:clamp(88px,16vh,110px)}.road{height:54px}.hint{display:none}.control-row input{min-height:36px}button{min-height:44px}.explain{font-size:12px}details summary{min-height:26px}}
 </style></head><body>
 <main>
 <header><h1>動きとグラフはどうつながる？</h1><p class="hint">速さを変えて、車とグラフを見てみよう</p></header>
@@ -49,9 +49,9 @@ h1{font-size:clamp(16px,2.6vh,23px);margin:0}p{margin:0}.hint{color:#aebed2;font
 <details><summary>くわしい説明・使い方</summary><p>速さが一定のとき、距離＝速さ×時間。グラフの傾きは速さを表します。速さ0では時間が進んでも距離は増えません。速さを途中で変更すると、これは「最初からその速さで走った場合」の比較に切り替わります（走行履歴ではありません）。</p></details>
 </main>
 <script type="module">
-import {distance, clampTime, describe} from './motion.mjs';
+import {distance, describe, formatValue, createMotionState, setSpeed, seekTime, pauseMotion, startMotion, resetMotion, advanceMotion} from './motion.mjs';
 const q=id=>document.getElementById(id);
-const state={speed:2,time:3,playing:false,last:null};
+const state=createMotionState();
 const ns='http://www.w3.org/2000/svg',grid=q('grid');
 function line(x1,y1,x2,y2,opacity){const e=document.createElementNS(ns,'line');for(const [k,v] of Object.entries({x1,y1,x2,y2,stroke:'#94a3b8','stroke-opacity':opacity,'stroke-width':1}))e.setAttribute(k,v);grid.append(e)}
 function label(x,y,text,anchor='middle'){const e=document.createElementNS(ns,'text');for(const [k,v] of Object.entries({x,y,fill:'#b7c5d7','font-size':10,'text-anchor':anchor}))e.setAttribute(k,v);e.textContent=text;grid.append(e)}
@@ -59,10 +59,9 @@ const gx=t=>32+272*t/10,gy=d=>150-130*d/50;
 for(let t=0;t<=10;t+=2){line(gx(t),20,gx(t),150,.15);label(gx(t),164,String(t))}
 for(let d=0;d<=50;d+=10){line(32,gy(d),304,gy(d),.15);label(27,gy(d)+3,String(d),'end')}
 line(32,16,32,150,.8);line(32,150,308,150,.8);label(33,11,'距離(m)','start');label(303,176,'時間(秒)','end');
-const format=n=>Number(n.toFixed(2)).toFixed(1);
 function paint(){const v=state.speed,t=state.time,d=distance(v,t),x=gx(t),y=gy(d);
-q('speedValue').textContent=v;q('timeValue').textContent=format(t);q('distanceValue').textContent=format(d);
-q('speedOut').textContent=v+' m/秒';q('timeOut').textContent=format(t)+' 秒';
+q('speedValue').textContent=v;q('timeValue').textContent=formatValue(t);q('distanceValue').textContent=formatValue(d);
+q('speedOut').textContent=v+' m/秒';q('timeOut').textContent=formatValue(t)+' 秒';
 q('speed').value=v;q('time').value=t;
 q('car').setAttribute('transform','translate('+(20+280*d/50)+' 35)');
 q('roadTrail').setAttribute('d','M20 65 H'+(20+280*d/50));
@@ -70,16 +69,15 @@ q('graphLine').setAttribute('d','M'+gx(0)+' '+gy(0)+' L'+gx(10)+' '+gy(distance(
 q('guides').setAttribute('d','M'+x+' 150 V'+y+' H32');
 q('graphPoint').setAttribute('cx',x);q('graphPoint').setAttribute('cy',y);
 q('pointText').setAttribute('x',Math.max(36,Math.min(248,x+(x>240?-65:7))));q('pointText').setAttribute('y',y<24?y+15:y-8);
-q('pointText').textContent=format(t)+'秒 / '+format(d)+'m';
+q('pointText').textContent=formatValue(t)+'秒 / '+formatValue(d)+'m';
 q('explain').textContent=describe(v,t);
 q('play').textContent=state.playing?'Ⅱ 一時停止':'▶ 再生';q('play').setAttribute('aria-pressed',String(state.playing));
 }
-function pause(){state.playing=false;state.last=null;paint()}
-q('speed').addEventListener('input',e=>{state.speed=Number(e.target.value);paint()});
-q('time').addEventListener('input',e=>{state.time=clampTime(Number(e.target.value));state.last=null;paint()});
-q('play').addEventListener('click',()=>{if(state.playing){pause();return}if(state.time>=10)state.time=0;state.playing=true;state.last=null;paint()});
-q('reset').addEventListener('click',()=>{state.time=0;pause()});
-document.addEventListener('visibilitychange',()=>{if(document.hidden)pause()});
-function frame(now){if(state.playing){if(state.last!==null)state.time=clampTime(state.time+Math.max(0,(now-state.last)/1000));state.last=now;if(state.time>=10){state.time=10;state.playing=false;state.last=null}paint()}requestAnimationFrame(frame)}
+q('speed').addEventListener('input',e=>{setSpeed(state,Number(e.target.value));paint()});
+q('time').addEventListener('input',e=>{seekTime(state,Number(e.target.value));paint()});
+q('play').addEventListener('click',()=>{if(state.playing)pauseMotion(state);else startMotion(state);paint()});
+q('reset').addEventListener('click',()=>{resetMotion(state);paint()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){pauseMotion(state);paint()}});
+function frame(now){advanceMotion(state,now);paint();requestAnimationFrame(frame)}
 paint();requestAnimationFrame(frame);
 </script></body></html>

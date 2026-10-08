@@ -1,6 +1,12 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {distance,clampTime,describe} from '../learning/speed-distance/motion.mjs';
+import test from 'node:test';import assert from 'node:assert/strict';import {distance,clampTime,describe,formatValue,createMotionState,setSpeed,seekTime,pauseMotion,startMotion,resetMotion,advanceMotion} from '../learning/speed-distance-time/motion.mjs';
 test('代表値・端点・停止',()=>{for(const [v,t,d] of [[2,3,6],[0,10,0],[5,10,50],[0,0,0],[.5,2.5,1.25],[5,0,0]])assert.equal(distance(v,t),d)});
 test('全グリッドで距離とグラフ用モデルが一致',()=>{for(let v=0;v<=5;v+=.5)for(let i=0;i<=100;i++){const t=i/10;assert.ok(Math.abs(distance(v,t)-v*t)<1e-10)}});
 test('シーク境界',()=>{assert.equal(clampTime(-2),0);assert.equal(clampTime(12),10)});
 test('停止説明・速さ説明',()=>{assert.match(describe(0,4),/水平/);assert.match(describe(2,3),/1秒ごとに2m/);assert.match(describe(2,3),/6.0m/)});
+test('説明文と数値欄で同じ小数第1位に丸める',()=>{assert.equal(formatValue(5.75),'5.8');assert.equal(formatValue(28.75),'28.8');assert.match(describe(5,5.75),/5.8秒で28.8m/)});
 test('範囲外は拒否',()=>{for(const [v,t] of [[-1,1],[6,1],[2,-1],[2,11]])assert.throws(()=>distance(v,t),RangeError)});
+test('再生中に速さを変えると同じ時刻の比較へ即時反映',()=>{const s=createMotionState();seekTime(s,4);startMotion(s);advanceMotion(s,0);setSpeed(s,5);advanceMotion(s,1000);assert.equal(s.time,5);assert.equal(distance(s.speed,s.time),25);assert.match(describe(s.speed,s.time),/25.0m/)});
+test('再生中の時間操作はシーク位置から再開する',()=>{const s=createMotionState();seekTime(s,2);startMotion(s);advanceMotion(s,0);advanceMotion(s,1000);seekTime(s,7.5);assert.equal(s.time,7.5);assert.equal(s.last,null);advanceMotion(s,2000);assert.equal(s.time,7.5);advanceMotion(s,2500);assert.equal(s.time,8)});
+test('一時停止と再開で停止中の時間を加算しない',()=>{const s=createMotionState();seekTime(s,2);startMotion(s);advanceMotion(s,0);advanceMotion(s,1000);pauseMotion(s);advanceMotion(s,6000);assert.equal(s.time,3);startMotion(s);advanceMotion(s,7000);advanceMotion(s,8000);assert.equal(s.time,4)});
+test('10秒で停止し、到達後の再生は0秒から始まる',()=>{const s=createMotionState();seekTime(s,9.5);startMotion(s);advanceMotion(s,0);advanceMotion(s,1000);assert.equal(s.time,10);assert.equal(s.playing,false);startMotion(s);assert.equal(s.time,0);assert.equal(s.playing,true)});
+test('resetで0秒停止に戻し、選んだ速さを保つ',()=>{const s=createMotionState();setSpeed(s,4.5);seekTime(s,7);startMotion(s);resetMotion(s);assert.equal(s.time,0);assert.equal(s.speed,4.5);assert.equal(s.playing,false);assert.equal(s.last,null)});
