@@ -1,0 +1,4 @@
+import { lunarPhase } from './model.mjs';
+const $=id=>document.getElementById(id), range=$('age');
+function draw(){const age=Number(range.value),p=lunarPhase(age);$('ageValue').textContent=age.toFixed(2);$('ageOut').textContent=age.toFixed(2)+'日';$('illumValue').textContent=(p.illumination*100).toFixed(1);$('phaseValue').textContent=p.name;$('phaseLabel').textContent=p.name;$('moonShadow').setAttribute('cx',String(277+(p.waxing?-1:1)*86*p.illumination));$('explain').textContent=p.name+'ごろ。月の明るい部分の割合は約'+(p.illumination*100).toFixed(1)+'%。月自体の形が変わるのではなく、太陽に照らされた面の見え方が変わります。';}
+range.addEventListener('input',draw);$('reset').addEventListener('click',()=>{range.value='7.38';draw()});$('resetAlt').addEventListener('click',()=>{range.value='0';draw()});draw();

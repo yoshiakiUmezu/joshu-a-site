@@ -1,0 +1,2 @@
+export const SYNODIC_MONTH=29.53;
+export function lunarPhase(age){if(!Number.isFinite(age)||age<0||age>SYNODIC_MONTH)throw new RangeError('age must be within one synodic month');const angle=2*Math.PI*age/SYNODIC_MONTH,illumination=(1-Math.cos(angle))/2;const quarter=SYNODIC_MONTH/4;let name;if(age<quarter*.45||age>SYNODIC_MONTH-quarter*.45)name='新月ごろ';else if(age<quarter*1.45)name='上弦ごろ';else if(age<quarter*2.45)name='満月ごろ';else name='下弦ごろ';return {age,illumination,name,waxing:age<SYNODIC_MONTH/2};}
