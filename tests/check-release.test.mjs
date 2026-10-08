@@ -14,7 +14,10 @@ function fixture(t) {
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   for (const file of ['index.html', '404.html', 'robots.txt', 'sitemap.xml', '_headers']) fs.copyFileSync(path.join(source, file), path.join(root, file));
   fs.mkdirSync(path.join(root, 'assets'));
-  for (const file of ['og-home.png', 'brand-mark.png']) fs.copyFileSync(path.join(source, 'assets', file), path.join(root, 'assets', file));
+  for (const file of ['og-home.png', 'og-learning-speed-distance-time.png', 'brand-mark.png']) fs.copyFileSync(path.join(source, 'assets', file), path.join(root, 'assets', file));
+  const learning = path.join(root, 'learning', 'speed-distance-time');
+  fs.mkdirSync(learning, { recursive: true });
+  for (const file of ['index.html', 'motion.mjs']) fs.copyFileSync(path.join(source, 'learning', 'speed-distance-time', file), path.join(learning, file));
   return root;
 }
 
@@ -58,6 +61,7 @@ test('current unpublished site passes and stays product-free', t => {
   const result = checkSite(root);
   assert.deepEqual(result.errors, []);
   assert.equal(result.productCount, 0);
+  assert.equal(result.learningCount, 1);
 });
 
 test('valid temporary product passes and missing sitemap/CTA/OG are caught', t => {
@@ -195,4 +199,27 @@ test('sitemap cannot announce an unpublished product URL', t => {
   const file = path.join(root, 'sitemap.xml');
   fs.writeFileSync(file, fs.readFileSync(file, 'utf8').replace('</urlset>', '<url><loc>https://joshu-a.com/products/coming-soon/</loc></url></urlset>'));
   assert.match(checkSite(root).errors.join('\n'), /sitemap.xml: unpublished or noncanonical URL/);
+});
+
+
+test('published learning page requires indexability, sitemap entry, and homepage link', t => {
+  const root = fixture(t);
+  const learning = path.join(root, 'learning', 'speed-distance-time', 'index.html');
+  const home = path.join(root, 'index.html');
+  const sitemap = path.join(root, 'sitemap.xml');
+  fs.writeFileSync(learning, fs.readFileSync(learning, 'utf8').replace('content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"', 'content="noindex,nofollow"'));
+  fs.writeFileSync(home, fs.readFileSync(home, 'utf8').replace('<a class="contact-link" href="/learning/speed-distance-time/">触ってみる</a>', ''));
+  fs.writeFileSync(sitemap, fs.readFileSync(sitemap, 'utf8').replace(/\s*<url>\s*<loc>https:\/\/joshu-a\.com\/learning\/speed-distance-time\/<\/loc>[\s\S]*?<\/url>/, ''));
+  const errors = checkSite(root).errors.join('\n');
+  assert.match(errors, /noindex on published page/);
+  assert.match(errors, /index.html: learning link missing/);
+  assert.match(errors, /sitemap.xml: missing https:\/\/joshu-a\.com\/learning\/speed-distance-time\//);
+});
+
+test('learning page shares a lesson-specific social image', t => {
+  const root = fixture(t);
+  const page = fs.readFileSync(path.join(root, 'learning', 'speed-distance-time', 'index.html'), 'utf8');
+  assert.match(page, /property="og:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-speed-distance-time\.png"/);
+  assert.match(page, /name="twitter:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-speed-distance-time\.png"/);
+  assert.match(page, /"image":"https:\/\/joshu-a\.com\/assets\/og-learning-speed-distance-time\.png"/);
 });

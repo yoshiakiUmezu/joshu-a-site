@@ -53,7 +53,7 @@ function pageUrl(relative) {
 
 function discover(root) {
   const pages = ['index.html'];
-  for (const group of ['products', 'journal']) {
+  for (const group of ['products', 'journal', 'learning']) {
     const base = path.join(root, group);
     if (!fs.existsSync(base)) continue;
     for (const item of fs.readdirSync(base, { withFileTypes: true })) {
@@ -90,6 +90,7 @@ export function checkSite(root = DEFAULT_ROOT) {
   let pages;
   try { pages = discover(root); } catch (error) { report(error.message); pages = ['index.html']; }
   const productCount = pages.filter(file => file.startsWith('products/')).length;
+  const learningCount = pages.filter(file => file.startsWith('learning/')).length;
   const pageUrls = new Set(pages.map(pageUrl));
   for (const relative of pages) {
     const file = path.join(root, relative);
@@ -214,7 +215,14 @@ export function checkSite(root = DEFAULT_ROOT) {
       if (!tags(home, 'a').some(link => link.href === url || link.href === `${ORIGIN}${url}`)) report(`index.html: product link missing for ${relative}`);
     }
   }
-  return { errors, pages, productCount };
+  if (learningCount > 0) {
+    const home = fs.existsSync(path.join(root, 'index.html')) ? fs.readFileSync(path.join(root, 'index.html'), 'utf8') : '';
+    for (const relative of pages.filter(file => file.startsWith('learning/'))) {
+      const url = `/${relative.replace(/index\.html$/, '')}`;
+      if (!tags(home, 'a').some(link => link.href === url || link.href === `${ORIGIN}${url}`)) report(`index.html: learning link missing for ${relative}`);
+    }
+  }
+  return { errors, pages, productCount, learningCount };
 }
 
 async function checkLive(pages) {
@@ -257,13 +265,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.ar
   const live = args.includes('--live');
   const rootArg = args.filter(arg => arg !== '--live')[0];
   const root = rootArg ? path.resolve(rootArg) : DEFAULT_ROOT;
-  const { errors, pages, productCount } = checkSite(root);
+  const { errors, pages, productCount, learningCount } = checkSite(root);
   if (live && !errors.length) errors.push(...await checkLive(pages));
   if (errors.length) {
     console.error(`FAIL: ${errors.length} issue(s) across ${pages.length} page(s)`);
     for (const error of errors) console.error(`- ${error}`);
     process.exitCode = 1;
   } else {
-    console.log(`PASS: release gate checked ${pages.length} page(s), ${productCount} released product(s)${productCount ? '' : ' (homepage-only baseline)'}, sitemap/robots/metadata/links${live ? ', live HTTP' : ''}.`);
+    console.log(`PASS: release gate checked ${pages.length} page(s), ${productCount} released product(s), ${learningCount} learning page(s)${productCount || learningCount ? '' : ' (homepage-only baseline)'}, sitemap/robots/metadata/links${live ? ', live HTTP' : ''}.`);
   }
 }

@@ -12,6 +12,7 @@
 | 項目 | 状態 | 再開条件 | 次の操作 |
 | --- | --- | --- | --- |
 | GPT Sites再評価 | WATCH | OpenAI側に意味のある仕様変更が出たら | 独自ドメイン、SEO/OG、カスタムヘッダー、GitHub/コード連携、export/import、上限、料金、制御、移行性をCloudflare Pagesと比較 |
+| 知育コンテンツ Android実機フォロー | WATCH | 「速さ・距離・時間」公開後 | Android実機＋OS文字拡大で表示・操作を確認し、問題があれば修正 |
 
 ## DONE
 

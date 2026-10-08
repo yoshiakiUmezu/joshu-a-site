@@ -14,6 +14,7 @@ function fixture(t) {
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   for (const file of ['index.html', '404.html', 'robots.txt', 'sitemap.xml', '_headers']) fs.copyFileSync(path.join(source, file), path.join(root, file));
   fs.cpSync(path.join(source, 'assets'), path.join(root, 'assets'), { recursive: true });
+  fs.cpSync(path.join(source, 'learning', 'speed-distance-time'), path.join(root, 'learning', 'speed-distance-time'), { recursive: true });
   fs.mkdirSync(path.join(root, 'docs'), { recursive: true });
   fs.copyFileSync(path.join(source, 'docs', 'product-page-template.md'), path.join(root, 'docs', 'product-page-template.md'));
   return root;
