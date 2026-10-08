@@ -1,0 +1,2 @@
+import assert from 'node:assert/strict';import {test} from 'node:test';import {rayPoint,reflectAngle} from '../learning/light-reflection/model.mjs';
+test('reflection angle and ray symmetry',()=>{for(const a of [0,1,35,80,90]){assert.equal(reflectAngle(a),a);assert.deepEqual(rayPoint(a),{parallel:Math.sin(a*Math.PI/180),normal:Math.cos(a*Math.PI/180)});}assert.throws(()=>reflectAngle(-1),RangeError);assert.throws(()=>reflectAngle(91),RangeError);});
