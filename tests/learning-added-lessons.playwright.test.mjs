@@ -11,6 +11,7 @@ const viewports = [{ width: 320, height: 568 }, { width: 360, height: 640 }, { w
 const lessons = [
   { path: '/learning/proportion/', slider: '#x', value: '10', result: '#xValue', expected: '10.0', reset: '#reset' },
   { path: '/learning/current-voltage/', slider: '#voltage', value: '12', result: '#vValue', expected: '12.0', reset: '#reset' },
+  { path: '/learning/geometry-nets/', slider: '#fold', value: '100', result: '#foldValue', expected: '100', reset: '#reset' },
 ];
 let server, browser, baseUrl;
 
@@ -46,6 +47,11 @@ for (const lesson of lessons) test(`${lesson.path}: six portrait conditions and 
       assert.ok(layout.touch.every(height => height >= 44), 'range and buttons have 44px touch areas');
       await page.locator(lesson.slider).evaluate((el, value) => { el.value = value; el.dispatchEvent(new Event('input', { bubbles: true })); }, lesson.value);
       assert.equal(await page.locator(lesson.result).textContent(), lesson.expected);
+      if (lesson.path.includes('geometry-nets')) {
+        assert.equal(await page.locator('#cubeShape').getAttribute('opacity'), '1');
+        assert.equal(await page.locator('#netShape').getAttribute('opacity'), '0');
+        assert.equal(await page.locator('#foldLabel').textContent(), '立方体');
+      }
       if (lesson.path.includes('current-voltage')) {
         assert.equal(await page.locator('#iValue').textContent(), '4.00');
         assert.match(await page.locator('#explain').textContent(), /I=V\/R/);

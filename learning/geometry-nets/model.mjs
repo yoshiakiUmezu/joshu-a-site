@@ -1,0 +1,3 @@
+export function cubeNetFaceCount(faces){if(!Number.isInteger(faces)||faces<0)throw new RangeError('face count must be a nonnegative integer');return faces===6;}
+export function cubeSurfaceArea(edge){if(!Number.isFinite(edge)||edge<0)throw new RangeError('edge must be nonnegative');return 6*edge*edge;}
+export function cubeVolume(edge){if(!Number.isFinite(edge)||edge<0)throw new RangeError('edge must be nonnegative');return edge**3;}
