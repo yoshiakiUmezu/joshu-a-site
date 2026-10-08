@@ -5,6 +5,7 @@ import { dirname, extname, resolve, sep } from 'node:path';
 import { after, before, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { events } from '../learning/japan-and-world-history/model.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const viewports = [{ width: 320, height: 568 }, { width: 360, height: 640 }, { width: 390, height: 844 }];
@@ -42,7 +43,7 @@ for (const lesson of lessons) test(`${lesson.path}: six portrait conditions and 
     try {
       await page.goto(`${baseUrl}${lesson.path}`, { waitUntil: 'networkidle', timeout: 8000 });
       if (scale > 1) await page.evaluate(factor => document.querySelectorAll('h1,.crumb,.row label,.row output,.explain,.foot,.stats small,.stats strong,button,svg text').forEach(el => el.style.setProperty('font-size', `${parseFloat(getComputedStyle(el).fontSize) * factor}px`, 'important')), scale);
-      const layout = await page.evaluate(() => ({ w: document.documentElement.scrollWidth, h: document.documentElement.scrollHeight, iw: innerWidth, ih: innerHeight, touch: [...document.querySelectorAll('input[type=range],button,.exit a')].map(el => el.getBoundingClientRect().height), bottoms: [...document.querySelectorAll('main > *')].map(el => el.getBoundingClientRect().bottom) }));
+      const layout = await page.evaluate(() => ({ w: document.documentElement.scrollWidth, h: document.documentElement.scrollHeight, iw: innerWidth, ih: innerHeight, touch: [...document.querySelectorAll('input[type=range],button,.exit a')].filter(el => el.getClientRects().length > 0).map(el => el.getBoundingClientRect().height), bottoms: [...document.querySelectorAll('main > *')].map(el => el.getBoundingClientRect().bottom) }));
       assert.ok(layout.w <= layout.iw, 'no horizontal scrolling');
       assert.ok(layout.h <= layout.ih + 2, 'lesson fits in one screen');
       assert.ok(layout.touch.every(height => height >= 44), 'range and buttons have 44px touch areas');
@@ -59,6 +60,11 @@ for (const lesson of lessons) test(`${lesson.path}: six portrait conditions and 
         assert.ok((await page.locator('#jpTitle').textContent()).length > 0);
         assert.ok((await page.locator('#worldTitle').textContent()).length > 0);
         assert.ok((await page.locator('#historyNote').textContent()).length > 0);
+        await page.locator('#showSources').tap();
+        assert.equal(await page.locator('#sourceHeading').textContent(), '出典 6 / 30');
+        assert.ok(await page.locator('#sourceLinks a').count() >= 2);
+        assert.ok((await page.locator('#sourceLinks a').evaluateAll(links => links.every(link => link.getBoundingClientRect().height >= 44))));
+        await page.locator('#closeSources').tap();
         await page.locator('#next').tap();
         assert.equal(await page.locator('#eventOut').textContent(), '7 / 30');
         await page.locator('#prev').tap();
@@ -80,4 +86,29 @@ for (const lesson of lessons) test(`${lesson.path}: six portrait conditions and 
       await page.locator(lesson.reset).tap();
     } finally { await context.close(); }
   });
+});
+
+test('history source links follow every one of the 30 slider positions', async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const page = await context.newPage();
+  try {
+    await page.goto(`${baseUrl}/learning/japan-and-world-history/`, { waitUntil: 'networkidle' });
+    for (const [index, event] of events.entries()) {
+      await page.locator('#eventIndex').evaluate((el, value) => { el.value = String(value); el.dispatchEvent(new Event('input', { bubbles: true })); }, index);
+      assert.equal(await page.locator('#eventOut').textContent(), `${index + 1} / 30`);
+      assert.equal(await page.locator('#jpTitle').textContent(), event.jp);
+      assert.equal(await page.locator('#worldTitle').textContent(), event.world);
+      await page.locator('#showSources').tap();
+      assert.equal(await page.locator('#sourceHeading').textContent(), `出典 ${index + 1} / 30`);
+      const actual = await page.locator('#sourceLinks a').evaluateAll(links => links.map(link => link.href));
+      assert.deepEqual(actual, [...event.sources.japan, ...event.sources.world].map(source => source.url));
+      await page.locator('#closeSources').tap();
+    }
+    await page.locator('#reset').tap();
+    assert.equal(await page.locator('#eventOut').textContent(), '1 / 30');
+    await page.locator('#next').tap();
+    assert.equal(await page.locator('#eventOut').textContent(), '2 / 30');
+    await page.locator('#prev').tap();
+    assert.equal(await page.locator('#eventOut').textContent(), '1 / 30');
+  } finally { await context.close(); }
 });
