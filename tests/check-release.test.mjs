@@ -14,7 +14,7 @@ function fixture(t) {
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   for (const file of ['index.html', '404.html', 'robots.txt', 'sitemap.xml', '_headers']) fs.copyFileSync(path.join(source, file), path.join(root, file));
   fs.mkdirSync(path.join(root, 'assets'));
-  for (const file of ['og-home.png', 'brand-mark.png']) fs.copyFileSync(path.join(source, 'assets', file), path.join(root, 'assets', file));
+  for (const file of ['og-home.png', 'og-learning-speed-distance-time.png', 'brand-mark.png']) fs.copyFileSync(path.join(source, 'assets', file), path.join(root, 'assets', file));
   const learning = path.join(root, 'learning', 'speed-distance-time');
   fs.mkdirSync(learning, { recursive: true });
   for (const file of ['index.html', 'motion.mjs']) fs.copyFileSync(path.join(source, 'learning', 'speed-distance-time', file), path.join(learning, file));
@@ -214,4 +214,12 @@ test('published learning page requires indexability, sitemap entry, and homepage
   assert.match(errors, /noindex on published page/);
   assert.match(errors, /index.html: learning link missing/);
   assert.match(errors, /sitemap.xml: missing https:\/\/joshu-a\.com\/learning\/speed-distance-time\//);
+});
+
+test('learning page shares a lesson-specific social image', t => {
+  const root = fixture(t);
+  const page = fs.readFileSync(path.join(root, 'learning', 'speed-distance-time', 'index.html'), 'utf8');
+  assert.match(page, /property="og:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-speed-distance-time\.png"/);
+  assert.match(page, /name="twitter:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-speed-distance-time\.png"/);
+  assert.match(page, /"image":"https:\/\/joshu-a\.com\/assets\/og-learning-speed-distance-time\.png"/);
 });
