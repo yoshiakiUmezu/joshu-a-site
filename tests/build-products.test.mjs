@@ -15,6 +15,7 @@ function fixture(t) {
   for (const file of ['index.html', '404.html', 'robots.txt', 'sitemap.xml', '_headers']) fs.copyFileSync(path.join(source, file), path.join(root, file));
   fs.cpSync(path.join(source, 'assets'), path.join(root, 'assets'), { recursive: true });
   fs.cpSync(path.join(source, 'learning', 'speed-distance-time'), path.join(root, 'learning', 'speed-distance-time'), { recursive: true });
+  fs.cpSync(path.join(source, 'learning', 'point-p'), path.join(root, 'learning', 'point-p'), { recursive: true });
   fs.copyFileSync(path.join(source, 'learning', 'index.html'), path.join(root, 'learning', 'index.html'));
   fs.mkdirSync(path.join(root, 'docs'), { recursive: true });
   fs.copyFileSync(path.join(source, 'docs', 'product-page-template.md'), path.join(root, 'docs', 'product-page-template.md'));
