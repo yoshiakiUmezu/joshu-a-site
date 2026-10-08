@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -65,7 +66,12 @@ test('mobile layout and synchronized controls at six viewport/text-size conditio
   const { server, url } = await serveLesson();
   let browser;
   try {
-    browser = await chromium.launch({ headless: true });
+    const configuredPath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+    const systemBrowsers = process.platform === 'win32'
+      ? ['C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe', 'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe']
+      : [];
+    const executablePath = configuredPath && existsSync(configuredPath) ? configuredPath : systemBrowsers.find(existsSync);
+    browser = await chromium.launch({ headless: true, ...(executablePath ? { executablePath } : {}) });
     for (const viewport of viewports) {
       for (const textScale of [1, 1.25]) {
         const context = await browser.newContext({ viewport, isMobile: true, hasTouch: true });
