@@ -371,6 +371,35 @@
       font-size: 14px;
     }
 
+    .learning-feature {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 24px;
+      padding: 22px 24px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(120deg, rgba(17, 29, 48, .72), rgba(13, 18, 25, .9));
+    }
+
+    .learning-feature-copy h3 { margin: 10px 0 6px; font-size: 20px; }
+    .learning-feature-copy p { margin: 0; color: var(--muted); font-size: 14px; }
+    .learning-feature .tag { color: #c9d9f2; }
+    .learning-feature-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .learning-feature-actions a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .learning-feature-actions a:first-child { background: #eaf1fb; color: #101722; border-color: #eaf1fb; }
+
     .info-grid {
       display: grid;
       grid-template-columns: 1.1fr .9fr;
@@ -460,6 +489,8 @@
       .hero-panel { min-height: 340px; padding: 22px; }
       .mini-grid { grid-template-columns: 1fr; }
       .section { padding: 64px 0; }
+      .learning-feature { grid-template-columns: 1fr; gap: 18px; padding: 20px; }
+      .learning-feature-actions { display: grid; grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -556,11 +587,16 @@
           </p>
         </div>
 
-        <article class="product">
-          <span class="tag">無料Webコンテンツ</span>
-          <h3>速さ・距離・時間</h3>
-          <p>速さと時間を動かして、車の位置と距離のグラフがどうつながるかを確かめられます。</p>
-          <a class="contact-link" href="/learning/speed-distance-time/">触ってみる</a>
+        <article class="learning-feature">
+          <div class="learning-feature-copy">
+            <span class="tag">新着 · 算数 · 無料</span>
+            <h3>速さ・距離・時間</h3>
+            <p>速さと時間を動かし、車の動きと距離のグラフのつながりを確かめられます。</p>
+          </div>
+          <div class="learning-feature-actions">
+            <a data-featured-learning href="/learning/speed-distance-time/">教材を開く</a>
+            <a href="/learning/">教材をもっと見る</a>
+          </div>
         </article>
       </div>
     </section>

@@ -45,8 +45,8 @@ function chromiumLaunchOptions() {
 before(async () => {
   server = createServer((request, response) => {
     const pathname = new URL(request.url ?? '/', 'http://127.0.0.1').pathname;
-    const relativePath = pathname === lessonPath
-      ? 'learning/speed-distance-time/index.html'
+    const relativePath = pathname.endsWith('/')
+      ? `${pathname.replace(/^\/+|\/+$/g, '')}/index.html`.replace(/^\/index\.html$/, 'index.html')
       : pathname.replace(/^\/+/, '');
     const filePath = resolve(root, relativePath);
 
@@ -299,5 +299,98 @@ test('mobile touch, viewport, text enlargement, playback, and synchronized visua
         }
       });
     }
+  }
+});
+
+test('learning catalog mobile layout, filters, lesson links, and return path', async t => {
+  for (const viewport of viewports) {
+    for (const textScale of [1, 1.25]) {
+      await t.test(`${viewport.width}×${viewport.height}, text ${Math.round(textScale * 100)}%`, async () => {
+        const context = await browser.newContext({
+          viewport,
+          deviceScaleFactor: 3,
+          isMobile: true,
+          hasTouch: true,
+        });
+        const page = await context.newPage();
+
+        try {
+          await page.goto(`${baseUrl}/learning/`, { waitUntil: 'networkidle' });
+          if (textScale > 1) {
+            await page.evaluate(scale => {
+              document.querySelectorAll('.breadcrumbs, h1, .intro p, h2, .filter, .lesson-meta, .lesson-copy h3, .lesson-description').forEach(element => {
+                const fontSize = Number.parseFloat(getComputedStyle(element).fontSize);
+                element.style.setProperty('font-size', `${fontSize * scale}px`, 'important');
+              });
+            }, textScale);
+          }
+
+          const initial = await page.evaluate(() => ({
+            width: window.innerWidth,
+            scrollWidth: document.documentElement.scrollWidth,
+            filters: [...document.querySelectorAll('[data-filter]')].map(element => {
+              const box = element.getBoundingClientRect();
+              return { height: box.height, left: box.left, right: box.right };
+            }),
+            card: (() => {
+              const box = document.querySelector('[data-learning-card]').getBoundingClientRect();
+              return { height: box.height, left: box.left, right: box.right };
+            })(),
+            visibleLessons: [...document.querySelectorAll('[data-learning-item]')].filter(item => !item.hidden).length,
+          }));
+          assert.ok(initial.scrollWidth <= initial.width, 'catalog should not scroll horizontally');
+          assert.ok(initial.filters.every(filter => filter.height >= 44 && filter.left >= 0 && filter.right <= viewport.width), 'filter buttons should be visible 44px tap targets');
+          assert.ok(initial.card.height >= 44 && initial.card.left >= 0 && initial.card.right <= viewport.width, 'lesson card should be a visible tap target');
+          assert.equal(initial.visibleLessons, 1);
+
+          await page.locator('#subject-math').tap();
+          assert.equal(await page.locator('#subject-math').getAttribute('aria-pressed'), 'true');
+          assert.equal(new URL(page.url()).hash, '#subject-math');
+          assert.equal(await page.locator('[data-learning-item]:visible').count(), 1);
+          assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'filtered catalog should not scroll horizontally');
+
+          await Promise.all([
+            page.waitForURL(url => url.pathname === lessonPath),
+            page.locator('[data-learning-card]').tap(),
+          ]);
+          assert.equal(new URL(page.url()).pathname, lessonPath);
+          assert.equal(await page.locator('h1').textContent(), '動きとグラフはどうつながる？');
+          assert.equal(await page.locator('.breadcrumbs a[href="/learning/"]').count(), 1);
+          await Promise.all([
+            page.waitForURL(url => url.pathname === '/learning/'),
+            page.locator('.lesson-exit a').tap(),
+          ]);
+          assert.equal(new URL(page.url()).pathname, '/learning/');
+          assert.equal(await page.locator('[data-filter="all"]').getAttribute('aria-pressed'), 'true');
+          assert.equal(await page.locator('[data-learning-item]:visible').count(), 1);
+        } finally {
+          await context.close();
+        }
+      });
+    }
+  }
+});
+
+test('home presents one latest lesson and links to the catalog and lesson; unknown lesson is 404', async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const page = await context.newPage();
+  try {
+    await page.goto(`${baseUrl}/`, { waitUntil: 'networkidle' });
+    assert.equal(await page.locator('[data-featured-learning]').count(), 1);
+    await Promise.all([
+      page.waitForURL(url => url.pathname === '/learning/'),
+      page.locator('#learning a[href="/learning/"]').tap(),
+    ]);
+    assert.equal(new URL(page.url()).pathname, '/learning/');
+    await page.goto(`${baseUrl}/`, { waitUntil: 'networkidle' });
+    await Promise.all([
+      page.waitForURL(url => url.pathname === lessonPath),
+      page.locator('[data-featured-learning]').tap(),
+    ]);
+    assert.equal(new URL(page.url()).pathname, lessonPath);
+    const missing = await page.goto(`${baseUrl}/learning/not-a-real-lesson/`);
+    assert.equal(missing.status(), 404);
+  } finally {
+    await context.close();
   }
 });

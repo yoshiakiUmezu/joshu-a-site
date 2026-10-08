@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const ORIGIN = 'https://joshu-a.com';
 const DEFAULT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PLACEHOLDER = /\{\{[^}]+\}\}|\b(?:TODO|TBD)\b|example\.(?:com|org|net)|localhost|127\.0\.0\.1|\.pages\.dev\b|https?:\/\/[^\s"'<>]*\.(?:test|invalid)\b/i;
+const LEARNING_PLACEHOLDER = /光と植物の成長|ことばをつくろう|日本の地形|coming\s+soon|サンプル教材|教材準備中|公開予定/i;
 
 function visibleText(html) {
   return (html ?? '').replace(/<[^>]+>/g, '').replace(/&nbsp;|&#160;/gi, ' ').trim();
@@ -56,6 +57,7 @@ function discover(root) {
   for (const group of ['products', 'journal', 'learning']) {
     const base = path.join(root, group);
     if (!fs.existsSync(base)) continue;
+    if (group === 'learning' && fs.existsSync(path.join(base, 'index.html'))) pages.push('learning/index.html');
     for (const item of fs.readdirSync(base, { withFileTypes: true })) {
       if (!item.isDirectory()) continue;
       if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.name)) throw new Error(`Invalid ${group} slug: ${item.name}`);
@@ -90,7 +92,9 @@ export function checkSite(root = DEFAULT_ROOT) {
   let pages;
   try { pages = discover(root); } catch (error) { report(error.message); pages = ['index.html']; }
   const productCount = pages.filter(file => file.startsWith('products/')).length;
-  const learningCount = pages.filter(file => file.startsWith('learning/')).length;
+  const learningPages = pages.filter(file => file.startsWith('learning/') && file !== 'learning/index.html');
+  const learningCount = learningPages.length;
+  const learningIndexPath = path.join(root, 'learning', 'index.html');
   const pageUrls = new Set(pages.map(pageUrl));
   for (const relative of pages) {
     const file = path.join(root, relative);
@@ -162,6 +166,18 @@ export function checkSite(root = DEFAULT_ROOT) {
       if (!screenshots.length) report(`${label}: real screenshot required`);
       for (const screenshot of screenshots) if (!screenshot.alt?.trim()) report(`${label}: screenshot needs descriptive alt text`);
     }
+    if (relative === 'learning/index.html') {
+      if (og['og:title'] !== title || meta(head, 'name', 'twitter:title') !== title) report(`${label}: title must match OG and X`);
+      if (og['og:description'] !== description || meta(head, 'name', 'twitter:description') !== description) report(`${label}: description must match OG and X`);
+      if (!schemas.some(item => item['@type'] === 'CollectionPage' && item.url === expected)) report(`${label}: CollectionPage JSON-LD missing or URL mismatch`);
+      if (LEARNING_PLACEHOLDER.test(html)) report(`${label}: placeholder or unpublished learning content remains`);
+    }
+    if (relative.startsWith('learning/') && relative !== 'learning/index.html') {
+      if (og['og:title'] !== title || meta(head, 'name', 'twitter:title') !== title) report(`${label}: title must match OG and X`);
+      if (og['og:description'] !== description || meta(head, 'name', 'twitter:description') !== description) report(`${label}: description must match OG and X`);
+      if (!schemas.some(item => item['@type'] === 'WebPage' && item.url === expected && item.name === title && item.description === description)) report(`${label}: WebPage JSON-LD identity/metadata mismatch`);
+      if (LEARNING_PLACEHOLDER.test(html)) report(`${label}: placeholder or unpublished learning content remains`);
+    }
     for (const image of tags(body, 'img')) if (!Object.hasOwn(image, 'alt')) report(`${label}: image alt attribute missing`);
     const ids = new Set([...body.matchAll(/\bid=["']([^"']+)["']/gi)].map(match => match[1]));
     for (const anchor of tags(body, 'a')) {
@@ -215,14 +231,41 @@ export function checkSite(root = DEFAULT_ROOT) {
       if (!tags(home, 'a').some(link => link.href === url || link.href === `${ORIGIN}${url}`)) report(`index.html: product link missing for ${relative}`);
     }
   }
-  if (learningCount > 0) {
+  if (fs.existsSync(learningIndexPath) && learningCount === 0) report('learning/index.html: no published lessons; do not publish an empty catalog');
+  if (learningCount > 0 && !fs.existsSync(learningIndexPath)) report('learning/index.html: catalog missing for published lessons');
+  if (learningCount > 0 && fs.existsSync(learningIndexPath)) {
     const home = fs.existsSync(path.join(root, 'index.html')) ? fs.readFileSync(path.join(root, 'index.html'), 'utf8') : '';
-    for (const relative of pages.filter(file => file.startsWith('learning/'))) {
-      const url = `/${relative.replace(/index\.html$/, '')}`;
-      if (!tags(home, 'a').some(link => link.href === url || link.href === `${ORIGIN}${url}`)) report(`index.html: learning link missing for ${relative}`);
+    const learningIndex = fs.readFileSync(learningIndexPath, 'utf8');
+    const homeLinks = tags(home, 'a');
+    if (!homeLinks.some(link => link.href === '/learning/' || link.href === `${ORIGIN}/learning/`)) report('index.html: learning catalog link missing');
+    const featuredLinks = homeLinks.filter(link => Object.hasOwn(link, 'data-featured-learning'));
+    if (featuredLinks.length !== 1 || !learningPages.some(relative => featuredLinks[0]?.href === `/${relative.replace(/index\.html$/, '')}` || featuredLinks[0]?.href === pageUrl(relative))) report('index.html: exactly one valid latest learning link required');
+
+    const cardLinks = tags(learningIndex, 'a').filter(link => Object.hasOwn(link, 'data-learning-card'));
+    const lessonUrls = new Set(learningPages.map(pageUrl));
+    if (cardLinks.length !== lessonUrls.size) report('learning/index.html: each published lesson must have exactly one catalog card');
+    for (const link of cardLinks) if (!lessonUrls.has(new URL(link.href ?? '', ORIGIN).href)) report(`learning/index.html: unpublished or duplicate lesson card ${link.href ?? ''}`);
+    if (LEARNING_PLACEHOLDER.test(learningIndex)) report('learning/index.html: placeholder or unpublished learning content remains');
+
+    const subjects = new Set();
+    for (const relative of learningPages) {
       const learningHtml = fs.readFileSync(path.join(root, relative), 'utf8');
-      if (!tags(learningHtml, 'a').some(link => link.href === '/#learning' || link.href === `${ORIGIN}/#learning`)) report(`${relative}: return link to /#learning missing`);
+      const lessonUrl = pageUrl(relative);
+      const subject = tags(learningHtml, 'main')[0]?.['data-learning-subject'];
+      if (!subject || !/^[a-z0-9-]+$/.test(subject)) report(`${relative}: learning subject missing or invalid`);
+      else subjects.add(subject);
+      const exitNav = learningHtml.match(/<nav\b(?=[^>]*aria-label=["']教材の出口["'])[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? '';
+      if (!tags(exitNav, 'a').some(link => link.href === '/learning/')) report(`${relative}: return link to /learning/ missing`);
+      const breadcrumb = learningHtml.match(/<nav\b(?=[^>]*aria-label=["']パンくずリスト["'])[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? '';
+      const breadcrumbLinks = tags(breadcrumb, 'a');
+      if (!breadcrumb || !breadcrumbLinks.some(link => link.href === '/') || !breadcrumbLinks.some(link => link.href === '/learning/') || !subject || !breadcrumbLinks.some(link => link.href === `/learning/#subject-${subject}`)) report(`${relative}: breadcrumb home/catalog/subject links missing`);
+      if (!/aria-current=["']page["']/.test(breadcrumb)) report(`${relative}: breadcrumb current page marker missing`);
+      if (breadcrumbLinks.some(link => link.href === lessonUrl)) report(`${relative}: current page must not be linked in breadcrumb`);
     }
+    const filters = tags(learningIndex, 'button').filter(button => Object.hasOwn(button, 'data-filter')).map(button => button['data-filter']);
+    if (new Set(filters).size !== filters.length || !filters.includes('all')) report('learning/index.html: unique all/subject filters required');
+    for (const subject of subjects) if (!filters.includes(subject)) report(`learning/index.html: filter missing for published subject ${subject}`);
+    for (const filter of filters) if (filter !== 'all' && !subjects.has(filter)) report(`learning/index.html: empty or unpublished subject filter ${filter}`);
   }
   return { errors, pages, productCount, learningCount };
 }
