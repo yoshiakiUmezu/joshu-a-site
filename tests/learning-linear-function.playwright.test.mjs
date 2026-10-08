@@ -45,19 +45,19 @@ async function assertSynchronized(page, a, b) {
   assert.equal(await page.locator('#aValue').innerText(), String(a));
   assert.equal(await page.locator('#bValue').innerText(), String(b));
   assert.equal(Number(await page.locator('#intercept').getAttribute('cx')), 170);
-  assert.equal(Number(await page.locator('#intercept').getAttribute('cy')), 170 - b * 20);
+  assert.equal(Number(await page.locator('#intercept').getAttribute('cy')), 125 - b * 20);
   assert.equal(Number(await page.locator('#next').getAttribute('cx')), 190);
-  assert.equal(Number(await page.locator('#next').getAttribute('cy')), 170 - (a + b) * 20);
-  assert.equal(await page.locator('#rise').getAttribute('d'), `M170 ${170 - b * 20}H190V${170 - (a + b) * 20}`);
+  assert.equal(Number(await page.locator('#next').getAttribute('cy')), 125 - (a + b) * 20);
+  assert.equal(await page.locator('#rise').getAttribute('d'), `M170 ${125 - b * 20}H190V${125 - (a + b) * 20}`);
   assert.equal(await page.locator('#riseLabel').textContent(), `${a > 0 ? '+' : ''}${a}`);
   assert.equal(await page.locator('#slopeText').innerText(), a === 0
     ? '右に1進んでも高さは変わらない'
     : `右に1進むと${a > 0 ? '上' : '下'}に${Math.abs(a)}進む`);
   assert.equal(await page.locator('#interceptText').innerText(), b === 0 ? 'y軸の0（原点）を通る' : `y軸の${b}を通る`);
   assert.equal(await page.locator('#function').getAttribute('x1'), '-10');
-  assert.equal(Number(await page.locator('#function').getAttribute('y1')), 170 - (a * -9 + b) * 20);
+  assert.equal(Number(await page.locator('#function').getAttribute('y1')), 125 - (a * -9 + b) * 20);
   assert.equal(await page.locator('#function').getAttribute('x2'), '350');
-  assert.equal(Number(await page.locator('#function').getAttribute('y2')), 170 - (a * 9 + b) * 20);
+  assert.equal(Number(await page.locator('#function').getAttribute('y2')), 125 - (a * 9 + b) * 20);
   assert.equal(await page.locator('#function').evaluate(line => line.parentElement.getAttribute('clip-path')), 'url(#clip)');
 }
 
@@ -121,3 +121,4 @@ test('mobile layout and synchronized controls at six viewport/text-size conditio
     await new Promise(resolve => server.close(resolve));
   }
 });
+
