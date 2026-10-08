@@ -73,7 +73,7 @@ test('mobile layout and synchronized controls at six viewport/text-size conditio
         await page.goto(url);
         if (textScale > 1) {
           await page.evaluate(scale => {
-            for (const element of document.querySelectorAll('h1,.sub,.formula,.legend,.control label,.control output,.explanations p,button,details,summary,svg text')) {
+            for (const element of document.querySelectorAll('h1,.sub,.lesson-back,.breadcrumbs,.formula,.legend,.control label,.control output,.explanations p,button,details,summary,svg text')) {
               const size = Number.parseFloat(getComputedStyle(element).fontSize);
               element.style.setProperty('font-size', `${size * scale}px`, 'important');
             }
