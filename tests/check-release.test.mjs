@@ -217,7 +217,7 @@ test('published learning page requires indexability, sitemap entry, and homepage
   const home = path.join(root, 'index.html');
   const sitemap = path.join(root, 'sitemap.xml');
   fs.writeFileSync(learning, fs.readFileSync(learning, 'utf8').replace('content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"', 'content="noindex,nofollow"'));
-  fs.writeFileSync(home, fs.readFileSync(home, 'utf8').replace('<a data-featured-learning href="/learning/point-p/">教材を開く</a>', ''));
+  fs.writeFileSync(home, fs.readFileSync(home, 'utf8').replace('<a data-featured-learning href="/learning/linear-function/">教材を開く</a>', ''));
   fs.writeFileSync(sitemap, fs.readFileSync(sitemap, 'utf8').replace(/\s*<url>\s*<loc>https:\/\/joshu-a\.com\/learning\/speed-distance-time\/<\/loc>[\s\S]*?<\/url>/, ''));
   const errors = checkSite(root).errors.join('\n');
   assert.match(errors, /noindex on published page/);
