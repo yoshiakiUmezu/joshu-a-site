@@ -13,9 +13,10 @@
 <style>
 :root{color-scheme:dark;font-family:system-ui,"Noto Sans JP",sans-serif;background:#08101d;color:#eff6ff;--line:#334155;--blue:#38bdf8;--orange:#fbbf24}
 *{box-sizing:border-box}body{margin:0}main{max-width:590px;margin:auto;min-height:100dvh;padding:max(8px,env(safe-area-inset-top)) 12px max(8px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:clamp(5px,1vh,12px)}
-h1{font-size:clamp(16px,2.6vh,23px);margin:0}p{margin:0}.hint{color:#aebed2;font-size:12px}.panel{background:#111d30;border:1px solid var(--line);border-radius:13px;padding:clamp(7px,1.2vh,12px)}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.metric{text-align:center}.metric small{display:block;color:#b7c5d7;font-size:11px}.metric strong{font-size:clamp(17px,3.2vh,27px);font-variant-numeric:tabular-nums}.metric em{font-size:11px;font-style:normal}.blue{color:var(--blue)}.orange{color:var(--orange)}svg{display:block;width:100%;height:auto;overflow:visible}.visuals{display:grid;gap:6px}.label{font-size:12px;font-weight:650;margin-bottom:3px}.road{height:clamp(74px,13vh,116px)}.chart{height:clamp(135px,24vh,235px)}.controls{display:grid;gap:5px}.control-row{display:grid;grid-template-columns:66px 1fr 69px;align-items:center;gap:7px}.control-row label{font-size:13px;font-weight:650}.control-row output{text-align:right;font-size:12px;font-variant-numeric:tabular-nums}.control-row input{width:100%;min-height:36px;accent-color:#38bdf8;touch-action:pan-x}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}button{min-height:44px;border:1px solid #56657b;border-radius:10px;background:#223149;color:white;font-size:14px;font-weight:650;cursor:pointer}button.primary{background:#0369a1;border-color:#0ea5e9}.explain{font-size:13px;line-height:1.45}.more{font-size:12px;color:#b7c5d7}details summary{cursor:pointer;min-height:28px;font-size:12px;color:#b7c5d7}details p{font-size:12px;line-height:1.6;padding:5px 0}
+h1{font-size:clamp(16px,2.6vh,23px);margin:0}p{margin:0}.hint{color:#aebed2;font-size:12px}.panel{background:#111d30;border:1px solid var(--line);border-radius:13px;padding:clamp(7px,1.2vh,12px)}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.metric{text-align:center}.metric small{display:block;color:#b7c5d7;font-size:11px}.metric strong{font-size:clamp(17px,3.2vh,27px);font-variant-numeric:tabular-nums}.metric em{font-size:11px;font-style:normal}.blue{color:var(--blue)}.orange{color:var(--orange)}svg{display:block;width:100%;height:auto;overflow:visible}.visuals{display:grid;gap:6px}.label{font-size:12px;font-weight:650;margin-bottom:3px}.road{height:clamp(74px,13vh,116px)}.chart{height:clamp(135px,24vh,235px)}.controls{display:grid;gap:5px}.control-row{display:grid;grid-template-columns:66px 1fr 69px;align-items:center;gap:7px}.control-row label{font-size:13px;font-weight:650}.control-row output{text-align:right;font-size:12px;font-variant-numeric:tabular-nums}.control-row input{width:100%;min-height:44px;accent-color:#38bdf8;touch-action:pan-x}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}button{min-height:44px;border:1px solid #56657b;border-radius:10px;background:#223149;color:white;font-size:14px;font-weight:650;cursor:pointer}button.primary{background:#0369a1;border-color:#0ea5e9}.explain{font-size:13px;line-height:1.45}.more{font-size:12px;color:#b7c5d7}details summary{cursor:pointer;min-height:28px;font-size:12px;color:#b7c5d7}details p{font-size:12px;line-height:1.6;padding:5px 0}
 @media(min-width:650px){main{gap:12px;padding:18px}.chart{height:240px}.road{height:116px}}
-@media(max-height:640px){main{gap:3px}.panel{padding:4px}.chart{height:clamp(88px,16vh,110px)}.road{height:54px}.hint{display:none}.control-row input{min-height:36px}button{min-height:44px}.explain{font-size:12px}details summary{min-height:26px}}
+@media(max-width:430px){.chart{height:clamp(150px,20vh,180px)}.road{height:clamp(74px,10vh,90px)}}
+@media(max-height:640px){main{gap:1px}.panel{padding:3px}.chart{height:clamp(80px,14vh,92px)}.road{height:clamp(48px,8vh,52px)}.hint{display:none}.control-row input{min-height:44px}button{min-height:44px}.explain{font-size:12px}details summary{min-height:26px}}
 </style></head><body>
 <main>
 <header><h1>動きとグラフはどうつながる？</h1><p class="hint">速さを変えて、車とグラフを見てみよう</p></header>
@@ -43,13 +44,13 @@ h1{font-size:clamp(16px,2.6vh,23px);margin:0}p{margin:0}.hint{color:#aebed2;font
 <section class="panel controls" aria-label="操作">
 <div class="control-row"><label for="speed">速さ</label><input id="speed" type="range" min="0" max="5" step="0.5" value="2"><output id="speedOut" for="speed">2 m/秒</output></div>
 <div class="control-row"><label for="time">時間</label><input id="time" type="range" min="0" max="10" step="0.01" value="3"><output id="timeOut" for="time">3.0 秒</output></div>
-<div class="buttons"><button type="button" class="primary" id="play" aria-pressed="false">▶ 再生</button><button type="button" id="reset">↺ 最初に戻す</button></div>
+<div class="buttons"><button type="button" class="primary" id="play" aria-pressed="false">▶ 再生</button><button type="button" id="reset">↺ リセット</button></div>
 </section>
 <section class="panel"><p id="explain" class="explain" aria-live="off">1秒ごとに2m進む。</p></section>
 <details><summary>くわしい説明・使い方</summary><p>速さが一定のとき、距離＝速さ×時間。グラフの傾きは速さを表します。速さ0では時間が進んでも距離は増えません。速さを途中で変更すると、これは「最初からその速さで走った場合」の比較に切り替わります（走行履歴ではありません）。</p></details>
 </main>
 <script type="module">
-import {distance, describe, formatValue, createMotionState, setSpeed, seekTime, pauseMotion, startMotion, resetMotion, advanceMotion} from './motion.mjs';
+import {distance, describe, formatTime, formatValue, createMotionState, setSpeed, seekTime, pauseMotion, startMotion, resetMotion, advanceMotion} from './motion.mjs';
 const q=id=>document.getElementById(id);
 const state=createMotionState();
 const ns='http://www.w3.org/2000/svg',grid=q('grid');
@@ -59,17 +60,18 @@ const gx=t=>32+272*t/10,gy=d=>150-130*d/50;
 for(let t=0;t<=10;t+=2){line(gx(t),20,gx(t),150,.15);label(gx(t),164,String(t))}
 for(let d=0;d<=50;d+=10){line(32,gy(d),304,gy(d),.15);label(27,gy(d)+3,String(d),'end')}
 line(32,16,32,150,.8);line(32,150,308,150,.8);label(33,11,'距離(m)','start');label(303,176,'時間(秒)','end');
-function paint(){const v=state.speed,t=state.time,d=distance(v,t),x=gx(t),y=gy(d);
-q('speedValue').textContent=v;q('timeValue').textContent=formatValue(t);q('distanceValue').textContent=formatValue(d);
-q('speedOut').textContent=v+' m/秒';q('timeOut').textContent=formatValue(t)+' 秒';
+function paint(){const v=state.speed,t=Number(formatTime(state.time)),d=distance(v,t),x=gx(t),y=gy(d);
+q('speedValue').textContent=v;q('timeValue').textContent=formatTime(t);q('distanceValue').textContent=formatValue(d);
+q('speedOut').textContent=v+' m/秒';q('timeOut').textContent=formatTime(t)+' 秒';
 q('speed').value=v;q('time').value=t;
 q('car').setAttribute('transform','translate('+(20+280*d/50)+' 35)');
 q('roadTrail').setAttribute('d','M20 65 H'+(20+280*d/50));
 q('graphLine').setAttribute('d','M'+gx(0)+' '+gy(0)+' L'+gx(10)+' '+gy(distance(v,10)));
 q('guides').setAttribute('d','M'+x+' 150 V'+y+' H32');
 q('graphPoint').setAttribute('cx',x);q('graphPoint').setAttribute('cy',y);
-q('pointText').setAttribute('x',Math.max(36,Math.min(248,x+(x>240?-65:7))));q('pointText').setAttribute('y',y<24?y+15:y-8);
-q('pointText').textContent=formatValue(t)+'秒 / '+formatValue(d)+'m';
+q('pointText').textContent=formatTime(t)+'秒 / '+formatValue(d)+'m';
+const pointLabelWidth=q('pointText').getComputedTextLength(),alignRight=x+7+pointLabelWidth>315;
+q('pointText').setAttribute('text-anchor',alignRight?'end':'start');q('pointText').setAttribute('x',alignRight?x-7:x+7);q('pointText').setAttribute('y',y<24?y+15:y-8);
 q('explain').textContent=describe(v,t);
 q('play').textContent=state.playing?'Ⅱ 一時停止':'▶ 再生';q('play').setAttribute('aria-pressed',String(state.playing));
 }

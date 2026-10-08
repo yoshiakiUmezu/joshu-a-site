@@ -9,6 +9,11 @@ export function formatValue(value) {
   return (Math.round((value + Number.EPSILON) * 10) / 10).toFixed(1);
 }
 
+export function formatTime(value) {
+  const rounded = Math.round((value + Number.EPSILON) * 100) / 100;
+  return Number.isInteger(rounded * 10) ? rounded.toFixed(1) : rounded.toFixed(2);
+}
+
 export function clampTime(time) {
   return Math.min(10, Math.max(0, time));
 }
@@ -59,7 +64,8 @@ export function advanceMotion(state, now) {
 }
 
 export function describe(speed, time) {
-  const d = distance(speed, time);
+  const displayedTime = Number(formatTime(time));
+  const d = distance(speed, displayedTime);
   if (speed === 0) return '時間が進んでも距離は増えない。車は止まり、グラフは水平。';
-  return '1秒ごとに' + speed + 'm進む。' + formatValue(time) + '秒で' + formatValue(d) + 'm。速いほどグラフの傾きは大きい。';
+  return '距離＝速さ×時間。' + speed + 'm/秒×' + formatTime(displayedTime) + '秒＝' + formatValue(d) + 'm。';
 }

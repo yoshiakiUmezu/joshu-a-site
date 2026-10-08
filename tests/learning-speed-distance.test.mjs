@@ -1,9 +1,9 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {distance,clampTime,describe,formatValue,createMotionState,setSpeed,seekTime,pauseMotion,startMotion,resetMotion,advanceMotion} from '../learning/speed-distance-time/motion.mjs';
+import test from 'node:test';import assert from 'node:assert/strict';import {distance,clampTime,describe,formatTime,formatValue,createMotionState,setSpeed,seekTime,pauseMotion,startMotion,resetMotion,advanceMotion} from '../learning/speed-distance-time/motion.mjs';
 test('代表値・端点・停止',()=>{for(const [v,t,d] of [[2,3,6],[0,10,0],[5,10,50],[0,0,0],[.5,2.5,1.25],[5,0,0]])assert.equal(distance(v,t),d)});
 test('全グリッドで距離とグラフ用モデルが一致',()=>{for(let v=0;v<=5;v+=.5)for(let i=0;i<=100;i++){const t=i/10;assert.ok(Math.abs(distance(v,t)-v*t)<1e-10)}});
 test('シーク境界',()=>{assert.equal(clampTime(-2),0);assert.equal(clampTime(12),10)});
-test('停止説明・速さ説明',()=>{assert.match(describe(0,4),/水平/);assert.match(describe(2,3),/1秒ごとに2m/);assert.match(describe(2,3),/6.0m/)});
-test('説明文と数値欄で同じ小数第1位に丸める',()=>{assert.equal(formatValue(5.75),'5.8');assert.equal(formatValue(28.75),'28.8');assert.match(describe(5,5.75),/5.8秒で28.8m/)});
+test('停止説明・速さ説明',()=>{assert.match(describe(0,4),/水平/);assert.match(describe(2,3),/2m\/秒×3.0秒＝6.0m/)});
+test('表示時刻と距離の計算が説明文で一致する',()=>{assert.equal(formatTime(3.1),'3.1');assert.equal(formatTime(10),'10.0');assert.equal(formatTime(.18),'0.18');assert.equal(formatValue(5.75),'5.8');assert.equal(formatValue(28.75),'28.8');assert.match(describe(5,.18),/5m\/秒×0.18秒＝0.9m/);assert.match(describe(2,3.07),/2m\/秒×3.07秒＝6.1m/)});
 test('範囲外は拒否',()=>{for(const [v,t] of [[-1,1],[6,1],[2,-1],[2,11]])assert.throws(()=>distance(v,t),RangeError)});
 test('再生中に速さを変えると同じ時刻の比較へ即時反映',()=>{const s=createMotionState();seekTime(s,4);startMotion(s);advanceMotion(s,0);setSpeed(s,5);advanceMotion(s,1000);assert.equal(s.time,5);assert.equal(distance(s.speed,s.time),25);assert.match(describe(s.speed,s.time),/25.0m/)});
 test('再生中の時間操作はシーク位置から再開する',()=>{const s=createMotionState();seekTime(s,2);startMotion(s);advanceMotion(s,0);advanceMotion(s,1000);seekTime(s,7.5);assert.equal(s.time,7.5);assert.equal(s.last,null);advanceMotion(s,2000);assert.equal(s.time,7.5);advanceMotion(s,2500);assert.equal(s.time,8)});
