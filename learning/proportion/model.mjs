@@ -1,0 +1,2 @@
+export function proportionValue(a,x){if(!Number.isFinite(a)||!Number.isFinite(x))throw new RangeError('a and x must be finite');return a*x;}
+export function inverseProportionValue(a,x){if(!Number.isFinite(a)||!Number.isFinite(x)||x===0)throw new RangeError('a must be finite and x nonzero');return a/x;}
