@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">点P・面積とグラフ</title>
+  <desc id="desc">長方形ABCDの辺上を動く点Pと三角形APC、面積の折れ線グラフを示す無料算数教材の共有画像。</desc>
+  <defs>
+    <linearGradient id="background" x2="1" y2="1"><stop stop-color="#08101d"/><stop offset="1" stop-color="#101e33"/></linearGradient>
+    <linearGradient id="card" x2="0" y2="1"><stop stop-color="#172a43"/><stop offset="1" stop-color="#111d30"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#16456a" stop-opacity=".56"/><stop offset="1" stop-color="#16456a" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#background)"/>
+  <circle cx="1120" cy="40" r="340" fill="url(#glow)"/>
+  <circle cx="30" cy="640" r="280" fill="#0d2138" opacity=".45"/>
+  <path d="M64 50H1136" stroke="#334155" stroke-width="2"/>
+  <text x="72" y="88" fill="#e7edf6" font-family="'Yu Gothic','Meiryo',sans-serif" font-size="23" font-weight="700">助手A</text>
+  <text x="174" y="88" fill="#7dd3fc" font-family="Arial,sans-serif" font-size="15" letter-spacing="2">LEARNING / 算数・無料Web教材</text>
+  <text x="72" y="154" fill="#f1f5f9" font-family="'Yu Gothic','Meiryo',sans-serif" font-size="48" font-weight="700">点P・面積とグラフ</text>
+  <text x="74" y="197" fill="#b7c5d7" font-family="'Yu Gothic','Meiryo',sans-serif" font-size="21">点Pが動くと、三角形APCの面積はどう変わる？</text>
+
+  <rect x="64" y="226" width="474" height="340" rx="22" fill="url(#card)" stroke="#334155" stroke-width="2"/>
+  <text x="94" y="266" fill="#e2e8f0" font-family="'Yu Gothic','Meiryo',sans-serif" font-size="19" font-weight="700">長方形 ABCD ・ 三角形 APC</text>
+  <rect x="137" y="316" width="330" height="186" fill="none" stroke="#94a3b8" stroke-width="3"/>
+  <polygon points="137,502 302,502 467,316" fill="#38bdf8" fill-opacity=".22" stroke="#38bdf8" stroke-width="3"/>
+  <line x1="137" y1="502" x2="467" y2="316" stroke="#38bdf8" stroke-width="3"/>
+  <circle cx="302" cy="502" r="9" fill="#fb923c" stroke="#fff" stroke-width="3"/>
+  <text x="113" y="527" fill="#e2e8f0" font-family="Arial,sans-serif" font-size="19">A</text>
+  <text x="470" y="527" fill="#e2e8f0" font-family="Arial,sans-serif" font-size="19">B</text>
+  <text x="470" y="310" fill="#e2e8f0" font-family="Arial,sans-serif" font-size="19">C</text>
+  <text x="113" y="310" fill="#e2e8f0" font-family="Arial,sans-serif" font-size="19">D</text>
+  <text x="316" y="526" fill="#fb923c" font-family="Arial,sans-serif" font-size="20" font-weight="700">P</text>
+  <text x="274" y="552" fill="#b7c5d7" font-family="Arial,sans-serif" font-size="16">6 cm</text>
+  <text x="87" y="416" fill="#b7c5d7" font-family="Arial,sans-serif" font-size="16">3 cm</text>
+  <text x="95" y="294" fill="#94a3b8" font-family="'Yu Gothic','Meiryo',sans-serif" font-size="14">A → B → C を毎秒1cmで移動</text>
+
+  <rect x="566" y="226" width="570" height="340" rx="22" fill="url(#card)" stroke="#334155" stroke-width="2"/>
+  <text x="598" y="266" fill="#e2e8f0" font-family="'Yu Gothic','Meiryo',sans-serif" font-size="19" font-weight="700">時間と三角形APCの面積</text>
+  <g stroke="#94a3b8" stroke-opacity=".24" stroke-width="1">
+    <path d="M670 312V492M808 312V492M946 312V492M1084 312V492"/>
+    <path d="M670 312H1084M670 372H1084M670 432H1084M670 492H1084"/>
+  </g>
+  <path d="M670 492L946 312L1084 492" fill="none" stroke="#38bdf8" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="946" cy="312" r="6" fill="#93c5fd" stroke="#fff" stroke-width="2"/>
+  <text x="958" y="304" fill="#b7c5d7" font-family="'Yu Gothic','Meiryo',sans-serif" font-size="15">折れ点 (6, 9)</text>
+  <path d="M808 402V492M670 402H808" stroke="#fb923c" stroke-width="2" stroke-dasharray="7 6" opacity=".8"/>
+  <circle cx="808" cy="402" r="9" fill="#fb923c" stroke="#fff" stroke-width="3"/>
+  <text x="822" y="396" fill="#fbbf24" font-family="Arial,sans-serif" font-size="16" font-weight="700">(3, 4.5)</text>
+  <path d="M670 492H1094M670 502V302" stroke="#cbd5e1" stroke-width="2"/>
+  <g fill="#cbd5e1" font-family="Arial,sans-serif" font-size="15" text-anchor="middle">
+    <text x="670" y="519">0</text><text x="808" y="519">3</text><text x="946" y="519">6</text><text x="1084" y="519">9</text>
+  </g>
+  <g fill="#cbd5e1" font-family="Arial,sans-serif" font-size="14" text-anchor="end">
+    <text x="658" y="497">0</text><text x="658" y="437">3</text><text x="658" y="377">6</text><text x="658" y="317">9</text>
+  </g>
+  <text x="1088" y="544" fill="#b7c5d7" font-family="'Yu Gothic','Meiryo',sans-serif" font-size="15" text-anchor="end">時間（秒）</text>
+  <text x="594" y="320" fill="#b7c5d7" font-family="'Yu Gothic','Meiryo',sans-serif" font-size="14">面積</text>
+  <text x="598" y="555" fill="#cbd5e1" font-family="Arial,sans-serif" font-size="15">0〜6秒: 1.5t</text>
+  <text x="806" y="555" fill="#cbd5e1" font-family="Arial,sans-serif" font-size="15">6〜9秒: 3(9−t)</text>
+</svg>

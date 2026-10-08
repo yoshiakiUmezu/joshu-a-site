@@ -13,6 +13,7 @@ function fixture(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'joshu-a-release-check-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   for (const file of ['index.html', '404.html', 'robots.txt', 'sitemap.xml', '_headers']) fs.copyFileSync(path.join(source, file), path.join(root, file));
+  fs.mkdirSync(path.join(root, 'assets'));
   fs.cpSync(path.join(source, 'assets'), path.join(root, 'assets'), { recursive: true });
   fs.cpSync(path.join(source, 'learning'), path.join(root, 'learning'), { recursive: true });
   return root;
@@ -59,6 +60,7 @@ test('current unpublished site passes and stays product-free', t => {
   assert.deepEqual(result.errors, []);
   assert.equal(result.productCount, 0);
   assert.equal(result.learningCount, fs.readdirSync(path.join(source, 'learning')).filter(entry => fs.existsSync(path.join(source, 'learning', entry, 'index.html'))).length);
+  assert.equal(result.pages.includes('learning/point-p/index.html'), true);
 });
 
 test('valid temporary product passes and missing sitemap/CTA/OG are caught', t => {
@@ -228,6 +230,46 @@ test('learning page shares a lesson-specific social image', t => {
   assert.match(page, /"image":"https:\/\/joshu-a\.com\/assets\/og-learning-speed-distance-time\.png"/);
 });
 
+test('point P lesson has public metadata and a dedicated OG image', t => {
+  const root = fixture(t);
+  const page = fs.readFileSync(path.join(root, 'learning', 'point-p', 'index.html'), 'utf8');
+  assert.match(page, /name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"/);
+  assert.match(page, /rel="canonical" href="https:\/\/joshu-a\.com\/learning\/point-p\/"/);
+  assert.match(page, /property="og:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-point-p\.png"/);
+  assert.match(page, /name="twitter:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-point-p\.png"/);
+  assert.match(page, /"@type": "WebPage"/);
+  assert.match(fs.readFileSync(path.join(root, 'learning', 'index.html'), 'utf8'), /data-learning-card href="\/learning\/point-p\/"/);
+  assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /data-featured-learning href="\/learning\/probability\/"/);
+  assert.deepEqual(checkSite(root).errors, []);
+});
+
+test('linear function lesson has public metadata and catalog/home integration', t => {
+  const root = fixture(t);
+  const page = fs.readFileSync(path.join(root, 'learning', 'linear-function', 'index.html'), 'utf8');
+  assert.match(page, /name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"/);
+  assert.match(page, /rel="canonical" href="https:\/\/joshu-a\.com\/learning\/linear-function\/"/);
+  assert.match(page, /property="og:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-linear-function\.png"/);
+  assert.match(page, /name="twitter:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-linear-function\.png"/);
+  assert.match(page, /"@type":"WebPage"/);
+  assert.match(page, /data-learning-subject="math"/);
+  assert.match(fs.readFileSync(path.join(root, 'learning', 'index.html'), 'utf8'), /data-learning-card href="\/learning\/linear-function\/"/);
+  assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /data-featured-learning href="\/learning\/probability\/"/);
+  assert.deepEqual(checkSite(root).errors, []);
+});
+
+test('probability lesson has public metadata, a dedicated OG image, and current home link', t => {
+  const root = fixture(t);
+  const page = fs.readFileSync(path.join(root, 'learning', 'probability', 'index.html'), 'utf8');
+  assert.match(page, /name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"/);
+  assert.match(page, /rel="canonical" href="https:\/\/joshu-a\.com\/learning\/probability\/"/);
+  assert.match(page, /property="og:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-probability\.png"/);
+  assert.match(page, /name="twitter:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-probability\.png"/);
+  assert.match(page, /"@type":"WebPage"/);
+  assert.match(fs.readFileSync(path.join(root, 'learning', 'index.html'), 'utf8'), /data-learning-card href="\/learning\/probability\/"/);
+  assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /data-featured-learning href="\/learning\/probability\/"/);
+  assert.deepEqual(checkSite(root).errors, []);
+});
+
 test('learning catalog links only published lessons and exposes only published subjects', t => {
   const root = fixture(t);
   const catalog = path.join(root, 'learning', 'index.html');
@@ -235,6 +277,9 @@ test('learning catalog links only published lessons and exposes only published s
   assert.match(html, /data-filter="all"/);
   assert.match(html, /data-filter="math"/);
   assert.match(html, /data-learning-card href="\/learning\/speed-distance-time\/"/);
+  assert.match(html, /data-learning-card href="\/learning\/point-p\/"/);
+  assert.match(html, /data-learning-card href="\/learning\/linear-function\/"/);
+  assert.match(html, /data-learning-card href="\/learning\/probability\/"/);
   assert.deepEqual(checkSite(root).errors, []);
   fs.writeFileSync(catalog, html.replace(/\s*<button class="filter" id="subject-math"[\s\S]*?<\/button>/, ''));
   assert.match(checkSite(root).errors.join('\n'), /filter missing for published subject math/);

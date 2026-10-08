@@ -341,28 +341,28 @@ test('learning catalog mobile layout, filters, lesson links, and return path', a
           assert.ok(initial.scrollWidth <= initial.width, 'catalog should not scroll horizontally');
           assert.ok(initial.filters.every(filter => filter.height >= 44 && filter.left >= 0 && filter.right <= viewport.width), 'filter buttons should be visible 44px tap targets');
           assert.ok(initial.card.height >= 44 && initial.card.left >= 0 && initial.card.right <= viewport.width, 'lesson card should be a visible tap target');
-          assert.equal(initial.visibleLessons, 1);
+          assert.equal(initial.visibleLessons, 4);
 
           await page.locator('#subject-math').tap();
           assert.equal(await page.locator('#subject-math').getAttribute('aria-pressed'), 'true');
           assert.equal(new URL(page.url()).hash, '#subject-math');
-          assert.equal(await page.locator('[data-learning-item]:visible').count(), 1);
+          assert.equal(await page.locator('[data-learning-item]:visible').count(), 4);
           assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'filtered catalog should not scroll horizontally');
 
           await Promise.all([
             page.waitForURL(url => url.pathname === lessonPath),
-            page.locator('[data-learning-card]').tap(),
+            page.locator('[data-learning-card][href="/learning/speed-distance-time/"]').tap(),
           ]);
           assert.equal(new URL(page.url()).pathname, lessonPath);
           assert.equal(await page.locator('h1').textContent(), '動きとグラフはどうつながる？');
           assert.equal(await page.locator('.breadcrumbs a[href="/learning/"]').count(), 1);
           await Promise.all([
             page.waitForURL(url => url.pathname === '/learning/'),
-            page.locator('.lesson-exit a').tap(),
+            page.locator('.lesson-back').tap(),
           ]);
           assert.equal(new URL(page.url()).pathname, '/learning/');
           assert.equal(await page.locator('[data-filter="all"]').getAttribute('aria-pressed'), 'true');
-          assert.equal(await page.locator('[data-learning-item]:visible').count(), 1);
+          assert.equal(await page.locator('[data-learning-item]:visible').count(), 4);
         } finally {
           await context.close();
         }
@@ -384,10 +384,11 @@ test('home presents one latest lesson and links to the catalog and lesson; unkno
     assert.equal(new URL(page.url()).pathname, '/learning/');
     await page.goto(`${baseUrl}/`, { waitUntil: 'networkidle' });
     await Promise.all([
-      page.waitForURL(url => url.pathname === lessonPath),
+      page.waitForURL(url => url.pathname === '/learning/probability/'),
       page.locator('[data-featured-learning]').tap(),
     ]);
-    assert.equal(new URL(page.url()).pathname, lessonPath);
+    assert.equal(new URL(page.url()).pathname, '/learning/probability/');
+    assert.equal(await page.locator('h1').textContent(), 'サイコロの「出やすさ」を考えよう');
     const missing = await page.goto(`${baseUrl}/learning/not-a-real-lesson/`);
     assert.equal(missing.status(), 404);
   } finally {
