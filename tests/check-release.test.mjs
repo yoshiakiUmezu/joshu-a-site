@@ -221,7 +221,7 @@ test('published learning page requires indexability, sitemap entry, and homepage
 test('learning page requires a return link to the catalog', t => {
   const root = fixture(t);
   const learning = path.join(root, 'learning', 'speed-distance-time', 'index.html');
-  fs.writeFileSync(learning, fs.readFileSync(learning, 'utf8').replace('<a href="/learning/">← 教材一覧へ</a>', ''));
+  fs.writeFileSync(learning, fs.readFileSync(learning, 'utf8').replace('<a href="/learning/">← 教材一覧へ戻る</a>', ''));
   assert.match(checkSite(root).errors.join('\n'), /return link to \/learning\/ missing/);
 });
 
