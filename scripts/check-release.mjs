@@ -220,6 +220,8 @@ export function checkSite(root = DEFAULT_ROOT) {
     for (const relative of pages.filter(file => file.startsWith('learning/'))) {
       const url = `/${relative.replace(/index\.html$/, '')}`;
       if (!tags(home, 'a').some(link => link.href === url || link.href === `${ORIGIN}${url}`)) report(`index.html: learning link missing for ${relative}`);
+      const learningHtml = fs.readFileSync(path.join(root, relative), 'utf8');
+      if (!tags(learningHtml, 'a').some(link => link.href === '/#learning' || link.href === `${ORIGIN}/#learning`)) report(`${relative}: return link to /#learning missing`);
     }
   }
   return { errors, pages, productCount, learningCount };
