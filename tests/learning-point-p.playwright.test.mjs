@@ -144,7 +144,7 @@ async function assertFits(page, viewport, textScale) {
       const box = svg.getBoundingClientRect();
       return { left: box.left, right: box.right, top: box.top, bottom: box.bottom };
     });
-    const controls = [...document.querySelectorAll('input[type="range"], button')].map(control => {
+    const controls = [...document.querySelectorAll('input[type="range"], button, .lesson-back')].map(control => {
       const box = control.getBoundingClientRect();
       return { width: box.width, height: box.height, left: box.left, right: box.right };
     });
@@ -162,6 +162,10 @@ async function assertFits(page, viewport, textScale) {
       controls,
       graphLabels,
       point: document.querySelector('#point').getBoundingClientRect().toJSON(),
+      children: [...document.querySelector('main').children].map(element => {
+        const box = element.getBoundingClientRect();
+        return { tag: element.tagName, className: element.className, top: box.top, bottom: box.bottom, height: box.height };
+      }),
     };
   });
   assert.ok(layout.scrollWidth <= layout.width, 'page should not scroll horizontally');
@@ -247,7 +251,7 @@ test('Point P touch, six mobile conditions, interval boundary, playback, and syn
           assert.deepEqual(state.point, { x: 283, y: 18 });
           await assertFits(page, viewport, textScale);
           await page.locator('#play').tap();
-          assert.equal((await readState(page)).time, 0, 'play after the end should restart at zero');
+          assert.ok((await readState(page)).time < 0.05, 'play after the end should restart from zero before visibly advancing');
           assert.equal(await page.locator('#play').textContent(), 'Ⅱ 一時停止');
           await page.locator('#play').tap();
         } finally {
