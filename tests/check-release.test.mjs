@@ -13,13 +13,8 @@ function fixture(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'joshu-a-release-check-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   for (const file of ['index.html', '404.html', 'robots.txt', 'sitemap.xml', '_headers']) fs.copyFileSync(path.join(source, file), path.join(root, file));
-  fs.mkdirSync(path.join(root, 'assets'));
-  for (const file of ['og-home.png', 'og-learning-speed-distance-time.png', 'brand-mark.png']) fs.copyFileSync(path.join(source, 'assets', file), path.join(root, 'assets', file));
-  const learning = path.join(root, 'learning', 'speed-distance-time');
-  fs.mkdirSync(learning, { recursive: true });
-  fs.mkdirSync(path.join(root, 'learning'), { recursive: true });
-  fs.copyFileSync(path.join(source, 'learning', 'index.html'), path.join(root, 'learning', 'index.html'));
-  for (const file of ['index.html', 'motion.mjs']) fs.copyFileSync(path.join(source, 'learning', 'speed-distance-time', file), path.join(learning, file));
+  fs.cpSync(path.join(source, 'assets'), path.join(root, 'assets'), { recursive: true });
+  fs.cpSync(path.join(source, 'learning'), path.join(root, 'learning'), { recursive: true });
   return root;
 }
 
@@ -63,7 +58,7 @@ test('current unpublished site passes and stays product-free', t => {
   const result = checkSite(root);
   assert.deepEqual(result.errors, []);
   assert.equal(result.productCount, 0);
-  assert.equal(result.learningCount, 1);
+  assert.equal(result.learningCount, fs.readdirSync(path.join(source, 'learning')).filter(entry => fs.existsSync(path.join(source, 'learning', entry, 'index.html'))).length);
 });
 
 test('valid temporary product passes and missing sitemap/CTA/OG are caught', t => {
@@ -210,7 +205,7 @@ test('published learning page requires indexability, sitemap entry, and homepage
   const home = path.join(root, 'index.html');
   const sitemap = path.join(root, 'sitemap.xml');
   fs.writeFileSync(learning, fs.readFileSync(learning, 'utf8').replace('content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"', 'content="noindex,nofollow"'));
-  fs.writeFileSync(home, fs.readFileSync(home, 'utf8').replace('<a data-featured-learning href="/learning/speed-distance-time/">教材を開く</a>', ''));
+  fs.writeFileSync(home, fs.readFileSync(home, 'utf8').replace(/<a data-featured-learning\b[^>]*>[\s\S]*?<\/a>/, ''));
   fs.writeFileSync(sitemap, fs.readFileSync(sitemap, 'utf8').replace(/\s*<url>\s*<loc>https:\/\/joshu-a\.com\/learning\/speed-distance-time\/<\/loc>[\s\S]*?<\/url>/, ''));
   const errors = checkSite(root).errors.join('\n');
   assert.match(errors, /noindex on published page/);
