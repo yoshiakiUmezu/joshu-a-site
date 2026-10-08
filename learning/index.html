@@ -59,6 +59,12 @@
           "position": 4,
           "name": "確率",
           "url": "https://joshu-a.com/learning/probability/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "月の満ち欠け",
+          "url": "https://joshu-a.com/learning/moon-phases/"
         }
       ]
     }
@@ -136,9 +142,13 @@
               <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.5 18 16.5H2L10 2.5Z" stroke="currentColor" stroke-linejoin="round"/><path d="M7 12h6" stroke="currentColor" stroke-linecap="round"/></svg>
               算数
             </button>
+            <button class="filter" id="subject-science" type="button" data-filter="science" aria-pressed="false" aria-controls="learning-list">
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7" stroke="currentColor"/><path d="M10 3v14M3 10h14" stroke="currentColor"/></svg>
+              理科
+            </button>
           </div>
         </div>
-        <p id="filter-status" class="sr-only" aria-live="polite">公開中の教材 4件</p>
+        <p id="filter-status" class="sr-only" aria-live="polite">公開中の教材 5件</p>
         <ul class="lesson-list" id="learning-list">
           <li class="lesson-card" data-learning-item data-subject="math">
             <a data-learning-card href="/learning/linear-function/">
@@ -148,6 +158,13 @@
                 <h3>一次関数 y=ax+b</h3>
                 <span class="lesson-description">傾きaと切片bを動かして、直線の向きと位置の変化を確かめます。</span>
               </span>
+              <span class="card-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+          <li class="lesson-card" data-learning-item data-subject="science">
+            <a data-learning-card href="/learning/moon-phases/">
+              <span class="subject-mark" aria-hidden="true">☾</span>
+              <span class="lesson-copy"><span class="lesson-meta">理科 / 無料Web教材</span><h3>月の満ち欠け</h3><span class="lesson-description">月齢と月の形を動かして、太陽・地球・月の位置関係を見てみます。</span></span>
               <span class="card-arrow" aria-hidden="true">→</span>
             </a>
           </li>

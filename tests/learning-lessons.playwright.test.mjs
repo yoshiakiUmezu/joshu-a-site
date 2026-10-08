@@ -60,3 +60,29 @@ for (const lessonPath of lessonPaths) {
     });
   });
 }
+
+test('/learning/moon-phases/: 6 portrait conditions, lunar cycle, touch and reset', async t => {
+  for (const viewport of viewports) for (const scale of [1, 1.25]) await t.test(`${viewport.width}×${viewport.height}, ${scale * 100}% text`, async () => {
+    const context = await browser.newContext({ viewport, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+    const page = await context.newPage();
+    try {
+      await page.goto(`${baseUrl}/learning/moon-phases/`, { waitUntil: 'networkidle' });
+      if (scale > 1) await page.evaluate(factor => document.querySelectorAll('h1,.crumb,.row label,.row output,.explain,.foot,.stats small,.stats strong,button,svg text').forEach(el => el.style.setProperty('font-size', `${parseFloat(getComputedStyle(el).fontSize) * factor}px`, 'important')), scale);
+      const layout = await page.evaluate(() => ({ w: document.documentElement.scrollWidth, h: document.documentElement.scrollHeight, iw: innerWidth, ih: innerHeight, touch: [...document.querySelectorAll('input[type=range],button,.exit a')].map(el => el.getBoundingClientRect().height) }));
+      assert.ok(layout.w <= layout.iw, 'no horizontal scrolling');
+      assert.ok(layout.h <= layout.ih + 2, 'lesson fits in one screen');
+      assert.ok(layout.touch.every(height => height >= 44), 'range and buttons have 44px touch areas');
+      await page.locator('#age').evaluate(el => { el.value = '0'; el.dispatchEvent(new Event('input', { bubbles: true })); });
+      assert.equal(await page.locator('#illumValue').textContent(), '0.0');
+      assert.equal(await page.locator('#phaseValue').textContent(), '新月ごろ');
+      assert.equal(await page.locator('#moonShadow').getAttribute('cx'), '277');
+      await page.locator('#age').evaluate(el => { el.value = '14.77'; el.dispatchEvent(new Event('input', { bubbles: true })); });
+      assert.ok(Number(await page.locator('#illumValue').textContent()) > 99.9);
+      assert.equal(await page.locator('#phaseValue').textContent(), '満月ごろ');
+      assert.ok(Number(await page.locator('#moonShadow').getAttribute('cx')) > 320, 'full moon shadow stays outside the visible disk');
+      await page.locator('#reset').tap();
+      assert.equal(await page.locator('#age').inputValue(), '7.38');
+      assert.equal(await page.locator('#ageValue').textContent(), '7.38');
+    } finally { await context.close(); }
+  });
+});

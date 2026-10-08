@@ -1,0 +1,2 @@
+import assert from 'node:assert/strict';import {test} from 'node:test';import {SYNODIC_MONTH,lunarPhase} from '../learning/moon-phases/model.mjs';
+test('moon phase illumination and cycle boundaries',()=>{assert.equal(lunarPhase(0).illumination,0);assert.ok(Math.abs(lunarPhase(SYNODIC_MONTH/4).illumination-.5)<1e-12);assert.equal(lunarPhase(SYNODIC_MONTH/2).illumination,1);assert.ok(Math.abs(lunarPhase(3*SYNODIC_MONTH/4).illumination-.5)<1e-12);assert.equal(lunarPhase(SYNODIC_MONTH).illumination,0);assert.throws(()=>lunarPhase(-.01),RangeError);});
