@@ -17,6 +17,8 @@ function fixture(t) {
   for (const file of ['og-home.png', 'og-learning-speed-distance-time.png', 'brand-mark.png']) fs.copyFileSync(path.join(source, 'assets', file), path.join(root, 'assets', file));
   const learning = path.join(root, 'learning', 'speed-distance-time');
   fs.mkdirSync(learning, { recursive: true });
+  fs.mkdirSync(path.join(root, 'learning'), { recursive: true });
+  fs.copyFileSync(path.join(source, 'learning', 'index.html'), path.join(root, 'learning', 'index.html'));
   for (const file of ['index.html', 'motion.mjs']) fs.copyFileSync(path.join(source, 'learning', 'speed-distance-time', file), path.join(learning, file));
   return root;
 }
@@ -208,12 +210,19 @@ test('published learning page requires indexability, sitemap entry, and homepage
   const home = path.join(root, 'index.html');
   const sitemap = path.join(root, 'sitemap.xml');
   fs.writeFileSync(learning, fs.readFileSync(learning, 'utf8').replace('content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"', 'content="noindex,nofollow"'));
-  fs.writeFileSync(home, fs.readFileSync(home, 'utf8').replace('<a class="contact-link" href="/learning/speed-distance-time/">触ってみる</a>', ''));
+  fs.writeFileSync(home, fs.readFileSync(home, 'utf8').replace('<a data-featured-learning href="/learning/speed-distance-time/">教材を開く</a>', ''));
   fs.writeFileSync(sitemap, fs.readFileSync(sitemap, 'utf8').replace(/\s*<url>\s*<loc>https:\/\/joshu-a\.com\/learning\/speed-distance-time\/<\/loc>[\s\S]*?<\/url>/, ''));
   const errors = checkSite(root).errors.join('\n');
   assert.match(errors, /noindex on published page/);
-  assert.match(errors, /index.html: learning link missing/);
+  assert.match(errors, /index.html: exactly one valid latest learning link required/);
   assert.match(errors, /sitemap.xml: missing https:\/\/joshu-a\.com\/learning\/speed-distance-time\//);
+});
+
+test('learning page requires a return link to the catalog', t => {
+  const root = fixture(t);
+  const learning = path.join(root, 'learning', 'speed-distance-time', 'index.html');
+  fs.writeFileSync(learning, fs.readFileSync(learning, 'utf8').replace('<a href="/learning/">← 教材一覧へ</a>', ''));
+  assert.match(checkSite(root).errors.join('\n'), /return link to \/learning\/ missing/);
 });
 
 test('learning page shares a lesson-specific social image', t => {
@@ -222,4 +231,31 @@ test('learning page shares a lesson-specific social image', t => {
   assert.match(page, /property="og:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-speed-distance-time\.png"/);
   assert.match(page, /name="twitter:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-speed-distance-time\.png"/);
   assert.match(page, /"image":"https:\/\/joshu-a\.com\/assets\/og-learning-speed-distance-time\.png"/);
+});
+
+test('learning catalog links only published lessons and exposes only published subjects', t => {
+  const root = fixture(t);
+  const catalog = path.join(root, 'learning', 'index.html');
+  const html = fs.readFileSync(catalog, 'utf8');
+  assert.match(html, /data-filter="all"/);
+  assert.match(html, /data-filter="math"/);
+  assert.match(html, /data-learning-card href="\/learning\/speed-distance-time\/"/);
+  assert.deepEqual(checkSite(root).errors, []);
+  fs.writeFileSync(catalog, html.replace(/\s*<button class="filter" id="subject-math"[\s\S]*?<\/button>/, ''));
+  assert.match(checkSite(root).errors.join('\n'), /filter missing for published subject math/);
+});
+
+test('learning catalog rejects placeholder and unapproved sample lessons', t => {
+  const root = fixture(t);
+  const catalog = path.join(root, 'learning', 'index.html');
+  fs.writeFileSync(catalog, fs.readFileSync(catalog, 'utf8').replace('</main>', '<p>光と植物の成長</p></main>'));
+  assert.match(checkSite(root).errors.join('\n'), /placeholder or unpublished learning content remains/);
+});
+
+test('learning category anchor targets are checked', t => {
+  const root = fixture(t);
+  const catalog = path.join(root, 'learning', 'index.html');
+  fs.writeFileSync(catalog, fs.readFileSync(catalog, 'utf8').replace('id="subject-math"', ''));
+  const errors = checkSite(root).errors.join('\n');
+  assert.match(errors, /missing anchor \/learning\/#subject-math/);
 });
