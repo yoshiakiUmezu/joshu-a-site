@@ -309,6 +309,18 @@ test('current and voltage lesson has public science metadata and catalog integra
   assert.deepEqual(checkSite(root).errors, []);
 });
 
+test('geometry nets lesson has public math metadata and catalog integration', t => {
+  const root = fixture(t);
+  const page = fs.readFileSync(path.join(root, 'learning', 'geometry-nets', 'index.html'), 'utf8');
+  assert.match(page, /name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"/);
+  assert.match(page, /rel="canonical" href="https:\/\/joshu-a\.com\/learning\/geometry-nets\/"/);
+  assert.match(page, /property="og:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-geometry-nets\.png"/);
+  assert.match(page, /name="twitter:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-geometry-nets\.png"/);
+  assert.match(page, /data-learning-subject="math"/);
+  assert.match(fs.readFileSync(path.join(root, 'learning', 'index.html'), 'utf8'), /data-learning-card href="\/learning\/geometry-nets\/"/);
+  assert.deepEqual(checkSite(root).errors, []);
+});
+
 test('learning catalog links only published lessons and exposes only published subjects', t => {
   const root = fixture(t);
   const catalog = path.join(root, 'learning', 'index.html');

@@ -1,0 +1,2 @@
+import assert from 'node:assert/strict';import {test} from 'node:test';import {cubeNetFaceCount,cubeSurfaceArea,cubeVolume} from '../learning/geometry-nets/model.mjs';
+test('cube net faces and dimensions',()=>{assert.equal(cubeNetFaceCount(6),true);assert.equal(cubeNetFaceCount(5),false);assert.equal(cubeSurfaceArea(3),54);assert.equal(cubeVolume(3),27);assert.equal(cubeSurfaceArea(0),0);assert.throws(()=>cubeVolume(-1),RangeError);});
