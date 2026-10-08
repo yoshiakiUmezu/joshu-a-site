@@ -1,0 +1,2 @@
+export function reflectAngle(incidentAngle){if(!Number.isFinite(incidentAngle)||incidentAngle<0||incidentAngle>90)throw new RangeError('angle must be between 0 and 90 degrees from the normal');return incidentAngle;}
+export function rayPoint(angle,length=1){reflectAngle(angle);if(!Number.isFinite(length)||length<0)throw new RangeError('length must be nonnegative');const rad=angle*Math.PI/180;return {parallel:length*Math.sin(rad),normal:length*Math.cos(rad)};}

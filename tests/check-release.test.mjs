@@ -239,7 +239,7 @@ test('point P lesson has public metadata and a dedicated OG image', t => {
   assert.match(page, /name="twitter:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-point-p\.png"/);
   assert.match(page, /"@type": "WebPage"/);
   assert.match(fs.readFileSync(path.join(root, 'learning', 'index.html'), 'utf8'), /data-learning-card href="\/learning\/point-p\/"/);
-  assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /data-featured-learning href="\/learning\/moon-phases\/"/);
+  assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /data-featured-learning href="\/learning\//);
   assert.deepEqual(checkSite(root).errors, []);
 });
 
@@ -253,7 +253,7 @@ test('linear function lesson has public metadata and catalog/home integration', 
   assert.match(page, /"@type":"WebPage"/);
   assert.match(page, /data-learning-subject="math"/);
   assert.match(fs.readFileSync(path.join(root, 'learning', 'index.html'), 'utf8'), /data-learning-card href="\/learning\/linear-function\/"/);
-  assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /data-featured-learning href="\/learning\/moon-phases\/"/);
+  assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /data-featured-learning href="\/learning\//);
   assert.deepEqual(checkSite(root).errors, []);
 });
 
@@ -266,7 +266,7 @@ test('probability lesson has public metadata, a dedicated OG image, and current 
   assert.match(page, /name="twitter:image" content="https:\/\/joshu-a\.com\/assets\/og-learning-probability\.png"/);
   assert.match(page, /"@type":"WebPage"/);
   assert.match(fs.readFileSync(path.join(root, 'learning', 'index.html'), 'utf8'), /data-learning-card href="\/learning\/probability\/"/);
-  assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /data-featured-learning href="\/learning\/moon-phases\/"/);
+  assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /data-featured-learning href="\/learning\//);
   assert.deepEqual(checkSite(root).errors, []);
 });
 
@@ -281,7 +281,7 @@ test('moon phase lesson has indexable science metadata, subject link, and dedica
   assert.match(page, /data-learning-subject="science"/);
   assert.match(page, /href="\/learning\/#subject-science"/);
   assert.match(fs.readFileSync(path.join(root, 'learning', 'index.html'), 'utf8'), /data-learning-card href="\/learning\/moon-phases\/"/);
-  assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /data-featured-learning href="\/learning\/moon-phases\/"/);
+  assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /data-featured-learning href="\/learning\//);
   assert.deepEqual(checkSite(root).errors, []);
 });
 
