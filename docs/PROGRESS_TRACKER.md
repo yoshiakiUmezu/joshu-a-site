@@ -7,9 +7,6 @@
 
 | 項目 | 状態 | 完了条件 | 次の操作 |
 | --- | --- | --- | --- |
-| Cloudflare Web Analytics | STAY | Pagesプロジェクトの現在状態をダッシュボードで確認し、助手Aが有効化を承認 | 既に有効なら重複導入せず計測画面を確認。未有効なら Workers & Pages > joshu-a-site > Metrics > Web Analytics をEnableし、次回Production deployment後にbeacon注入とデータ取得を確認 |
-
-
 ## WATCH
 
 | 項目 | 状態 | 再開条件 | 次の操作 |
@@ -24,6 +21,7 @@
 | Google Search Console | ユーザー確認: joshu-a.com Domain property登録・所有権確認・sitemap.xml送信済み。URL検査でトップはインデックス済み、Googlebot取得成功、canonical正常。 |
 | Bing Webmaster Tools | ユーザー確認: joshu-a.com追加・所有権確認・sitemap.xml送信済み。URL InspectionでトップはIndexed successfully。 |
 | pages.dev → joshu-a.com 301転送 | ユーザー確認: Cloudflare Bulk Redirectを設定し、https://joshu-a-site.pages.dev/ から https://joshu-a.com/ への301転送が動作。 |
+| Cloudflare Web Analytics | ユーザー確認: PagesのWeb Analyticsを有効化し、有効化後にProduction再デプロイ成功。Web Analytics画面で実データ受信を確認（Visits 1 / Page views 2、joshu-a.com と教材ページが記録）。 |
 
 ## 運用ルール
 
