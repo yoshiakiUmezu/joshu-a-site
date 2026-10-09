@@ -1,5 +1,81 @@
 # 製品公開後の計測と改善ループ
 
+## 2026-10-09 現状調査と導入判断
+
+公開済みの無料知育コンテンツ10本について、ページ単位の流入・閲覧を把握する必要が生じたため、Cloudflare Web Analyticsを第一候補として再評価した。
+
+### 現在の計測状態
+
+- **Cloudflare Web Analytics:** Cloudflareダッシュボードへはこの作業環境から接続できないため、Pagesプロジェクト側で現在有効かどうかは**未確認**。リポジトリ検索ではCloudflare Web Analytics / Google Analytics等の解析スニペット、Cookie、localStorage/sessionStorageを使う解析コードは見つからなかった。ただしPagesのWeb Analyticsはダッシュボード設定で自動注入できるため、ソースにスニペットがないことだけでCloudflare側も無効とは断定しない。
+- **Cloudflare Pagesとの関係:** Pagesでは `Workers & Pages > 対象プロジェクト > Metrics > Web Analytics` から有効化でき、次回デプロイ時にCloudflareがJavaScript beaconを自動挿入する。したがって初期導入ではHTMLへ手動スニペットを追加しない方針とする。
+- **既存HTML / headers:** main上のHTMLに解析コードは見つからない。`_headers` はMarkdownへの `X-Robots-Tag: noindex` のみで、CSPは設定されていない。現状はWeb Analytics beaconを妨げるCSP設定は確認できない。
+- **Google Search Console:** `docs/PROGRESS_TRACKER.md` のユーザー確認記録ではDomain property登録、所有権確認、sitemap送信、トップのインデックス/canonical確認までDONE。
+- **Bing Webmaster Tools:** 同じ正本ではサイト追加、所有権確認、sitemap送信、トップのIndexed successfully確認までDONE。
+- **その他の追跡:** 現在のリポジトリには広告SDK、GA、追跡Cookie、フォーム、アカウント、決済、独自イベント解析は確認できない。問い合わせメールは別途個人情報を含み得るため、サイト全体を「個人情報を一切扱わない」とは表現しない。
+
+### 採用判断
+
+**推奨: Cloudflare Web AnalyticsをPagesのダッシュボード設定から有効化する。**
+
+理由:
+- Cloudflare公式ではWeb Analyticsは全プランで利用可能かつ無料。
+- Pagesはダッシュボードから一回の設定で有効化でき、サイトHTMLへ手動スニペットを恒久追加する必要がない。
+- CookieやlocalStorageを使わず、Cloudflareは個人データを収集・利用しないプライバシー重視の方式として説明している。
+- 今必要な「どの教材ページが見られたか」「どこから来たか」「モバイル/PC比率」「日別傾向」を、独自分析基盤なしで把握できる。
+
+追加費用、Workers、DB、独自サーバー、Google Analyticsは初期導入に不要。
+
+### 導入後に確認できる指標
+
+Cloudflare Web Analyticsで確認対象とする:
+
+- Visits
+- Page views
+- Path（トップ、`/learning/`、各教材URL）
+- Referer host
+- Device type（desktop / mobile / tablet）
+- Browser / OS
+- Country
+- 日時範囲別の推移
+- Page load time / Core Web Vitals
+
+まず `/learning/` と各教材10本をPathで比較し、「検索や外部参照から見つかっている教材」「一覧を経由して見られている教材」の傾向を集計値で確認する。
+
+### 今回取得しないもの
+
+Cloudflare Web Analyticsは現行仕様では以下を提供しないため、今回の対象外とする:
+
+- UTMパラメータ別集計（クエリ文字列を記録しない）
+- スライダー操作
+- 再生 / リセット等のボタンクリック
+- 教材カードやCTAのクリックイベント
+- 個人単位の行動履歴
+- 同一ユーザーを媒体横断で結合したファネル
+
+カスタムイベントは現行Web Analyticsで未対応。これを補うWorkers等の独自イベント基盤は、ページ閲覧データを見て必要性が実証されるまで作らない。
+
+### プライバシー / セキュリティ
+
+Cloudflare公式ではWeb AnalyticsはCookieやlocalStorage等のクライアント状態を使用せず、個人のフィンガープリントも行わない。beaconは `https://static.cloudflareinsights.com/beacon.min.js` から読み込まれ、Cloudflare proxied siteでは `/cdn-cgi/rum` へ計測データを送信する。
+
+現状の `_headers` にCSPはないため、導入時のCSP変更は不要。将来CSPを導入する場合はCloudflare beaconを許可する設定を同時に設計する。
+
+ただし第三者への情報送信を伴う機能であるため、Cookieを使わないことだけを理由に法務確認を省略しない。`legal-release-checklist.md` の「Analytics / Cookie」および外部送信規律の確認対象として扱う。現段階では広告・個人ID・独自テレメトリーを追加しない。
+
+### 本番設定の承認ゲート
+
+本番変更は未実施。助手Aの承認後に次を人がCloudflareダッシュボードで行う:
+
+1. Workers & Pages
+2. `joshu-a-site` プロジェクト
+3. Metrics
+4. Web Analytics の **Enable**
+5. 次回Production deployment後、Web Analytics画面にデータが入り始めることを確認
+6. 本番HTMLでCloudflare beaconが注入されていることを確認
+7. 24時間〜数日後にトップ / learning一覧 / 各教材のPath・Referer・Device typeが表示されることを確認
+
+有効化済みだった場合は重複設定を行わず、既存Analytics siteとデータ表示を確認するだけにする。
+
 2026-10-07時点で実製品は未公開。この文書は、公開後に確認する指標と手順を決めるもので、実測値や解析アカウントの状態を示すものではない。目的は個人単位の追跡ではなく、集計値で「発見 → 製品ページ → CTA → 配布/販売先 → DL・購入・利用」のどこを次に調べるべきか見つけること。
 
 ## 推奨する最小構成

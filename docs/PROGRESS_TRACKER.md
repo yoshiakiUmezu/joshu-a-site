@@ -5,7 +5,10 @@
 
 ## STAY / PC操作待ち
 
-現在なし。
+| 項目 | 状態 | 完了条件 | 次の操作 |
+| --- | --- | --- | --- |
+| Cloudflare Web Analytics | STAY | Pagesプロジェクトの現在状態をダッシュボードで確認し、助手Aが有効化を承認 | 既に有効なら重複導入せず計測画面を確認。未有効なら Workers & Pages > joshu-a-site > Metrics > Web Analytics をEnableし、次回Production deployment後にbeacon注入とデータ取得を確認 |
+
 
 ## WATCH
 
