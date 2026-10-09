@@ -1,6 +1,6 @@
 # 助手A X運用窓 引き継ぎ・状態管理
 
-Status: HANDOFF / 運用準備中（プロフィールと固定ポストは未確認・未設定というユーザー申告）
+Status: PREPARING / X運用準備中（アカウント未特定・公開操作なし）
 Updated: 2026-10-09
 Maintainer: X運用窓
 Repository: `yoshiakiUmezu/joshu-a-site`
@@ -54,7 +54,7 @@ Repository: `yoshiakiUmezu/joshu-a-site`
 
 ## 実行順・完了判定
 
-- [ ] 正本文書 `docs/social-operations.md`、`docs/promotional-assets.md`、`ACQUISITION_STRATEGY.md` を読み、矛盾を確認する。
+- [x] 正本文書 `docs/social-operations.md`、`docs/promotional-assets.md`、`ACQUISITION_STRATEGY.md` を読み、矛盾を確認する。
 - [ ] Xアカウントの実際のハンドル、プロフィール、Website、既存投稿/固定投稿を確認する。確認できなければ未確認と記す。
 - [ ] プロフィール文の最終案を準備する。
 - [ ] 固定ポストの本文案を準備する（サイトと教材の現在公開状態を再確認）。
@@ -117,6 +117,78 @@ Repository: `yoshiakiUmezu/joshu-a-site`
 - 公式サイトのリンク・文言・公開状態に変更が必要ならホームページ窓へ依頼する。X窓からサイト共通ファイルを直接編集しない。
 - A.I. TERMINALのロゴ・起動アニメーションの正本はA.I. TERMINAL側。資料の読み取りや収録についてのみ協議し、開発窓の本来の優先作業を妨げない。
 - 新しいX運用窓への移転時は、正本のURL、参照すべきブランチまたは `main`、保留事項、最新の投稿/PR証拠を簡潔に伝える。
+
+## 2026-10-09 X運用窓開始時レビュー・準備状況
+
+**この節の文案・動画方針は提案中／ユーザー未承認。X投稿・プロフィール更新は未実施。**
+
+### リポジトリと運用正本
+
+- 確認したサイトmain: `d1e32c279011a22eec057efd40818e6b76c964fb`。X専用PR #29: Draft / open、作業開始時HEAD `090e64dab0855b420867e45cb7a08a263a668836`、変更対象は本MDのみ。新PRを作らず#29を継続利用。
+- `social-operations.md`、`promotional-assets.md`、`ACQUISITION_STRATEGY.md`、`PROMOTION_PROGRESS.md`、`SALES_WINDOW_HANDOFF.md` を照合。Xは実物デモ／代表製品の送客入口。広告・収益優先順位は販促窓の管理範囲。
+- `learning/index.html` のItemListで公開対象10件と正式URLを確認。ただしWeb本番の直接レスポンス・Xからのアクセス可否は今回未検証。
+- **XアカウントのハンドルとプロフィールURLが不明**。現行Bio・Website・固定投稿・ログイン権限は未確認。検索結果を本人のアカウントと断定しない。アカウントURLの提供が必要。
+
+### プロフィール案の比較（全て提案・未設定）
+
+表示名: **助手A** ／ Website欄: **https://joshu-a.com/**（Bio欄のURL重複は避ける）。
+
+- **候補A／推奨（作品領域＋現在公開物＋ブランドコピー、62文字）**：助手A｜ソフトウェア・ゲームを個人で開発。無料知育コンテンツ「触ってわかる」シリーズも公開中。使いやすく、少し面白いものを。
+- 候補B／コピー先行（63文字）：使いやすく、少し面白いものを。助手Aとしてソフトウェアやゲームを制作しています。無料のインタラクティブ知育コンテンツも公開中。
+- 候補C／開発過程重視（66文字）：助手A｜個人でソフトウェア・ゲーム・Web教材を制作。無料の「触ってわかる」シリーズも公開しています。開発中のものや制作過程も発信。
+
+Aを初期案とする。X公式ヘルプのBio上限160文字内。ユーザー承認前は確定扱いにしない。
+
+### 固定ポスト本文案（提案・未投稿）
+
+> 個人開発ブランド「助手A」です。
+> ソフトウェアやゲーム、無料の「触ってわかる」知育コンテンツを制作しています。
+> 動画は、開発中の自動開発基盤「A.I. TERMINAL」の起動アニメーションです。
+> 
+> 使いやすく、少し面白いものを。
+> https://joshu-a.com/
+
+動画: **既存のA.I. TERMINAL起動アニメーション**。既存動画ファイルの完成／投稿／固定はいずれも未実施。ハッシュ、公開投稿URL、実投稿日時は未取得。
+
+### 起動ロゴの正本と実装調査
+
+A.I. TERMINAL repo `yoshiakiUmezu/ai-terminal`（private）の `main` ツリーから以下の存在と実装内容を確認（2026-10-09）。
+
+- 原本: `assets/brand/assistant-a/master-original.jpg`（Git Blob `7fdf36f8aed384184f824d2f59a89b450c769c4a`）。非公開リポジトリの素材であり、公開利用前に内容と利用権利を最終確認。
+- 派生透明レイヤー: `derived/intro-circle.png`、`derived/intro-a.png`、`derived/intro-mark.png`。いずれも1500px級の画像を本体UI内で合成。
+- 既存アニメーション: `src/shared/brand/AssistantABrandIntro.tsx` + `.css`。円を描画→Aが出現→短い発光→A.I. TERMINAL文字、通常約1800ms、背景 `#03070d`。色フィルターはCSS側で付与。既存レイヤーをそのまま使い、形状再生成は禁止。
+- 既存検証: `mobile/src/tests/assistantABrandIntro.test.ts` は原本SHA256 `25AA1F133C99AF732581D5E1F810620DFD834C561699DE689BA6D9829192B31D` の一致、画像サイズ/アルファ、複数画面の起動条件を検査するテストを含む。これは**テストコードの存在を確認した**のであり、今回テスト実行済みという意味ではない。
+- `src/main/services/p10BrandVisualCapture.ts` と `scripts/test-p10-electron-brand-visual.mjs` に既存の起動時静止画キャプチャ仕組みあり。ただしMP4連続録画機能は現物未確認。
+- **未完了**: 実画像ピクセルの目視同一性検査、動画生成、再生/音声/セキュリティ確認。収録済み動画があるとは断定しない。
+
+### 動画制作手順（設計決定待ち・本体改変なしを優先）
+
+1. 読み取り専用のローカル作業コピー上で、上記の**既存Reactコンポーネント／CSS／派生PNG**を利用し、実アプリの機密UIを映さない単独の一時収録ページを作る。素材を生成AIで描き直さない。必要ならCodexへ限定的な収録作業を依頼。
+2. 既存1800msの動きを等倍でキャプチャ。終了前の完成表示を約1秒静止保持し、冒頭・末尾を黒背景に整える。最終尺は約3～4秒を候補とし、実際のUIと文字の見え方を優先。
+3. 候補形式は**MP4/H.264、1280×720、30fps、無音、yuv420p**。これは今回の制作目標であり、アプリ側仕様を変更するものではない。
+4. FFprobe等で長さ/コーデック/フレームサイズ/容量を検査。開始・円描画・A表示・文字表示・終了のフレームを目視確認。原本・派生画像を差し替えず、比率、線、色フィルターによる過度な潰れ、解像感を確認。個人情報・OS通知・識別子・機密UI・音声・ライセンスを検査。
+5. 安全な成果物の置き場とSHA256、作成コマンド、レビュー結果を**生成後に**記録する。現状は成果物なし。ユーザーの最終承認前にXへ投稿しない。
+
+公式仕様参照:
+- Xプロフィール: https://help.x.com/ja/managing-your-account/how-to-customize-your-profile （Bio 160文字、固定ポスト操作）
+- 通常投稿: https://help.x.com/en/using-x/how-to-post （280文字）
+- 動画: https://help.x.com/en/using-x/x-videos （非Premium時140秒／512MB上限）
+- https://help.x.com/ja/using-x/media-studio-faqs （Media Studio向けMP4/H.264等。**通常投稿の独立した全条件と混同しない**）
+
+### 次の投稿候補（動画化・実投稿はいずれも未実施）
+
+- 点P・面積とグラフ: https://joshu-a.com/learning/point-p/
+- 一次関数: https://joshu-a.com/learning/linear-function/
+- 日本と世界の同時代比較: https://joshu-a.com/learning/japan-and-world-history/
+
+### 承認待ち・ブロッカー・次の一手
+
+1. **要アカウントURL**: X本人のハンドル/URLを確認し、現状のBio・Website・固定投稿を参照する。
+2. **要収録環境**: GitHubのソース/派生画像は発見済みだが、こちらからElectron画面の実録画は未実施。読み取り専用ワークツリー等の環境で既存演出から安全な動画を製作・確認する。
+3. **要最終承認**: プロフィール候補Aと固定本文・動画をユーザーが承認した後、外部プロフィール変更・ポスト投稿・固定を実施する。必要なX接続/投稿権限の有無は未確認。
+4. 公開後は投稿URL・日時（JST）・動画SHA256・プロフィール反映証拠を残す。公開前に「完了」へ変更しない。
+5. **PR #29はDraft維持**。mainへの無承認マージは不可。本MDへの準備記録により公開済みステータスを変えない。
+
 
 ## 関連文書
 
