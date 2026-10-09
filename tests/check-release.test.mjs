@@ -375,3 +375,48 @@ test('learning category anchor targets are checked', t => {
   const errors = checkSite(root).errors.join('\n');
   assert.match(errors, /missing anchor \/learning\/#subject-math/);
 });
+
+
+test('SEO audit metadata stays aligned across title, OG/X, and JSON-LD', t => {
+  const root = fixture(t);
+  const cases = [
+    {
+      path: ['learning','linear-function','index.html'],
+      title: '一次関数の傾き・切片を動かして理解｜無料数学教材 | 助手A',
+      description: '一次関数 y=ax+b の傾きと切片を自分で変えて、直線がどう動くかをグラフで確かめる無料の数学Web教材です。'
+    },
+    {
+      path: ['learning','japan-and-world-history','index.html'],
+      title: '日本史と世界史を同じ年表で比較｜弥生〜大正の無料教材 | 助手A',
+      description: '弥生時代から大正時代まで、日本史の出来事と同時代の世界を時系列で見比べる無料歴史教材です。年代の幅や史料上の注意も確認できます。'
+    },
+    {
+      path: ['learning','proportion','index.html'],
+      title: '比例・反比例のグラフを比べる｜無料数学教材 | 助手A',
+      description: '比例 y=ax と反比例 y=a/x の違いを、値やグラフを変えて比較できる無料数学教材です。表示範囲や式の対応を確かめられます。'
+    },
+    {
+      path: ['learning','probability','index.html'],
+      title: '確率をサイコロで学ぶ無料教材 | 助手A',
+      description: '当たりとするサイコロの面の数と試行回数を変えて、理論上の確率と実験結果のばらつきを確かめる無料Web教材です。'
+    }
+  ];
+  for (const item of cases) {
+    const page = fs.readFileSync(path.join(root, ...item.path), 'utf8');
+    assert.ok(page.includes('<title>' + item.title + '</title>'));
+    assert.ok(page.includes('name="description" content="' + item.description + '"'));
+    assert.ok(page.includes('property="og:title" content="' + item.title + '"'));
+    assert.ok(page.includes('property="og:description" content="' + item.description + '"'));
+    assert.ok(page.includes('name="twitter:title" content="' + item.title + '"'));
+    assert.ok(page.includes('name="twitter:description" content="' + item.description + '"'));
+    const schemaText = page.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
+    assert.ok(schemaText);
+    const schema = JSON.parse(schemaText);
+    assert.equal(schema.name, item.title);
+    assert.equal(schema.description, item.description);
+    if (item.path[1] === 'linear-function') {
+      assert.ok(page.includes('property="og:image:alt" content="一次関数 y=ax+b の直線・切片・傾きを示す無料数学教材"'));
+      assert.ok(page.includes('name="twitter:image:alt" content="一次関数 y=ax+b の直線・切片・傾きを示す無料数学教材"'));
+    }
+  }
+});
