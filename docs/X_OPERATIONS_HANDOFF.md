@@ -1,6 +1,6 @@
 # 助手A X運用窓 引き継ぎ・状態管理
 
-Status: PREPARING / X運用準備中（アカウント未特定・公開操作なし）
+Status: PREPARING / アカウント画像確認済み・X公開操作なし
 Updated: 2026-10-09
 Maintainer: X運用窓
 Repository: `yoshiakiUmezu/joshu-a-site`
@@ -127,7 +127,7 @@ Repository: `yoshiakiUmezu/joshu-a-site`
 - 確認したサイトmain: `d1e32c279011a22eec057efd40818e6b76c964fb`。X専用PR #29: Draft / open、作業開始時HEAD `090e64dab0855b420867e45cb7a08a263a668836`、変更対象は本MDのみ。新PRを作らず#29を継続利用。
 - `social-operations.md`、`promotional-assets.md`、`ACQUISITION_STRATEGY.md`、`PROMOTION_PROGRESS.md`、`SALES_WINDOW_HANDOFF.md` を照合。Xは実物デモ／代表製品の送客入口。広告・収益優先順位は販促窓の管理範囲。
 - `learning/index.html` のItemListで公開対象10件と正式URLを確認。ただしWeb本番の直接レスポンス・Xからのアクセス可否は今回未検証。
-- **XアカウントのハンドルとプロフィールURLが不明**。現行Bio・Website・固定投稿・ログイン権限は未確認。検索結果を本人のアカウントと断定しない。アカウントURLの提供が必要。
+- **Xアカウントはユーザー提供画像から確認済み**（下記の実画面レビューを参照）。Website編集欄・固定投稿・ログイン権限は未確認。アカウントURLの提供が必要。
 
 ### プロフィール案の比較（全て提案・未設定）
 
@@ -183,12 +183,22 @@ A.I. TERMINAL repo `yoshiakiUmezu/ai-terminal`（private）の `main` ツリー�
 
 ### 承認待ち・ブロッカー・次の一手
 
-1. **要アカウントURL**: X本人のハンドル/URLを確認し、現状のBio・Website・固定投稿を参照する。
+1. **アカウントURL確認済み**: https://x.com/JoshuA_criate 。現状のBioは画像から確認済み。Website編集欄と固定投稿の有無は未確認。
 2. **要収録環境**: GitHubのソース/派生画像は発見済みだが、こちらからElectron画面の実録画は未実施。読み取り専用ワークツリー等の環境で既存演出から安全な動画を製作・確認する。
 3. **要最終承認**: プロフィール候補Aと固定本文・動画をユーザーが承認した後、外部プロフィール変更・ポスト投稿・固定を実施する。必要なX接続/投稿権限の有無は未確認。
 4. 公開後は投稿URL・日時（JST）・動画SHA256・プロフィール反映証拠を残す。公開前に「完了」へ変更しない。
 5. **PR #29はDraft維持**。mainへの無承認マージは不可。本MDへの準備記録により公開済みステータスを変えない。
 
+
+### Xアカウント実画面の確認（2026-10-09、ユーザー提供スクリーンショット）
+
+- アカウントURL: https://x.com/JoshuA_criate ／ハンドル `@JoshuA_criate` ／表示名「助手A」。
+- 現行Bio（画像で確認）: 「ゲーム作りしてます。AIは面白いですね」
+- Websiteリンク: 提供画像では表示されない。**未設定の可能性があるが、編集画面での登録状況は未確認**。
+- 投稿一覧はスクリーンショット内に表示されず、固定ポストの有無は未確認。設定完了と推定しない。
+- **個人情報の保護**: スクリーンショット内に存在する非運用情報（生年月日等）は転記・保存しない。
+- 現行BioはゲームとAIのみに触れ、ソフトウェア・無料知育コンテンツ・ブランドコピーが未記載。推奨プロフィール候補Aへの更新を提案（外部変更前にユーザー承認が必要）。
+- X連携外部サービス「Metricool」は運用候補として調査。公式Helpの2026年価格条件ではXアカウント管理に有料Starter以上 + X追加アドオン月10 USD/EUR/アカウントが必要。固定費回避方針を優先し**現時点では不採用を提案**。契約/接続は実施していない。出典: https://help.metricool.com/your-guide-to-the-x-twitter-add-on-wt5wy
 
 ## 関連文書
 
