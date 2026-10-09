@@ -414,5 +414,9 @@ test('SEO audit metadata stays aligned across title, OG/X, and JSON-LD', t => {
     const schema = JSON.parse(schemaText);
     assert.equal(schema.name, item.title);
     assert.equal(schema.description, item.description);
+    if (item.path[1] === 'linear-function') {
+      assert.ok(page.includes('property="og:image:alt" content="一次関数 y=ax+b の直線・切片・傾きを示す無料数学教材"'));
+      assert.ok(page.includes('name="twitter:image:alt" content="一次関数 y=ax+b の直線・切片・傾きを示す無料数学教材"'));
+    }
   }
 });
