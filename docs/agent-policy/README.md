@@ -7,9 +7,26 @@
 - 共通ブロック以外のリポジトリ固有ルールは変更しない。ローカル指示、品質ゲート、承認・公開条件を上書きしない。
 - GitHubの自動化はAGENTS.md自体の機能ではない。定期同期タスクが欠落・差分を検出し、レビュー用のPRを作る。自動マージしない。
 
-## 新しいリポジトリ
+## 新しいリポジトリを初回コミットから共通ルール付きで作る
 
-README付きなどデフォルトブランチに初期コミットを作成すると、定期同期で `AGENTS.md` 未作成を検出できる。定期チェック間やPRをマージするまではルールが適用されないため、最初から適用したい場合は作成直後に正本ブロックをルート `AGENTS.md` に入れる。将来、専用テンプレートリポジトリの作成が可能になればテンプレート運用に切り替えられる。
+GitHubの通常の `New repository` には全リポジトリに `AGENTS.md` を自動挿入する設定がない。作成時に初期化するには**専用テンプレート**を使用する。
+
+### テンプレートの初回準備（1回だけ）
+
+1. この正本のPRをレビューし、`joshu-a-site/main` にマージする（このリポジトリの公開連携・承認条件を確認する）。
+2. WindowsにGitと[GitHub CLI](https://cli.github.com/)を用意し、`gh auth login` で所有者アカウントへログインする。
+3. このリポジトリを取得し、PowerShellで `powershell -ExecutionPolicy Bypass -File docs/agent-policy/setup-template.ps1` を実行する。
+4. スクリプトが `yoshiakiUmezu/joshu-a-repo-template` を **Private** で作成し、正本の共通ルールだけが入った初回コミットをpushした後、Template repositoryとして設定・検証する。既存リポジトリは上書きしない。
+
+このチャットのGitHub連携にはリポジトリ作成/テンプレート設定の書き込み機能がないため、上記の1回限りの操作はユーザー側で必要。
+
+### 以後の新規作成
+
+- Web UI: `https://github.com/yoshiakiUmezu/joshu-a-repo-template/generate` から作成する（テンプレート初回準備が完了した場合のみ）。
+- GitHub CLI: `gh repo create yoshiakiUmezu/NEW_NAME --private --template yoshiakiUmezu/joshu-a-repo-template --clone`
+- Codex等のエージェントは、新規リポジトリを作成する際にテンプレート経由で作成する。使えないときは初回コミットに同等の `AGENTS.md` を同梱してからpushする。
+
+この方法なら初回コミット時点から `AGENTS.md` が存在する。ただし通常の「New repository」や他サービスによるリポジトリ作成には自動強制されない。専用テンプレートを選ばず作成した場合は、既存の定期同期が後からPRを提案するが、マージまでは適用されない。
 
 ## 変更時
 
