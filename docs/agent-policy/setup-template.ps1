@@ -41,7 +41,7 @@ $agents = '# AGENTS.md' + [Environment]::NewLine + [Environment]::NewLine +
 [System.IO.File]::WriteAllText(
     (Join-Path $workspace 'AGENTS.md'),
     $agents,
-    (New-Object System.Text.UTF8Encoding($false))
+    ([System.Text.UTF8Encoding]::new($false))
 )
 
 & git -C $workspace init -b main
