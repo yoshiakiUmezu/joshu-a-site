@@ -66,8 +66,17 @@
         </div>
         <div class="preview-foot">
           <span class="dimension" id="dimension">表示幅 1,280 px</span>
+          <label class="cover-choice" for="artwork">表紙素材
+            <select id="artwork" disabled>
+              <option value="auto">AIの構成を使う</option>
+              <option value="coffee">珈琲とトースト</option>
+              <option value="concert">公演グラフィック</option>
+              <option value="architecture">中庭住宅の模型</option>
+            </select>
+          </label>
           <button id="download" class="secondary" type="button" disabled>HTMLを保存</button>
         </div>
+        <p id="artwork-status" class="feedback cover-feedback" role="status"></p>
       </section>
       <section class="panel revision-panel" aria-labelledby="revision-title">
         <h2 id="revision-title">デザインの修正</h2>

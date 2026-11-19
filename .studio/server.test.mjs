@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import { startStudio } from './server.mjs';
+import { openLedger } from './ledger.mjs';
 
 const password = 'only-for-local-tests';
 const authorization = 'Basic ' + Buffer.from('developer:' + password).toString('base64');
@@ -84,4 +85,16 @@ test('unknown provider usage keeps the reservation and can exhaust tokens before
   assert.ok(ledger.reservedTokens > 8000);
   assert.equal((await send(origin)).status, 429);
   assert.equal(sent, 1);
+});
+
+test('legacy rows preserve totals and mixed ledgers distinguish untracked cache writes', async t => {
+  const dir = await mkdtemp(join(tmpdir(), 'studio-ledger-'));
+  t.after(() => rm(dir, { recursive: true, force: true }));
+  const file = join(dir, 'usage.json');
+  const usage = { inputTokens: 100, cachedInputTokens: 10, outputTokens: 50, totalTokens: 150 };
+  const row = { budget: 9000, status: 'ok', usage };
+  await writeFile(file, JSON.stringify([row, { ...row, usage: { ...usage, write30mTokens: 30, write12hTokens: 20 } }]));
+  const ledger = openLedger(file, {});
+  assert.deepEqual(ledger.summary(), { calls: 2, inputTokens: 200, cachedInputTokens: 20, write30mTokens: 30,
+    write12hTokens: 20, unknownCacheWriteCalls: 1, outputTokens: 100, totalTokens: 300, reservedTokens: 0 });
 });

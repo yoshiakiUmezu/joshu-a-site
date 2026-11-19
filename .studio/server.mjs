@@ -4,7 +4,7 @@ import http from 'node:http';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { buildResponseRequest, callResponses, MAX_HTML_BYTES, MAX_OUTPUT_TOKENS } from './engine.mjs';
+import { ART_IDS, buildResponseRequest, callResponses, MAX_HTML_BYTES, MAX_OUTPUT_TOKENS } from './engine.mjs';
 import { openLedger } from './ledger.mjs';
 
 const defaults = { maxCalls: 6, maxTotalTokens: 240_000, maxOutputTokens: MAX_OUTPUT_TOKENS, maxHtmlBytes: MAX_HTML_BYTES };
@@ -12,6 +12,8 @@ const files = new Map([
   ['/studio/', ['ui/index.html', 'text/html; charset=utf-8']],
   ['/studio/studio.css', ['ui/studio.css', 'text/css; charset=utf-8']],
   ['/studio/studio.js', ['ui/studio.js', 'text/javascript; charset=utf-8']],
+  ['/studio/artwork.js', ['ui/artwork.js', 'text/javascript; charset=utf-8']],
+  ...ART_IDS.map(id => ['/studio/art/' + id + '.webp', ['art/' + id + '.webp', 'image/webp']]),
   ['/assets/brand-mark.png', ['../assets/brand-mark.png', 'image/png']],
 ]);
 const fail = (status, message) => Object.assign(new Error(message), { status });
@@ -25,7 +27,7 @@ async function readInput(req) {
   let bytes = 0;
   for await (const chunk of req) {
     bytes += chunk.length;
-    if (bytes > 128 * 1024) throw fail(413, 'リクエストが大きすぎます。');
+    if (bytes > MAX_HTML_BYTES + 128 * 1024) throw fail(413, 'リクエストが大きすぎます。');
     chunks.push(chunk);
   }
   let data;
@@ -62,7 +64,7 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Referrer-Policy', 'no-referrer');
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'self'; frame-src data:; frame-ancestors 'none'; base-uri 'none'; form-action 'none'");
+    res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-src data:; frame-ancestors 'none'; base-uri 'none'; form-action 'none'");
     try {
       if (('http://' + req.headers.host) !== origin) throw fail(403, 'このホストからは利用できません。');
       if (!timingSafeEqual(digest(req.headers.authorization ?? ''), auth)) {

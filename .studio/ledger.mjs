@@ -3,6 +3,17 @@ import { dirname } from 'node:path';
 
 const integer = value => Number.isSafeInteger(value) && value >= 0;
 
+export function validUsage(usage) {
+  if (!usage) return false;
+  const { inputTokens, cachedInputTokens, write30mTokens, write12hTokens, outputTokens, totalTokens } = usage;
+  if (![inputTokens, cachedInputTokens, outputTokens, totalTokens].every(integer)
+      || cachedInputTokens > inputTokens || inputTokens + outputTokens !== totalTokens) return false;
+  // Older records retain their measured totals but cannot establish cache-write cost.
+  if (write30mTokens === undefined && write12hTokens === undefined) return true;
+  return [write30mTokens, write12hTokens].every(integer)
+    && cachedInputTokens + write30mTokens + write12hTokens <= inputTokens;
+}
+
 export function openLedger(file, limits) {
   mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
   let entries;
@@ -18,8 +29,7 @@ export function openLedger(file, limits) {
     if (!['pending', 'failed', 'ok'].includes(row.status)) return false;
     const u = row.usage;
     if (u === null) return row.status !== 'ok';
-    return u && [u.inputTokens, u.cachedInputTokens, u.outputTokens, u.totalTokens].every(integer)
-      && u.cachedInputTokens <= u.inputTokens && u.inputTokens + u.outputTokens === u.totalTokens;
+    return validUsage(u);
   })) throw new Error('使用記録の内容が不正です。');
 
   let writable = true;
@@ -36,13 +46,19 @@ export function openLedger(file, limits) {
 
   function summary() {
     const totals = { calls: entries.length, inputTokens: 0, cachedInputTokens: 0,
+      write30mTokens: 0, write12hTokens: 0, unknownCacheWriteCalls: 0,
       outputTokens: 0, totalTokens: 0, reservedTokens: 0 };
     for (const { usage, budget } of entries) {
       if (!usage) {
         totals.reservedTokens += budget;
         continue;
       }
-      for (const key of Object.keys(usage)) totals[key] += usage[key];
+      for (const key of ['inputTokens', 'cachedInputTokens', 'outputTokens', 'totalTokens']) totals[key] += usage[key];
+      if (usage.write30mTokens === undefined) totals.unknownCacheWriteCalls++;
+      else {
+        totals.write30mTokens += usage.write30mTokens;
+        totals.write12hTokens += usage.write12hTokens;
+      }
     }
     return totals;
   }

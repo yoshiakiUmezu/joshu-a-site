@@ -1,3 +1,5 @@
+import { composeArtwork } from './artwork.js';
+
 const byId = (id) => document.getElementById(id);
 const briefForm = byId("brief-form");
 const revisionForm = byId("revision-form");
@@ -5,6 +7,8 @@ const canvas = byId("canvas");
 const viewport = byId("viewport");
 const frame = byId("preview");
 const revision = byId("revision");
+const artwork = byId("artwork");
+const artStatus = byId("artwork-status");
 const number = new Intl.NumberFormat("ja-JP");
 
 let currentSite = null;
@@ -18,7 +22,8 @@ function updateControls() {
   byId("brief-fields").disabled = busy;
   byId("revise").disabled = busy || !remaining || !currentSite;
   revision.disabled = busy || !remaining || !currentSite;
-  byId("download").disabled = !currentSite;
+  byId("download").disabled = busy || !currentSite;
+  artwork.disabled = busy || !currentSite;
 }
 
 function showLedger(ledger) {
@@ -67,13 +72,39 @@ function showMessage(element, message, isError = false) {
   element.textContent = message;
 }
 
+async function displayArtwork(choice) {
+  const html = await composeArtwork(currentSite.modelHtml, choice);
+  if (new Blob([html]).size > limits.maxHtmlBytes) throw new Error("表紙を含むHTMLが保存サイズの上限を超えます。");
+  // Give the opaque sandbox its own document URL so #links scroll inside it.
+  frame.src = "data:text/html;charset=utf-8," + encodeURIComponent(html);
+  currentSite.html = html;
+  currentSite.choice = choice;
+  artwork.value = choice;
+}
+
+artwork.addEventListener("change", async () => {
+  if (busy || !currentSite) return;
+  busy = true;
+  updateControls();
+  try {
+    await displayArtwork(artwork.value);
+    showMessage(artStatus, "表紙素材を反映しました。API使用量の追加はありません。");
+  } catch (error) {
+    artwork.value = currentSite.choice;
+    showMessage(artStatus, error.message || "表紙素材を反映できませんでした。", true);
+  } finally {
+    busy = false;
+    updateControls();
+  }
+});
+
 async function generate(isRevision) {
   if (busy || !remaining || (isRevision && !currentSite)) return;
   const status = byId(isRevision ? "revision-status" : "generate-status");
   const brief = isRevision ? currentSite.brief : Object.fromEntries(new FormData(briefForm));
   const body = { brief };
   if (isRevision) {
-    body.previousHtml = currentSite.html;
+    body.previousHtml = currentSite.modelHtml;
     body.revision = revision.value.trim();
   }
   busy = true;
@@ -89,9 +120,15 @@ async function generate(isRevision) {
     if (data.ledger) showLedger(data.ledger);
     if (!response.ok) throw new Error(data.error || "生成に失敗しました。");
     if (typeof data.html !== "string" || !data.html) throw new Error("HTMLを受信できませんでした。");
-    // Give the opaque sandbox its own document URL so #links scroll inside it.
-    frame.src = "data:text/html;charset=utf-8," + encodeURIComponent(data.html);
-    currentSite = { brief, html: data.html };
+    const choice = isRevision ? currentSite.choice : "auto";
+    currentSite = { brief, modelHtml: data.html };
+    showMessage(artStatus, "");
+    try {
+      await displayArtwork(choice);
+    } catch {
+      await displayArtwork("auto");
+      showMessage(artStatus, "選んだ表紙を読み込めなかったため、AIの構成で表示しました。", true);
+    }
     canvas.hidden = false;
     byId("empty").hidden = true;
     fitPreview();
