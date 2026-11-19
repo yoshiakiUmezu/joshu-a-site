@@ -62,7 +62,7 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Referrer-Policy', 'no-referrer');
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'self'; frame-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'");
+    res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'self'; frame-src data:; frame-ancestors 'none'; base-uri 'none'; form-action 'none'");
     try {
       if (('http://' + req.headers.host) !== origin) throw fail(403, 'このホストからは利用できません。');
       if (!timingSafeEqual(digest(req.headers.authorization ?? ''), auth)) {

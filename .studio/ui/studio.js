@@ -89,8 +89,9 @@ async function generate(isRevision) {
     if (data.ledger) showLedger(data.ledger);
     if (!response.ok) throw new Error(data.error || "生成に失敗しました。");
     if (typeof data.html !== "string" || !data.html) throw new Error("HTMLを受信できませんでした。");
+    // Give the opaque sandbox its own document URL so #links scroll inside it.
+    frame.src = "data:text/html;charset=utf-8," + encodeURIComponent(data.html);
     currentSite = { brief, html: data.html };
-    frame.srcdoc = data.html;
     canvas.hidden = false;
     byId("empty").hidden = true;
     fitPreview();

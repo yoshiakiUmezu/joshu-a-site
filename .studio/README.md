@@ -27,4 +27,4 @@ API送信前に、入力のUTF-8バイト数と構造分の余裕、最大出力
 
 時刻・操作・予約量・成否・トークン数・HTMLバイト数をローカルの `usage.json` に記録します。入力本文、生成HTML、認証情報は含めません。Windowsの保存先は `%LOCALAPPDATA%\joshu-a-studio\usage.json`、他のOSでは `$XDG_STATE_HOME/joshu-a-studio/usage.json`（既定 `~/.local/state/joshu-a-studio/usage.json`）です。再起動後も同じ枠を使います。次の検証枠を用意する場合は、費用の承認後、サーバーを停止し、既存の台帳を保管してから開始してください。
 
-無課金で接続境界・保存・使用量処理を検証するコマンドは `node --test .studio/engine.test.mjs .studio/server.test.mjs` です。モデル単価は[OpenAIのモデル仕様](https://developers.openai.com/api/docs/models/gpt-6-luna)を参照してください。
+無課金で接続境界・保存・使用量処理を検証するコマンドは `node --test .studio/engine.test.mjs .studio/server.test.mjs` です。ブラウザでのページ内移動は、既存のPlaywrightとChromiumを用意して `node --test .studio/preview.playwright.test.mjs` で確認できます。システムのChromium系ブラウザを使う場合は、その実行ファイルを `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` に指定します。モデル単価は[OpenAIのモデル仕様](https://developers.openai.com/api/docs/models/gpt-6-luna)を参照してください。
