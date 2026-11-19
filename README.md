@@ -3,6 +3,8 @@ Official website for 助手A
 
 静的HTMLの公式サイト。公開製品の情報が揃ってから、詳細ページと購入・ダウンロード・利用先を追加します。
 
+開発者は[ホームページ制作室](.studio/README.md)で、用途と名称から静的な1ページを生成し、修正・表示確認・HTML保存を試せます。制作室はローカルの認証付きNode.jsサーバーで起動します。
+
 ## Cloudflare Pages
 
 - Production branch: `main`

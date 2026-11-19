@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>ホームページ制作室 | 助手A</title>
+  <link rel="icon" type="image/png" href="/assets/brand-mark.png">
+  <link rel="stylesheet" href="./studio.css">
+  <script type="module" src="./studio.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="shell masthead-inner">
+      <div class="brand"><img src="/assets/brand-mark.png" width="32" height="32" alt="">助手A</div>
+      <span class="private-label">開発者専用</span>
+    </div>
+  </header>
+  <main class="shell">
+    <div class="intro">
+      <div>
+        <h1>ホームページ制作室</h1>
+        <p>用途とイメージを入力して、1ページのサイトを制作します。</p>
+      </div>
+      <dl class="meter">
+        <div><dt>生成・修正回数</dt><dd id="calls">—</dd></div>
+        <div><dt>累計トークン</dt><dd id="tokens">—</dd></div>
+      </dl>
+    </div>
+    <div class="workspace">
+      <section class="panel brief-panel" aria-labelledby="brief-title">
+        <h2 id="brief-title">サイトの仕様</h2>
+        <form id="brief-form" autocomplete="off">
+          <fieldset id="brief-fields">
+            <label for="purpose">用途 <small>必須</small></label>
+            <input id="purpose" name="purpose" maxlength="120" required placeholder="例）喫茶店の店舗案内">
+            <label for="name">サイト名 <small>必須</small></label>
+            <input id="name" name="name" maxlength="120" required placeholder="例）喫茶 灯り">
+            <label for="mood">雰囲気</label>
+            <input id="mood" name="mood" maxlength="160" placeholder="例）静かで温かい、雑誌のような余白">
+            <label for="request">自由な要望</label>
+            <textarea id="request" name="request" rows="3" maxlength="1200" placeholder="載せたい内容、色使い、訪れる人に伝えたいことなど"></textarea>
+          </fieldset>
+          <button id="generate" class="primary" type="submit" disabled>サイトを生成</button>
+          <p class="feedback" role="status" id="generate-status"></p>
+        </form>
+      </section>
+      <section class="panel preview-panel" aria-labelledby="preview-title">
+        <div class="preview-head">
+          <h2 id="preview-title">プレビュー</h2>
+          <div class="modes" role="group" aria-label="プレビューの表示幅">
+            <button type="button" data-width="1280" aria-pressed="true">PC</button>
+            <button type="button" data-width="390" aria-pressed="false">スマホ</button>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="empty" id="empty">
+            <div class="page-shape" aria-hidden="true"><i></i><b></b><b></b></div>
+            <p>生成したサイトがここに表示されます</p>
+          </div>
+          <div class="canvas" id="canvas" hidden>
+            <div class="viewport" id="viewport">
+              <iframe id="preview" title="生成したサイトの開発者プレビュー" sandbox="" referrerpolicy="no-referrer"></iframe>
+            </div>
+          </div>
+        </div>
+        <div class="preview-foot">
+          <span class="dimension" id="dimension">表示幅 1,280 px</span>
+          <button id="download" class="secondary" type="button" disabled>HTMLを保存</button>
+        </div>
+      </section>
+      <section class="panel revision-panel" aria-labelledby="revision-title">
+        <h2 id="revision-title">デザインの修正</h2>
+        <form id="revision-form" autocomplete="off">
+          <label for="revision">追加指示</label>
+          <textarea name="revision" id="revision" rows="2" maxlength="800" required disabled placeholder="例）見出しを大きくして、背景を深い緑に"></textarea>
+          <button id="revise" class="secondary" type="submit" disabled>修正を反映</button>
+          <p class="feedback" role="status" id="revision-status"></p>
+        </form>
+      </section>
+    </div>
+    <p class="limits" id="limits" role="status"></p>
+  </main>
+</body>
+</html>

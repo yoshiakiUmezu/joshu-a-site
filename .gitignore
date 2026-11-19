@@ -1,2 +1,9 @@
 .wrangler/
 node_modules/
+
+# Local server secrets belong outside the Cloudflare Pages output directory.
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+studio-secrets.env
