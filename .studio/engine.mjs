@@ -23,7 +23,8 @@ imgも空要素です。素材を使うときは <img src="art:coffee" alt="窓�
 外部フォント・外部参照・インラインstyle・スクリプト・フォーム・HTMLコメントは使えません。
 CSSのアットルールは@mediaだけ。比較はmin-widthやmax-widthを使い、CSSエスケープ、URL、山括弧は使わないでください。`;
 
-export function buildResponseRequest({ brief, instruction = '', previousHtml = '' }, designNotes = '') {
+export function buildResponseRequest({ brief, instruction = '', previousHtml = '' }, designNotes = '', reference = '') {
+  const textInput = JSON.stringify({ brief, instruction, previousHtml: compactPreviousHtml(previousHtml) });
   return {
     model: MODEL,
     store: false,
@@ -31,7 +32,10 @@ export function buildResponseRequest({ brief, instruction = '', previousHtml = '
     reasoning: { effort: 'none' },
     max_output_tokens: MAX_OUTPUT_TOKENS,
     instructions: designNotes ? instructions + '\n\n' + designNotes : instructions,
-    input: JSON.stringify({ brief, instruction, previousHtml: compactPreviousHtml(previousHtml) }),
+    input: reference ? [{ role: 'user', content: [
+      { type: 'input_text', text: textInput },
+      { type: 'input_image', detail: 'high', image_url: reference },
+    ] }] : textInput,
     text: { format: {
       name: 'site',
       type: 'json_schema',
@@ -144,6 +148,38 @@ function checkedFragment(html) {
   return result.join('');
 }
 
+const captions = { coffee: '窓辺の珈琲とトーストのイメージ', concert: '音を描いた公演グラフィック', architecture: '中庭を囲む住宅のスタディ模型のイメージ' };
+const crops = { wide: '16/9', split: '4/3', poster: '3/2' };
+
+// Work on checked markup only. A missed image slot is completed locally,
+// without another provider request. The reference board never enters this step.
+export function applyMaterialPlan(site, { art: selected, placement, position }) {
+  if (!Object.hasOwn(crops, placement) || !/^(?:100|[1-9]?\d)% (?:100|[1-9]?\d)%$/.test(position)) throw new Error('素材の配置設定を確認してください。');
+  if (selected !== null && !ART_IDS.includes(selected)) throw new Error('未登録の制作素材です。');
+  const fragment = checkedFragment(site.html);
+  const imageTag = /<img\b[^>]*>/;
+  if (selected === null) return { ...site, html: fragment.replace(imageTag, tag => {
+    const id = tag.match(/\sid="([^"]+)"/);
+    return id ? '<span id="' + id[1] + '"></span>' : '';
+  }) };
+  const photo = '<img src="art:' + selected + '" alt="' + captions[selected] + '">';
+  let html;
+  if (imageTag.test(fragment)) {
+    html = fragment.replace(imageTag, tag => {
+      if (tag.includes('src="art:' + selected + '"')) return tag;
+      return tag.replace(/src="[^"]*"/, 'src="art:' + selected + '"').replace(/alt="[^"]*"/, 'alt="' + captions[selected] + '"');
+    });
+  } else {
+    const slot = /<figure\b[^>]*\sclass="[^"]*\bstudio-hero-visual\b[^"]*"[^>]*>/;
+    html = slot.test(fragment) ? fragment.replace(slot, tag => tag + photo)
+      : fragment.replace('</h1>', '</h1><figure class="studio-hero-visual">' + photo + '</figure>');
+  }
+  const style = 'img{display:block;width:100%;object-fit:cover;object-position:' + position + '!important}'
+    + '.studio-hero-visual>img{aspect-ratio:' + crops[placement] + ';height:auto}'
+    + '@media(max-width:600px){.studio-hero-visual>img{aspect-ratio:4/3}}';
+  return { ...site, html, css: site.css.includes(style) ? site.css : site.css + '\n' + style };
+}
+
 export function renderSite(site) {
   if (!site || !['title', 'html', 'css'].every(key => typeof site[key] === 'string' && site[key].trim())) {
     throw new Error('生成結果にタイトル・HTML・CSSが揃っていません。');
@@ -197,7 +233,7 @@ function providerError(message, usage = null) {
   return Object.assign(new Error(message), { usage });
 }
 
-export async function callResponses(body, { apiKey, fetchImpl = fetch, privateNotes = '' }) {
+export async function callResponses(body, { apiKey, fetchImpl = fetch, privateNotes = '', material }) {
   let response;
   let data;
   try {
@@ -233,7 +269,7 @@ export async function callResponses(body, { apiKey, fetchImpl = fetch, privateNo
     throw providerError('制作条件の文章が出力に混入したため、この版の表示を見送りました。', usage);
   }
   try {
-    return { html: renderSite(site), usage };
+    return { html: renderSite(material ? applyMaterialPlan(site, material) : site), usage };
   } catch (error) {
     throw providerError(error.message, usage);
   }

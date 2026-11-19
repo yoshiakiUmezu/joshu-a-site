@@ -5,15 +5,16 @@ import { join } from 'node:path';
 import test from 'node:test';
 import { chromium } from 'playwright';
 import { startStudio } from './server.mjs';
+import { fixturePlan } from './test-plan.mjs';
 
-test('the mobile brief shapes the provider request on generation and revision while design instructions stay server-side', async t => {
+test('beginners can select a genre, revise their choices and reuse earlier examples without stale settings', async t => {
   const dir = await mkdtemp(join(tmpdir(), 'studio-brief-'));
   const password = 'local-test-password';
   const marker = 'server-only-fixture-marker';
   const requests = [];
   const app = await startStudio({
     password, apiKey: 'local-fixture', ledgerPath: join(dir, 'usage.json'),
-    designInstructions: brief => marker + '/' + (brief.direction || 'auto'),
+    designInstructions: brief => fixturePlan(null, marker + '/' + (brief.genre || 'legacy')),
     fetchImpl: async (_url, options) => {
       const body = JSON.parse(options.body);
       requests.push(body);
@@ -30,16 +31,9 @@ test('the mobile brief shapes the provider request on generation and revision wh
     httpCredentials: { username: 'developer', password, origin: app.origin }, viewport: { width: 320, height: 780 },
   });
   await page.goto(app.origin + '/studio/');
-  const brief = {
-    purpose: '修理サービスの案内', name: '灯修理室', audience: '腕時計を大切に使っている人', action: '修理の流れを読む',
-    highlight: '受付から点検までの手順', direction: 'guide', mood: '落ち着いた', color: '濃紺', request: '料金は要相談',
-  };
-  await page.locator('#visual-settings > summary').click();
-  for (const [key, value] of Object.entries(brief)) {
-    const field = page.locator('#' + key);
-    if (key === 'direction') await field.selectOption(value);
-    else await field.fill(value);
-  }
+  await page.locator('#genre').selectOption('service');
+  await page.locator('#name').fill('灯修理室');
+  assert.ok(await page.locator('#purpose').isHidden());
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
 
   async function submit(button) {
@@ -51,33 +45,68 @@ test('the mobile brief shapes the provider request on generation and revision wh
     assert.ok(!(await response.text()).includes(marker));
     await page.frameLocator('#preview').getByRole('heading', { name: 'テストページ' + requests.length }).waitFor();
     const payload = requests.at(-1);
-    assert.ok(payload.instructions.includes(marker + '/' + brief.direction));
-    const input = JSON.parse(payload.input);
-    assert.deepEqual(input.brief, brief);
+    const json = typeof payload.input === 'string' ? payload.input
+      : payload.input.flatMap(item => item.content).find(part => part.type === 'input_text').text;
+    const input = JSON.parse(json);
+    assert.ok(payload.instructions.includes(marker + '/' + (input.brief.genre || 'legacy')));
     return input;
   }
-  assert.equal((await submit('#generate')).previousHtml, '');
-  brief.direction = 'editorial';
-  brief.audience = '修理を初めて依頼する人';
-  await page.locator('#direction').selectOption(brief.direction);
-  await page.locator('#audience').fill(brief.audience);
-  await page.locator('#revision').fill('冒頭の説明を短く');
+  const initial = await submit('#generate');
+  assert.equal(initial.previousHtml, '');
+  assert.equal(initial.brief.purpose, '教室・サービスの案内');
+  assert.equal(initial.brief.name, '灯修理室');
+  assert.equal(initial.brief.genre, 'service');
+  assert.equal(initial.brief.request, '');
+  await page.locator('#artwork').selectOption('coffee');
+  await page.locator('#artwork-status').filter({ hasText: '表紙素材を反映しました' }).waitFor();
+  await page.locator('#visual-settings > summary').click();
+  await page.locator('#mainColor').selectOption('#305B47');
+  await page.locator('#subColor').selectOption('#FAF8F2');
+  await page.locator('#photoPreference').selectOption('no');
+  await page.locator('#request').fill('料金は要相談');
+  await page.locator('#revision').fill('修理の受付方法を先に');
   const revised = await submit('#revise');
+  assert.equal(revised.brief.mainColor, '#305B47');
+  assert.equal(revised.brief.subColor, '#FAF8F2');
+  assert.equal(revised.brief.photoPreference, 'no');
+  assert.equal(await page.locator('#artwork').inputValue(), 'auto');
+  assert.equal(revised.brief.request, '料金は要相談');
   assert.ok(revised.previousHtml.includes('テストページ1'));
-  assert.equal(revised.instruction, '冒頭の説明を短く');
+  assert.equal(revised.instruction, '修理の受付方法を先に');
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
   assert.ok(!(await page.content()).includes(marker));
+
   const download = page.waitForEvent('download');
   await page.locator('#download').click();
   const exported = await readFile(await (await download).path(), 'utf8');
   assert.ok(exported.includes('テストページ2') && !exported.includes(marker));
 
-  // Earlier briefs and recorded examples lack every optional structured field.
+  await page.locator('#example-list').selectOption('kissaten');
+  await page.locator('#load-example').click();
+  await page.locator('#custom-purpose:not([hidden])').waitFor();
+  assert.equal(await page.locator('#genre').inputValue(), 'other');
+  assert.equal(await page.locator('#purpose').inputValue(), '喫茶店の紹介');
+  assert.equal(await page.locator('#mainColor').inputValue(), '');
+  assert.equal(await page.locator('#subColor').inputValue(), '');
+  assert.equal(await page.locator('#photoPreference').inputValue(), '');
+  await page.locator('#revision').fill('店名を強調');
+  const fromExample = await submit('#revise');
+  assert.ok(fromExample.brief.mood);
+  assert.equal(fromExample.brief.purpose, '喫茶店の紹介');
+  await page.locator('#genre').selectOption('event');
+  await page.locator('#name').fill('町の音楽会');
+  await page.locator('#request').fill('');
+  const fresh = await submit('#generate');
+  assert.equal(fresh.previousHtml, '');
+  assert.equal(fresh.brief.mood, '');
+  assert.equal(fresh.brief.purpose, 'イベント・公演');
+
   const legacy = await page.request.post(app.origin + '/api/generate', {
     headers: { Origin: app.origin }, data: { brief: { name: '旧形式', purpose: '作品紹介' } },
   });
   assert.ok(legacy.ok());
-  assert.ok(requests.at(-1).instructions.includes(marker + '/auto'));
-  assert.equal(requests.length, 3);
+  assert.ok(requests.at(-1).instructions.includes(marker + '/legacy'));
+  assert.equal(requests.length, 5);
   const status = await page.request.get(app.origin + '/api/status');
   assert.ok(!(await status.text()).includes(marker));
 });

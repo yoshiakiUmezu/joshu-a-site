@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { buildResponseRequest, callResponses, compactPreviousHtml, MAX_SOURCE_BYTES, MODEL, renderSite } from './engine.mjs';
+import { applyMaterialPlan, buildResponseRequest, callResponses, compactPreviousHtml, MAX_SOURCE_BYTES, MODEL, renderSite } from './engine.mjs';
 
 const site = {
   title: '紙と活字',
@@ -44,6 +44,23 @@ test('export only accepts bounded passive markup, embedded CSS and working fragm
     { css: 'main{background-image:url(texture.png)}' },
     { html: 'あ'.repeat(Math.ceil(MAX_SOURCE_BYTES / 3)) },
   ]) assert.throws(() => renderSite({ ...site, ...partial }));
+});
+
+test('a visual input stays with the provider and only the specified catalog material reaches the HTML', async () => {
+  const privateReference = 'data:image/jpeg;base64,/9j/VEVTVA==';
+  const material = { art: 'architecture', placement: 'wide', position: '52% 48%' };
+  const body = buildResponseRequest({ brief: { name: '庭' } }, 'fixture', privateReference);
+  const [text, reference] = body.input[0].content;
+  assert.equal(JSON.parse(text.text).brief.name, '庭');
+  assert.deepEqual(reference, { type: 'input_image', detail: 'high', image_url: privateReference });
+  const result = await callResponses(body, { apiKey: 'fixture', material, fetchImpl: async () => Response.json(payload) });
+  assert.ok(!result.html.includes(privateReference));
+  const editable = compactPreviousHtml(result.html);
+  assert.match(editable, /<figure class="studio-hero-visual"><img src="art:architecture"/);
+  assert.ok(editable.includes('52% 48%'));
+  const next = applyMaterialPlan({ ...site, html: '<main><h1>庭</h1><img src="art:coffee" id="cover" alt="珈琲"><a href="#cover">表紙</a></main>' }, { ...material, art: null });
+  assert.doesNotMatch(renderSite(next), /<img\b/);
+  assert.ok(next.html.includes('id="cover"'));
 });
 
 test('standalone art matches local WebP, and only its catalog reference is sent for revisions', () => {

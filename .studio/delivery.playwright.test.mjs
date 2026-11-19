@@ -6,12 +6,13 @@ import { join } from 'node:path';
 import test from 'node:test';
 import { chromium } from 'playwright';
 import { startStudio } from './server.mjs';
+import { fixturePlan } from './test-plan.mjs';
 
 test('only a confirmed and released version delivers its frozen HTML after restart', async t => {
   const dir = await mkdtemp(join(tmpdir(), 'studio-delivery-'));
   const password = 'delivery-test-fixture';
   let calls = 0;
-  const options = { password, apiKey: 'offline-fixture', designInstructions: () => 'fixture', ledgerPath: join(dir, 'usage.json'),
+  const options = { password, apiKey: 'offline-fixture', designInstructions: () => fixturePlan(), ledgerPath: join(dir, 'usage.json'),
     fetchImpl: async () => {
       const site = { title: '喫茶室', html: '<main><h1>喫茶室</h1><p>本文の検証用テキスト' + (++calls) + '</p></main>',
         css: 'main{max-width:50rem;margin:auto}' };
@@ -27,6 +28,7 @@ test('only a confirmed and released version delivers its frozen HTML after resta
   assert.equal((await buyer.request.post(generateURL)).status(), 401);
   assert.equal(calls, 0);
   await operator.goto(app.origin + '/studio/');
+  await operator.locator('#genre').selectOption('other');
   await operator.locator('#purpose').fill('喫茶店の案内');
   await operator.locator('#name').fill('喫茶室');
   await operator.locator('#generate').click();

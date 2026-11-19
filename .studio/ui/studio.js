@@ -11,6 +11,18 @@ const artwork = byId("artwork");
 const artStatus = byId("artwork-status");
 const exampleList = byId("example-list");
 const exampleStatus = byId("example-status");
+const genre = byId("genre");
+const purpose = byId("purpose");
+const colorChoices = [
+  ["", "おまかせ"], ["#FAF8F2", "白"], ["#22262A", "黒"], ["#275FA8", "青"],
+  ["#305B47", "緑"], ["#AF483D", "赤"], ["#E09C52", "オレンジ"], ["#DEBF55", "黄"],
+  ["#C9849E", "ピンク"], ["#716093", "紫"], ["#A68160", "ベージュ"],
+];
+for (const id of ["mainColor", "subColor"]) {
+  const select = byId(id);
+  for (const [value, label] of colorChoices) select.add(new Option(label, value));
+  select.addEventListener("change", () => showColor(select));
+}
 const number = new Intl.NumberFormat("ja-JP");
 const offerList = byId("offer-list");
 const offerFeedback = byId("offer-feedback");
@@ -29,6 +41,54 @@ let busy = false;
 let previewWidth;
 let offers = [];
 let offersRequest = 0;
+
+function showColor(select) {
+  const swatch = select.previousElementSibling;
+  swatch.style.background = select.value || "";
+}
+
+function showPurpose() {
+  const custom = genre.value === "other";
+  byId("custom-purpose").hidden = !custom;
+  purpose.required = custom;
+  purpose.disabled = !custom;
+}
+genre.addEventListener("change", () => {
+  purpose.value = "";
+  showPurpose();
+});
+
+function showBrief(brief) {
+  for (const field of briefForm.querySelectorAll("[name]")) field.value = brief[field.name] ?? "";
+  if (!genre.value && brief.purpose) genre.value = "other";
+  showPurpose();
+  for (const id of ["mainColor", "subColor"]) {
+    const select = byId(id);
+    const color = brief[id];
+    if (color && !select.value && /^#[0-9a-f]{6}$/i.test(color)) {
+      select.add(new Option(color, color));
+      select.value = color;
+    }
+    showColor(select);
+  }
+}
+
+function readBrief(isRevision) {
+  const brief = Object.fromEntries(new FormData(briefForm));
+  const prior = isRevision && currentSite?.brief;
+  const sameGenre = prior && genre.value === (prior.genre || "other");
+  if (genre.value !== "other") {
+    brief.purpose = sameGenre && prior.purpose ? prior.purpose : genre.selectedOptions[0].textContent;
+  }
+  // Keep earlier examples' extra guidance only when revising the same subject.
+  if (sameGenre && brief.purpose === prior.purpose) {
+    for (const key of ["audience", "action", "highlight", "mood", "direction"]) {
+      if (prior[key]) brief[key] = prior[key];
+    }
+    if (prior.color && !brief.mainColor && !brief.subColor) brief.color = prior.color;
+  }
+  return brief;
+}
 
 function updateControls() {
   byId("generate").disabled = busy || !remaining || !liveEnabled;
@@ -131,7 +191,7 @@ async function displayDraft(data, brief, choice) {
   fitPreview();
   revision.value = "";
   byId("generate").textContent = "新しいサイトを生成";
-  for (const field of briefForm.querySelectorAll("[name]")) field.value = brief[field.name] ?? "";
+  showBrief(brief);
   showRevisionTarget();
 }
 
@@ -155,7 +215,7 @@ async function generate(isRevision) {
   if (busy || !remaining || !liveEnabled || (isRevision && !currentSite)) return;
   if (!briefForm.reportValidity()) return;
   const status = byId(isRevision ? "revision-status" : "generate-status");
-  const brief = Object.fromEntries(new FormData(briefForm));
+  const brief = readBrief(isRevision);
   const body = { brief };
   if (isRevision) {
     body.previousHtml = currentSite.modelHtml;
@@ -174,7 +234,7 @@ async function generate(isRevision) {
     if (data.ledger) showLedger(data.ledger);
     if (!response.ok) throw new Error(data.error || "生成に失敗しました。");
     if (typeof data.html !== "string" || !data.html) throw new Error("HTMLを受信できませんでした。");
-    const choice = isRevision ? currentSite.choice : "auto";
+    const choice = isRevision && brief.photoPreference !== "no" ? currentSite.choice : "auto";
     await displayDraft(data, brief, choice);
     showMessage(exampleStatus, "");
     if (!isRevision) showMessage(byId("revision-status"), "");
@@ -332,8 +392,8 @@ async function refreshLedger() {
   exampleList.replaceChildren(...status.examples.map(({ id, name }) => new Option(name, id)));
   if (selection) exampleList.value = selection;
   byId("examples").hidden = !status.examples.length;
-  byId("live-mode").textContent = liveEnabled ? "AIによる新規生成と修正にはAPI料金が発生します。"
-    : "作例モードです。上の「作例を開く」から始めてください。";
+  briefForm.hidden = !liveEnabled;
+  byId("brief-title").textContent = liveEnabled ? "どんなサイトを作りますか？" : "作例を試す";
   showLedger(status.ledger);
 }
 refreshLedger().catch(() => {

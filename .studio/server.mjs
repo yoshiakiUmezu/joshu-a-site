@@ -56,13 +56,19 @@ async function readInput(req) {
   const data = await readJson(req, MAX_HTML_BYTES + 128 * 1024);
   const brief = {};
   for (const [key, max] of Object.entries({ purpose: 120, name: 120, mood: 160, request: 1200,
-    audience: 160, action: 160, highlight: 360, direction: 16, color: 100 })) {
+    audience: 160, action: 160, highlight: 360, direction: 16, color: 100,
+    genre: 16, mainColor: 7, subColor: 7, photoPreference: 3 })) {
     const value = data?.brief?.[key] ?? '';
     if (typeof value !== 'string' || value.length > max) throw fail(400, '制作条件の形式または文字数を確認してください。');
     brief[key] = value.trim();
   }
   if (!brief.purpose || !brief.name) throw fail(400, '用途と名称を入力してください。');
   if (!directions.includes(brief.direction)) throw fail(400, 'デザインの方向を選び直してください。');
+  if (!['', 'food', 'portfolio', 'event', 'service', 'shop', 'other'].includes(brief.genre)
+      || !['', 'yes', 'no'].includes(brief.photoPreference)
+      || [brief.mainColor, brief.subColor].some(color => color && !/^#[\da-f]{6}$/i.test(color))) {
+    throw fail(400, 'ジャンル・色・写真の選択を確認してください。');
+  }
   const instruction = data.revision ?? '';
   const previousHtml = data.previousHtml ?? '';
   if (typeof instruction !== 'string' || instruction.length > 800 || typeof previousHtml !== 'string'
@@ -170,18 +176,26 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       if (req.method !== 'POST') throw fail(405, 'POSTで送信してください。');
       if (examplesOnly) throw fail(403, '作例モードです。実際のAI生成は通常の制作室で利用できます。');
       const input = await readInput(req);
-      const notes = designInstructions(input.brief);
+      const plan = designInstructions(input.brief, { instruction: input.instruction });
+      const notes = plan?.notes;
       if (typeof notes !== 'string' || !notes.trim() || Buffer.byteLength(notes) > 16 * 1024) {
         throw fail(503, '非公開の制作設定を確認してください。');
       }
-      const body = buildResponseRequest(input, notes);
-      // UTF-8 byte count bounds text tokens conservatively. Include the schema,
-      // a margin for protocol framing, and the entire possible output.
+      if (typeof plan.reference !== 'string' || plan.reference.length > 210_000
+          || !/^data:image\/jpeg;base64,\/9j\/[A-Za-z0-9+/]+=*$/.test(plan.reference)
+          || !(plan.art === null || ART_IDS.includes(plan.art))
+          || !['wide', 'split', 'poster'].includes(plan.placement)
+          || !/^(?:100|[1-9]?\d)% (?:100|[1-9]?\d)%$/.test(plan.position)) {
+        throw fail(503, '非公開の参照画像と素材設定を確認してください。');
+      }
+      const body = buildResponseRequest(input, notes, plan.reference);
+      // Deliberately reserve the full serialized payload, including the image
+      // transport. The provider's measured token counts replace this reservation.
       const budget = Buffer.byteLength(JSON.stringify(body)) + 1024 + MAX_OUTPUT_TOKENS;
       const id = ledger.reserve(input.previousHtml ? 'revise' : 'generate', budget);
       let result;
       try {
-        result = await callResponses(body, { apiKey, fetchImpl, privateNotes: notes });
+        result = await callResponses(body, { apiKey, fetchImpl, privateNotes: notes, material: plan });
       } catch (error) {
         ledger.finish(id, 'failed', error.usage ?? null, 0);
         return json(502, { error: error.message, ledger: ledger.summary() });

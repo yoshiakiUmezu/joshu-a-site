@@ -5,13 +5,14 @@ import { join } from 'node:path';
 import test from 'node:test';
 import { chromium } from 'playwright';
 import { startStudio } from './server.mjs';
+import { fixturePlan } from './test-plan.mjs';
 
 test('the sandbox decodes the embedded editorial art and keeps fragment navigation inside', async t => {
   const dir = await mkdtemp(join(tmpdir(), 'preview-'));
   const password = 'local-preview-test';
   const site = { title: '喫茶店', html: '<main><h1>喫茶店</h1><img src="art:coffee" alt="窓辺の珈琲"><a href="#menu">メニュー</a><section id="menu">珈琲</section></main>',
     css: 'section{margin-top:200vh;min-height:100vh}' };
-  const app = await startStudio({ password, apiKey: 'local-fixture', designInstructions: () => 'fixture', ledgerPath: join(dir, 'usage.json'),
+  const app = await startStudio({ password, apiKey: 'local-fixture', designInstructions: () => fixturePlan('coffee'), ledgerPath: join(dir, 'usage.json'),
     fetchImpl: async () => Response.json({ status: 'completed', usage: { input_tokens: 20, output_tokens: 30, total_tokens: 50 },
       output: [{ type: 'message', role: 'assistant', content: [{ type: 'output_text', text: JSON.stringify(site) }] }] }) });
   t.after(async () => { await app.close(); await rm(dir, { recursive: true, force: true }); });
@@ -19,8 +20,8 @@ test('the sandbox decodes the embedded editorial art and keeps fragment navigati
   t.after(() => browser.close());
   const page = await browser.newPage({ httpCredentials: { username: 'developer', password, origin: app.origin } });
   await page.goto(app.origin + '/studio/');
-  await page.getByLabel(/用途/).fill('喫茶');
-  await page.getByLabel(/サイト名/).fill(site.title);
+  await page.locator('#genre').selectOption('food');
+  await page.locator('#name').fill(site.title);
   await page.getByRole('button', { name: 'サイトを生成' }).click();
   const iframe = page.frameLocator('#preview');
   const width = await iframe.getByRole('img', { name: '窓辺の珈琲' }).evaluate(async image => {

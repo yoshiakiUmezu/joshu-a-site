@@ -20,7 +20,7 @@
     <div class="intro">
       <div>
         <h1>ホームページ制作室</h1>
-        <p>用途とイメージを入力して、1ページのサイトを制作します。</p>
+        <p>ジャンルを選び、名前を入れると、1ページのサイトを作れます。</p>
       </div>
       <dl class="meter">
         <div><dt>生成・修正回数</dt><dd id="calls">—</dd></div>
@@ -29,7 +29,51 @@
     </div>
     <div class="workspace">
       <section class="panel brief-panel" aria-labelledby="brief-title">
-        <h2 id="brief-title">サイトの仕様</h2>
+        <h2 id="brief-title">どんなサイトを作りますか？</h2>
+        <form id="brief-form" autocomplete="off">
+          <fieldset id="brief-fields">
+            <label for="genre">ジャンル <small>必須</small></label>
+            <select id="genre" name="genre" required>
+              <option value="" disabled selected>選んでください</option>
+              <option value="food">飲食店・カフェ</option>
+              <option value="portfolio">作品・活動の紹介</option>
+              <option value="event">イベント・公演</option>
+              <option value="service">教室・サービスの案内</option>
+              <option value="shop">お店・商品の紹介</option>
+              <option value="other">その他（自由に記入）</option>
+            </select>
+            <div id="custom-purpose" hidden>
+              <label for="purpose">何のサイトですか？</label>
+              <input id="purpose" name="purpose" maxlength="120" disabled placeholder="例）町内会のお知らせ">
+            </div>
+            <label for="name">サイトの名前 <small>必須</small></label>
+            <input id="name" name="name" maxlength="120" required placeholder="例）喫茶 灯り">
+            <label for="request">載せたいこと <small>任意</small></label>
+            <textarea id="request" name="request" rows="2" maxlength="1200" placeholder="例）朝8時から。自家焙煎のコーヒーと厚切りトーストを紹介したい。"></textarea>
+            <details id="visual-settings">
+              <summary>色や写真の希望 <small>任意</small></summary>
+              <div class="color-fields">
+                <div>
+                  <label for="mainColor">メインの色</label>
+                  <div class="color-field"><i aria-hidden="true"></i><select id="mainColor" name="mainColor"></select></div>
+                </div>
+                <div>
+                  <label for="subColor">サブの色</label>
+                  <div class="color-field"><i aria-hidden="true"></i><select id="subColor" name="subColor"></select></div>
+                </div>
+              </div>
+              <label for="photoPreference">写真を使いますか？</label>
+              <select id="photoPreference" name="photoPreference">
+                <option value="">おまかせ</option>
+                <option value="yes">はい（合う素材があれば）</option>
+                <option value="no">いいえ、使わない</option>
+              </select>
+            </details>
+          </fieldset>
+          <button id="generate" class="primary" type="submit" disabled>サイトを生成</button>
+          <p class="feedback" id="live-mode">AIによる新規生成と修正にはAPI料金が発生します。</p>
+          <p class="feedback" role="status" id="generate-status"></p>
+        </form>
         <div class="examples" id="examples" hidden>
           <label for="example-list">生成済みの作例を試す</label>
           <div class="offer-picker">
@@ -39,40 +83,6 @@
           <p class="feedback">作例のプレビューと納品テストは無料です。</p>
           <p class="feedback" role="status" id="example-status"></p>
         </div>
-        <form id="brief-form" autocomplete="off">
-          <fieldset id="brief-fields">
-            <label for="purpose">用途 <small>必須</small></label>
-            <input id="purpose" name="purpose" maxlength="120" required placeholder="例）喫茶店の店舗案内">
-            <label for="name">サイト名 <small>必須</small></label>
-            <input id="name" name="name" maxlength="120" required placeholder="例）喫茶 灯り">
-            <label for="audience">どんな人に見てほしいですか？</label>
-            <input id="audience" name="audience" maxlength="160" placeholder="例）朝の散歩で立ち寄れる店を探している人">
-            <label for="action">見た人にどうしてほしいですか？</label>
-            <input id="action" name="action" maxlength="160" placeholder="例）朝食メニューと開店時刻を見て来店する">
-            <label for="highlight">最初に見せたいもの・伝えたいこと</label>
-            <textarea id="highlight" name="highlight" rows="2" maxlength="360" placeholder="例）朝8時から。厚切りトーストと深煎り珈琲のセットが自慢"></textarea>
-            <details id="visual-settings">
-              <summary>見た目の希望 <small>任意</small></summary>
-              <label for="direction">デザインの方向性</label>
-              <select id="direction" name="direction">
-                <option value="">用途に合わせておまかせ</option>
-                <option value="editorial">雑誌のように読ませる</option>
-                <option value="showcase">作品や商品を大きく見せる</option>
-                <option value="graphic">ポスターのように印象づける</option>
-                <option value="guide">必要な情報を見つけやすくする</option>
-              </select>
-              <label for="mood">雰囲気</label>
-              <input id="mood" name="mood" maxlength="160" placeholder="例）静かで温かい、朝の光を感じる">
-              <label for="color">使いたい色・避けたい色</label>
-              <input id="color" name="color" maxlength="100" placeholder="例）生成りと深緑。真っ黒は避けたい">
-            </details>
-            <label for="request">自由な要望</label>
-            <textarea id="request" name="request" rows="3" maxlength="1200" placeholder="例）メニューの後に、住所と定休日を載せてほしい"></textarea>
-          </fieldset>
-          <button id="generate" class="primary" type="submit" disabled>サイトを生成</button>
-          <p class="feedback" id="live-mode">AIによる新規生成と修正にはAPI料金が発生します。</p>
-          <p class="feedback" role="status" id="generate-status"></p>
-        </form>
       </section>
       <section class="panel preview-panel" aria-labelledby="preview-title">
         <div class="preview-head">

@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import { startStudio } from './server.mjs';
+import { fixturePlan } from './test-plan.mjs';
 import { openLedger } from './ledger.mjs';
 
 const password = 'only-for-local-tests';
@@ -19,7 +20,7 @@ const response = {
 
 async function setup(t, fetchImpl, limits) {
   const dir = await mkdtemp(join(tmpdir(), 'studio-test-'));
-  const options = { password, apiKey: 'local-fixture', designInstructions: () => 'fixture', ledgerPath: join(dir, 'usage.json'), fetchImpl, limits };
+  const options = { password, apiKey: 'local-fixture', designInstructions: () => fixturePlan(), ledgerPath: join(dir, 'usage.json'), fetchImpl, limits };
   const app = await startStudio(options);
   t.after(async () => {
     await app.close();
