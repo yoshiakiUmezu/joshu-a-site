@@ -140,3 +140,16 @@ iframe { position: absolute; inset: 0 auto auto 0; display: block; border: 0; tr
   .preview-head, .preview-foot { padding-inline: .8rem; }
   .stage { padding: .35rem; }
 }
+
+.production-wait {
+  position: absolute; inset: 0; z-index: 1; display: grid; place-content: center; justify-items: center;
+  gap: 1rem; background: #101821ef; color: #f3f6fa;
+}
+.production-wait::before, .working::before {
+  content: ""; display: inline-block; width: 1em; height: 1em; border: 2px solid #677685;
+  border-top-color: #c3e8fa; border-radius: 50%; animation: studio-spin 1s linear infinite;
+}
+.production-wait::before { width: 2rem; height: 2rem; }
+.working::before { margin-right: .55em; vertical-align: -.15em; }
+@keyframes studio-spin { to { transform: rotate(1turn); } }
+@media (prefers-reduced-motion: reduce) { .production-wait::before, .working::before { animation: none; } }

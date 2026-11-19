@@ -92,7 +92,8 @@
             <button type="button" data-width="390" aria-pressed="false">スマホ</button>
           </div>
         </div>
-        <div class="stage">
+        <div class="stage" id="stage" aria-busy="false">
+          <div id="production-wait" class="production-wait" hidden aria-hidden="true"><span id="wait-label"></span></div>
           <div class="empty" id="empty">
             <div class="page-shape" aria-hidden="true"><i></i><b></b><b></b></div>
             <p>生成したサイトがここに表示されます</p>
@@ -113,6 +114,7 @@
               <option value="architecture">中庭住宅の模型</option>
             </select>
           </label>
+          <button id="edit-draft" class="secondary" type="button" hidden>この初稿を編集</button>
           <button id="download" class="secondary" type="button" disabled>HTMLを保存</button>
         </div>
         <p id="artwork-status" class="feedback cover-feedback" role="status"></p>

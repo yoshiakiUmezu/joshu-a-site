@@ -51,7 +51,25 @@ test('beginners can select a genre, revise their choices and reuse earlier examp
     assert.ok(payload.instructions.includes(marker + '/' + (input.brief.genre || 'legacy')));
     return input;
   }
-  const initial = await submit('#generate');
+  let release;
+  const hold = new Promise(resolve => { release = resolve; });
+  await page.route('**/api/generate', async route => {
+    await hold;
+    await route.continue();
+  }, { times: 1 });
+  const firstRequest = submit('#generate');
+  try {
+    await page.locator('#production-wait').waitFor();
+    assert.equal(await page.locator('#stage').getAttribute('aria-busy'), 'true');
+    assert.ok(await page.locator('#generate').isDisabled());
+  } finally {
+    release();
+  }
+  const initial = await firstRequest;
+  await page.locator('#production-wait').waitFor({ state: 'hidden' });
+  await page.locator('#edit-draft').click();
+  assert.ok(await page.locator('#revision').evaluate(field => field === document.activeElement));
+  assert.equal(requests.length, 1);
   assert.equal(initial.previousHtml, '');
   assert.equal(initial.brief.purpose, '教室・サービスの案内');
   assert.equal(initial.brief.name, '灯修理室');
@@ -107,6 +125,14 @@ test('beginners can select a genre, revise their choices and reuse earlier examp
   assert.ok(legacy.ok());
   assert.ok(requests.at(-1).instructions.includes(marker + '/legacy'));
   assert.equal(requests.length, 5);
+  await page.route('**/api/generate', route => route.fulfill({
+    status: 503, json: { error: 'テスト用エラー' },
+  }), { times: 1 });
+  await page.locator('#generate').click();
+  await page.locator('#generate-status.error').waitFor();
+  await page.locator('#production-wait').waitFor({ state: 'hidden' });
+  assert.equal(await page.locator('#stage').getAttribute('aria-busy'), 'false');
+  assert.ok(await page.locator('#download').isEnabled());
   const status = await page.request.get(app.origin + '/api/status');
   assert.ok(!(await status.text()).includes(marker));
 });

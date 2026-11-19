@@ -95,6 +95,8 @@ function updateControls() {
   byId("brief-fields").disabled = busy;
   byId("revise").disabled = busy || !remaining || !liveEnabled || !currentSite;
   revision.disabled = busy || !remaining || !liveEnabled || !currentSite;
+  byId("edit-draft").hidden = !currentSite || !liveEnabled || !remaining;
+  byId("edit-draft").disabled = busy;
   exampleList.disabled = busy;
   byId("load-example").disabled = busy || !exampleList.value;
   byId("download").disabled = busy || !currentSite;
@@ -211,6 +213,8 @@ artwork.addEventListener("change", async () => {
   }
 });
 
+byId("edit-draft").addEventListener("click", () => revision.focus());
+
 async function generate(isRevision) {
   if (busy || !remaining || !liveEnabled || (isRevision && !currentSite)) return;
   if (!briefForm.reportValidity()) return;
@@ -223,7 +227,12 @@ async function generate(isRevision) {
   }
   busy = true;
   updateControls();
-  showMessage(status, isRevision ? "修正を反映しています…" : "サイトを生成しています…");
+  const waitMessage = isRevision ? "修正を反映しています…" : "初稿を制作しています…";
+  byId("stage").setAttribute("aria-busy", "true");
+  byId("wait-label").textContent = waitMessage;
+  byId("production-wait").hidden = false;
+  status.classList.add("working");
+  showMessage(status, waitMessage);
   try {
     const response = await fetch("/api/generate", {
       method: "POST",
@@ -254,6 +263,9 @@ async function generate(isRevision) {
       showMessage(byId("limits"), "最新の利用状況を取得できませんでした。接続を確認して再読み込みしてください。", true);
     }
   } finally {
+    byId("production-wait").hidden = true;
+    byId("stage").setAttribute("aria-busy", "false");
+    status.classList.remove("working");
     busy = false;
     updateControls();
   }
