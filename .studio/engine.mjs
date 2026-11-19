@@ -1,3 +1,4 @@
+import { motionModes, motionSheet } from './motion.mjs';
 import { readFileSync } from 'node:fs';
 import { validUsage } from './ledger.mjs';
 
@@ -21,6 +22,7 @@ const instructions = `入力のbriefをもとに、訪問者向けの日本語�
 
 ホストがサイト名入りの共通ヘッダー、h2から作るページ内目次、フッターを追加します。htmlにはmainをルートに本文のみを書き、冒頭にサイトの目的とh1、その後に提供内容・判断材料・次の行動を用途に応じて構成します。主要区画には短く具体的なh2を付けてください。短い告知は区画を統合できます。
 出力のdesignは非公開の短い制作方針です。先に読者の目的、要望の素材感を画面のどこにどう見せるか、各節で新しく伝える内容を具体化し、その方針をhtmlとcssで形にしてください。h2には本文とは別に短い目次名（例 data-nav="作品"）を付けられます。
+依頼に合わせてmotionを選ぶ。softは静かな浮かび上がり、editorialは印刷面が開くような登場、rhythmicは短く弾むリズム。動きを望まない依頼はstill。冒頭の主役が図や写真ならその要素にstudio-motion-lead、スクロールで見せたい作品・図やカードにstudio-motion-detailというclassを付ける。動きはホストがCSSで適用する。修正時は依頼に関係のない動きの設定を引き継ぐ。
 出力のtitleはプレーンテキスト、htmlは本文断片、cssはスタイルシートです。DOCTYPE・head・bodyはホストが用意します。
 HTML要素は ${[...elements].join(' ')} だけ。mainとh1を各1個使い、小文字で明示的に閉じてください（brとhrは空要素）。
 imgも空要素です。素材を使うときは <img src="art:coffee" alt="窓辺の珈琲とトースト"> の形式で、指定された素材を各1回、合計3点まで使えます。独自URL、base64、幅・高さ属性は使いません。
@@ -30,6 +32,7 @@ CSSのアットルールは@mediaだけ。比較はmin-widthやmax-widthを使�
 
 export function buildResponseRequest({ brief, instruction = '', previousHtml = '' }, designNotes = '', reference = '') {
   const textInput = JSON.stringify({ brief, instruction, previousHtml: compactPreviousHtml(previousHtml)
+    .replace(/<style id="studio-motion">[\s\S]*?<\/style>/, '')
     .replace(frameStyle, '').replace(/<div id="studio-top(?:-\d+)?"><\/div>(?=<!--studio-frame-start-->)/, '')
     .replace(/<!--studio-frame-start-->[\s\S]*?<!--studio-frame-end-->/g, '') });
   return {
@@ -49,8 +52,8 @@ export function buildResponseRequest({ brief, instruction = '', previousHtml = '
       strict: true,
       schema: {
         type: 'object',
-        properties: { design: { type: 'string' }, title: { type: 'string' }, html: { type: 'string' }, css: { type: 'string' } },
-        required: ['design', 'title', 'html', 'css'],
+        properties: { motion: { type: 'string', enum: motionModes }, design: { type: 'string' }, title: { type: 'string' }, html: { type: 'string' }, css: { type: 'string' } },
+        required: ['motion', 'design', 'title', 'html', 'css'],
         additionalProperties: false,
       },
     } },
@@ -261,8 +264,9 @@ ${siteName ? frameStyle : ''}
 [role="img"] > div{max-width:100%}
 @media(max-width:600px){nav{flex-wrap:wrap}nav a[href]{display:inline-flex;align-items:center;min-block-size:2rem;font-size:max(.875rem,1em)}}
 </style>
+${siteName || site.motion ? motionSheet(site.motion) : ''}
 </head>
-<body>
+<body${siteName || site.motion ? ' data-motion="' + (motionModes.includes(site.motion) ? site.motion : 'soft') + '"' : ''}>
 ${siteName ? pageFrame(fragment, siteName) : fragment}
 </body>
 </html>`;
