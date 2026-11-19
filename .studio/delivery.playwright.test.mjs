@@ -11,7 +11,7 @@ test('only a confirmed and released version delivers its frozen HTML after resta
   const dir = await mkdtemp(join(tmpdir(), 'studio-delivery-'));
   const password = 'delivery-test-fixture';
   let calls = 0;
-  const options = { password, apiKey: 'offline-fixture', ledgerPath: join(dir, 'usage.json'),
+  const options = { password, apiKey: 'offline-fixture', designInstructions: () => 'fixture', ledgerPath: join(dir, 'usage.json'),
     fetchImpl: async () => {
       const site = { title: '喫茶室', html: '<main><h1>喫茶室</h1><p>本文の検証用テキスト' + (++calls) + '</p></main>',
         css: 'main{max-width:50rem;margin:auto}' };

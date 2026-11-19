@@ -45,11 +45,15 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 label { display: block; margin-bottom: .3rem; font-size: .895rem; font-weight: 600; }
 label:not(:first-child) { margin-top: .85rem; }
 small { color: var(--muted); font-size: .75rem; font-weight: 400; margin-inline-start: .25rem; }
-input, textarea, button { font: inherit; color: inherit; }
-input, textarea {
+input, textarea, #direction, button { font: inherit; color: inherit; }
+input, textarea, #direction {
   display: block; width: 100%; padding: .58rem .8rem; border: 1px solid #414c5c;
   background: #0b1016; border-radius: .45rem; line-height: 1.5;
 }
+#visual-settings { margin-top: 1rem; border-block: 1px solid var(--line); }
+#visual-settings[open] { padding-bottom: 1rem; }
+#visual-settings summary { padding: .65rem 0; cursor: pointer; font-size: .895rem; font-weight: 600; }
+#visual-settings[open] summary + label { margin-top: .25rem; }
 textarea { resize: vertical; min-height: 4rem; }
 ::placeholder { color: #8793a4; opacity: 1; }
 input:disabled, textarea:disabled { opacity: .62; }
@@ -58,7 +62,8 @@ button {
   font-size: .925rem; font-weight: 650; cursor: pointer;
 }
 button:disabled { opacity: .48; cursor: default; }
-button:focus-visible, input:focus-visible, textarea:focus-visible, iframe:focus-visible {
+button:focus-visible, input:focus-visible, textarea:focus-visible, iframe:focus-visible,
+#visual-settings :is(summary, select):focus-visible {
   outline: 2px solid #b8d8ff; outline-offset: 3px;
 }
 .primary { width: 100%; margin-top: 1.15rem; background: var(--blue); color: #122238; }

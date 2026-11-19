@@ -1,9 +1,9 @@
 import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { readFile, realpath } from 'node:fs/promises';
 import http from 'node:http';
 import { homedir } from 'node:os';
-import { dirname, join } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { dirname, isAbsolute, join, relative, sep } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { ART_IDS, buildResponseRequest, callResponses, MAX_HTML_BYTES, MAX_OUTPUT_TOKENS, renderSite } from './engine.mjs';
 import { openLedger } from './ledger.mjs';
 import { createDeliveryStore } from './delivery.mjs';
@@ -20,6 +20,19 @@ const files = new Map([
 ]);
 const fail = (status, message) => Object.assign(new Error(message), { status });
 const digest = value => createHash('sha256').update(value).digest();
+const directions = ['', 'editorial', 'showcase', 'graphic', 'guide'];
+
+async function loadDesignInstructions() {
+  try {
+    const root = await realpath(fileURLToPath(new URL('../', import.meta.url)));
+    const file = await realpath(process.env.STUDIO_DESIGN_FILE || join(dirname(root), 'studio-design-policy.mjs'));
+    const inside = relative(root, file);
+    if (!isAbsolute(inside) && !inside.startsWith('..' + sep)) throw new Error();
+    const module = await import(pathToFileURL(file).href);
+    if (typeof module.designInstructions === 'function') return module.designInstructions;
+  } catch { /* Never include the private module or its contents in diagnostics. */ }
+  throw new Error('非公開の制作設定を読み込めません。リポジトリ外の設定ファイルを確認してください。');
+}
 
 async function readJson(req, maxBytes) {
   if (req.headers['content-type']?.split(';')[0].trim() !== 'application/json') {
@@ -42,12 +55,14 @@ async function readJson(req, maxBytes) {
 async function readInput(req) {
   const data = await readJson(req, MAX_HTML_BYTES + 128 * 1024);
   const brief = {};
-  for (const [key, max] of Object.entries({ purpose: 120, name: 120, mood: 160, request: 1200 })) {
+  for (const [key, max] of Object.entries({ purpose: 120, name: 120, mood: 160, request: 1200,
+    audience: 160, action: 160, highlight: 360, direction: 16, color: 100 })) {
     const value = data?.brief?.[key] ?? '';
     if (typeof value !== 'string' || value.length > max) throw fail(400, '制作条件の形式または文字数を確認してください。');
     brief[key] = value.trim();
   }
   if (!brief.purpose || !brief.name) throw fail(400, '用途と名称を入力してください。');
+  if (!directions.includes(brief.direction)) throw fail(400, 'デザインの方向を選び直してください。');
   const instruction = data.revision ?? '';
   const previousHtml = data.previousHtml ?? '';
   if (typeof instruction !== 'string' || instruction.length > 800 || typeof previousHtml !== 'string'
@@ -57,10 +72,11 @@ async function readInput(req) {
   return { brief, instruction: instruction.trim(), previousHtml: previousHtml.trim() };
 }
 
-export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetchImpl = fetch, limits = defaults, examplesOnly = false }) {
+export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetchImpl = fetch, limits = defaults, examplesOnly = false, designInstructions }) {
   if ((!examplesOnly && !apiKey?.trim()) || typeof password !== 'string' || password.length < 16) {
     throw new Error('OPENAI_API_KEY と16文字以上の STUDIO_PASSWORD をサーバーに設定してください。');
   }
+  if (!examplesOnly) designInstructions ??= await loadDesignInstructions();
   const auth = digest('Basic ' + Buffer.from('developer:' + password).toString('base64'));
   const store = createDeliveryStore(join(dirname(ledgerPath), 'deliveries'));
   const drafts = new Map();
@@ -154,14 +170,18 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       if (req.method !== 'POST') throw fail(405, 'POSTで送信してください。');
       if (examplesOnly) throw fail(403, '作例モードです。実際のAI生成は通常の制作室で利用できます。');
       const input = await readInput(req);
-      const body = buildResponseRequest(input);
+      const notes = designInstructions(input.brief);
+      if (typeof notes !== 'string' || !notes.trim() || Buffer.byteLength(notes) > 16 * 1024) {
+        throw fail(503, '非公開の制作設定を確認してください。');
+      }
+      const body = buildResponseRequest(input, notes);
       // UTF-8 byte count bounds text tokens conservatively. Include the schema,
       // a margin for protocol framing, and the entire possible output.
       const budget = Buffer.byteLength(JSON.stringify(body)) + 1024 + MAX_OUTPUT_TOKENS;
       const id = ledger.reserve(input.previousHtml ? 'revise' : 'generate', budget);
       let result;
       try {
-        result = await callResponses(body, { apiKey, fetchImpl });
+        result = await callResponses(body, { apiKey, fetchImpl, privateNotes: notes });
       } catch (error) {
         ledger.finish(id, 'failed', error.usage ?? null, 0);
         return json(502, { error: error.message, ledger: ledger.summary() });

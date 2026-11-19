@@ -2,15 +2,18 @@
 
 用途・名称・雰囲気・自由な要望から1ページを制作する開発者用の試作です。「サイトを生成」で初稿を作り、「追加指示」で修正します。PCは1,280px、スマホは390pxの幅で表示し、「HTMLを保存」で現在の版を端末に保存できます。購入前の画像確認と、模擬購入後のHTML受け取りも同じPCで試せます。
 
+必須の用途・名称に加え、「誰に見てほしいか」「取ってほしい行動」「最初に見せたいもの」を指定できます。「見た目の希望」ではデザインの方向性、雰囲気、配色を選べます。修正は現在の入力欄と追加指示を使います。
+
 ## ローカル起動
 
 Node.js 22以降を使用します。確認画像の作成にはリポジトリのルートで `npm ci` を実行し、Playwrightを用意します。Windowsではインストール済みのChromeまたはEdgeを使用できます。他の環境は `npx playwright install chromium` でブラウザを用意するか、`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` にChromium系ブラウザの実行ファイルを指定します。
 
-**作例を無課金で試す**には `node .studio/server.mjs --examples-only` を実行します。同じPCで `http://127.0.0.1:4313/studio/` を開き、ユーザー名 `developer` と端末に表示された今回のパスワードでログインします。作例は実際に生成・修正した喫茶店・音楽公演・建築作品集の3件です。APIキーは不要です。
+**作例を無課金で試す**には `node .studio/server.mjs --examples-only` を実行します。同じPCで `http://127.0.0.1:4313/studio/` を開き、ユーザー名 `developer` と端末に表示された今回のパスワードでログインします。喫茶店と音楽公演は実生成の修正版、建築作品集「間庭設計室」は追加条件を使って1回で生成した初稿です。APIキーは不要です。
 
 **自分の依頼でAI生成・修正する**場合は次の手順を使います。「サイトを生成」「修正を反映」を実行するとAPI料金が発生します。有料検証は予算と回数の承認後に実施してください。
 
 1. **リポジトリの外**に、自分だけが読める `studio-secrets.env` を用意します。`OPENAI_API_KEY=…` を設定します。OSからサーバープロセスに環境変数を渡すこともできます。
+   通常モードには運営者の非公開制作設定も必要です。既定の場所はリポジトリの親の `studio-design-policy.mjs` です。別の場所に用意する場合は `STUDIO_DESIGN_FILE` にリポジトリ外のファイルのパスを設定してください。サーバーはそのモジュールの `designInstructions(brief)` を使用します。作例モードは公開チェックアウトのみで利用できます。
 2. リポジトリの親にSecretファイルを置いた場合、リポジトリ直下から `node --env-file=../studio-secrets.env .studio/server.mjs --session-password` を実行します。毎回新しいログイン用パスワードを端末に表示します。固定したい場合は、Secretに16文字以上のランダムな `STUDIO_PASSWORD` を設定し、`--session-password` を外してください。
 3. 同じPCのブラウザで `http://127.0.0.1:4312/studio/` を開き、ユーザー名 `developer` とそのパスワードで認証します。終了はターミナルの Ctrl+C です。
 
@@ -29,7 +32,7 @@ Node.js 22以降を使用します。確認画像の作成にはリポジトリ�
 
 ## 生成と記録
 
-Responses APIの `gpt-6-luna` に仕様を送信し、修正時には現在のHTMLと追加指示も送信します。`store: false`、Standard処理、ツールなしで呼び出します。モデルが返したタイトル・HTML本文・CSSを検査して単一のHTMLに組み立てます。プレビューはサンドボックス内で動作し、保存版にもCSPを埋め込みます。
+Responses APIの `gpt-6-luna` に仕様を送信し、修正時には現在のHTMLと追加指示も送信します。非公開の制作設定はサーバーが依頼ごとに適用し、同じAPI呼び出しの指示として渡します。設定本体は公開リポジトリと配布ファイルの外に保管します。`store: false`、Standard処理、ツールなしで呼び出します。モデルが返したタイトル・HTML本文・CSSを検査して単一のHTMLに組み立てます。プレビューはサンドボックス内で動作し、保存版にもCSPを埋め込みます。
 
 制作室には、窓辺の珈琲とトースト、公演ポスター用の抽象画、建築のスタディ模型という3点の作例用画像を同梱しています。モデルが依頼に合う素材を選ぶと、保存時に制作室がWebPを1枚埋め込みます。素材は事前にImageGenで制作したイメージです。別の題材や画像不要の依頼では、文字組みやCSSによる図版を使えます。修正リクエストでは画像を短い素材IDに戻すため、画像データが入力トークンに加算されることはありません。生成・修正の各操作で呼び出すAPIはテキスト生成の1回です。
 
@@ -47,4 +50,4 @@ API送信前に、入力のUTF-8バイト数と構造分の余裕、最大出力
 
 時刻・操作・予約量・成否・トークン数・HTMLバイト数をローカルの `usage.json` に記録します。入力本文、生成HTML、認証情報は含めません。Windowsの保存先は `%LOCALAPPDATA%\joshu-a-studio\usage.json`、他のOSでは `$XDG_STATE_HOME/joshu-a-studio/usage.json`（既定 `~/.local/state/joshu-a-studio/usage.json`）です。再起動後も同じ枠を使います。次の検証枠を用意する場合は、費用の承認後、サーバーを停止し、既存の台帳を保管してから開始してください。
 
-無課金で接続境界・保存・使用量処理を検証するコマンドは `node --test .studio/engine.test.mjs .studio/server.test.mjs` です。ブラウザでのページ内移動と確認・納品の操作は `node --test .studio/preview.playwright.test.mjs .studio/delivery.playwright.test.mjs` で確認できます。システムのChromium系ブラウザを使う場合は、その実行ファイルを `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` に指定します。モデル単価は[OpenAIのモデル仕様](https://developers.openai.com/api/docs/models/gpt-6-luna)を参照してください。
+無課金で接続境界・保存・使用量処理を検証するコマンドは `node --test .studio/engine.test.mjs .studio/server.test.mjs` です。ブラウザでのページ内移動と確認・納品の操作は `node --test .studio/preview.playwright.test.mjs .studio/delivery.playwright.test.mjs .studio/brief.playwright.test.mjs` で確認できます。システムのChromium系ブラウザを使う場合は、その実行ファイルを `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` に指定します。モデル単価は[OpenAIのモデル仕様](https://developers.openai.com/api/docs/models/gpt-6-luna)を参照してください。

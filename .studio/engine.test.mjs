@@ -83,3 +83,12 @@ test('incomplete, refused and rejected outputs keep upstream usage; missing usag
       data.usage.total_tokens ? error.usage?.totalTokens === 190 : error.usage === null);
   }
 });
+
+test('verbatim private direction in a generated page is withheld with its usage recorded', async () => {
+  const privateNotes = 'This is a private test sentence for the local design fixture.';
+  const copy = { ...site, html: '<main><h1>' + privateNotes + '</h1></main>' };
+  const data = { ...payload, output: [{ type: 'message', role: 'assistant',
+    content: [{ type: 'output_text', text: JSON.stringify(copy) }] }] };
+  await assert.rejects(callResponses({}, { apiKey: 'fixture', privateNotes, fetchImpl: async () => Response.json(data) }),
+    error => error.usage?.totalTokens === 190 && !error.message.includes(privateNotes));
+});

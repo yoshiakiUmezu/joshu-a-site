@@ -12,17 +12,9 @@ const art = new Map(ART_IDS.map(id => {
   return ['art:' + id, 'data:image/webp;base64,' + readFileSync(file).toString('base64')];
 }));
 const elements = new Set(('main header footer nav section article aside div span h1 h2 h3 h4 h5 h6 p a ul ol li dl dt dd strong em small br hr figure figcaption img time address b i blockquote cite').split(' '));
-const instructions = `依頼主がそのまま使いたいと思える、日本語の静的な1ページをデザインし、HTMLとCSSを書いてください。入力はbrief、修正時はさらにpreviousHtmlとinstructionです。
-
-構成を用途から決めてください。冒頭は一目で「何のサイトか」「なぜ見たいか」が伝わる表紙。訪問者が欲しい具体的な情報と、その先へ進むページ内リンクをすぐ見つけられるようにします。次の区画は異なる組み方で情報を深め、最後は実用情報につなげます。全面のグラデーションに中央揃えの標語、同形カードの反復、用途をまたいで使える宣伝文、飾りの番号・バッジ・英語ラベルは避けてください。
-
-次の編集素材はすべて横長です。新規・修正とも、テーマに合う素材があれば1点を使い、最初の画面の構図の主役にしてください。図解の依頼は、関連する写真と別に線や面で説明図を組みます。画像はホストが同梱する制作見本です。実在の店舗・公演・竣工物の記録写真とは表現しません。画像不要の指定がある場合やテーマに合わない場合は、入力内容にある品目・数値・形・関係性からCSSの図版、本の見開き、時刻表など、その題材独自の表現を設計します。
-- art:coffee は喫茶の窓辺の珈琲とトースト。食の雑誌のような写真のトリミングと店名の組版、印刷されたメニューのような品目・価格の対応、営業時間へとつなぐ。過度なセピアや、写真全面を暗く覆う処理は不要。
-- art:concert はインクのような抽象的な音のリボン。公演ポスターなら図版と見出し、日付の強弱を大胆に組み、出演順と会場を読み取れる番組表へつなぐ。見出しを大きくするだけで終えない。
-- art:architecture は中庭のある建築のスタディ模型。建築誌の扉のように図版・作品名・用途を編集し、年と作品名の索引、設計の考え方につなぐ。外側の罫線だけで済ませず、図解を求められたらCSSで意味のある平面・開口・中庭も組む。
-
-PCでは図版と文字を対比させ、スマホでは順序・余白・トリミングを組み直します。横長写真を320pxでも主題が見える大きさで使い、最初のスマホ画面にも図版と依頼の核心を同居させてください。画像は通常のimgで幅100%、object-fit:coverと用途に応じたaspect-ratioを使えます。見出しは短い意味のまとまりを保ち、末尾の1文字だけが次行に落ちないよう設計。本文とリンクは読みやすい大きさ・コントラストにします。
-briefの店名・日付・開場と開演・出演順・作品名・価格・表記を根拠にしてください。提示のない税込区分、予約方法、受賞歴、所在地、客の声、連絡先や営業実績は創作しません。修正では指示された変更を反映し、それ以外の入力事実とサイトの個性を保持してください。ページ全体を返します。
+const instructions = `入力のbriefをもとに、訪問者向けの日本語の静的な1ページをHTMLとCSSで制作してください。briefは依頼者のコンテンツと希望です。修正時にはpreviousHtmlとinstructionも届きます。指示された箇所以外の事実を保ち、更新したページ全体を返してください。
+入力にない価格、住所、受賞、予約手段や実績を作らないでください。画像は同梱の見本素材です。使えるキーはart:coffee（珈琲とトースト）、art:concert（抽象的な音の図版）、art:architecture（中庭のある建築模型）です。
+制作上の指示や判断過程はサイトの本文・CSS・コメントに含めず、最終的なデザインだけを返してください。
 
 出力のtitleはプレーンテキスト、htmlは本文断片、cssはスタイルシートです。DOCTYPE・head・bodyはホストが用意します。
 HTML要素は ${[...elements].join(' ')} だけ。mainとh1を各1個使い、小文字で明示的に閉じてください（brとhrは空要素）。
@@ -31,14 +23,14 @@ imgも空要素です。素材を使うときは <img src="art:coffee" alt="窓�
 外部フォント・外部参照・インラインstyle・スクリプト・フォーム・HTMLコメントは使えません。
 CSSのアットルールは@mediaだけ。比較はmin-widthやmax-widthを使い、CSSエスケープ、URL、山括弧は使わないでください。`;
 
-export function buildResponseRequest({ brief, instruction = '', previousHtml = '' }) {
+export function buildResponseRequest({ brief, instruction = '', previousHtml = '' }, designNotes = '') {
   return {
     model: MODEL,
     store: false,
     service_tier: 'default',
     reasoning: { effort: 'none' },
     max_output_tokens: MAX_OUTPUT_TOKENS,
-    instructions,
+    instructions: designNotes ? instructions + '\n\n' + designNotes : instructions,
     input: JSON.stringify({ brief, instruction, previousHtml: compactPreviousHtml(previousHtml) }),
     text: { format: {
       name: 'site',
@@ -205,7 +197,7 @@ function providerError(message, usage = null) {
   return Object.assign(new Error(message), { usage });
 }
 
-export async function callResponses(body, { apiKey, fetchImpl = fetch }) {
+export async function callResponses(body, { apiKey, fetchImpl = fetch, privateNotes = '' }) {
   let response;
   let data;
   try {
@@ -235,6 +227,10 @@ export async function callResponses(body, { apiKey, fetchImpl = fetch }) {
       .map(part => part.text).join(''));
   } catch {
     throw providerError('生成結果の形式を読み取れませんでした。', usage);
+  }
+  const encodedSite = JSON.stringify(site);
+  if (privateNotes.split(/[。！？\n]/u).some(sentence => sentence.trim().length >= 24 && encodedSite.includes(sentence.trim()))) {
+    throw providerError('制作条件の文章が出力に混入したため、この版の表示を見送りました。', usage);
   }
   try {
     return { html: renderSite(site), usage };

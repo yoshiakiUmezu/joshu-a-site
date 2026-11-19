@@ -45,10 +45,29 @@
             <input id="purpose" name="purpose" maxlength="120" required placeholder="例）喫茶店の店舗案内">
             <label for="name">サイト名 <small>必須</small></label>
             <input id="name" name="name" maxlength="120" required placeholder="例）喫茶 灯り">
-            <label for="mood">雰囲気</label>
-            <input id="mood" name="mood" maxlength="160" placeholder="例）静かで温かい、雑誌のような余白">
+            <label for="audience">どんな人に見てほしいですか？</label>
+            <input id="audience" name="audience" maxlength="160" placeholder="例）朝の散歩で立ち寄れる店を探している人">
+            <label for="action">見た人にどうしてほしいですか？</label>
+            <input id="action" name="action" maxlength="160" placeholder="例）朝食メニューと開店時刻を見て来店する">
+            <label for="highlight">最初に見せたいもの・伝えたいこと</label>
+            <textarea id="highlight" name="highlight" rows="2" maxlength="360" placeholder="例）朝8時から。厚切りトーストと深煎り珈琲のセットが自慢"></textarea>
+            <details id="visual-settings">
+              <summary>見た目の希望 <small>任意</small></summary>
+              <label for="direction">デザインの方向性</label>
+              <select id="direction" name="direction">
+                <option value="">用途に合わせておまかせ</option>
+                <option value="editorial">雑誌のように読ませる</option>
+                <option value="showcase">作品や商品を大きく見せる</option>
+                <option value="graphic">ポスターのように印象づける</option>
+                <option value="guide">必要な情報を見つけやすくする</option>
+              </select>
+              <label for="mood">雰囲気</label>
+              <input id="mood" name="mood" maxlength="160" placeholder="例）静かで温かい、朝の光を感じる">
+              <label for="color">使いたい色・避けたい色</label>
+              <input id="color" name="color" maxlength="100" placeholder="例）生成りと深緑。真っ黒は避けたい">
+            </details>
             <label for="request">自由な要望</label>
-            <textarea id="request" name="request" rows="3" maxlength="1200" placeholder="載せたい内容、色使い、訪れる人に伝えたいことなど"></textarea>
+            <textarea id="request" name="request" rows="3" maxlength="1200" placeholder="例）メニューの後に、住所と定休日を載せてほしい"></textarea>
           </fieldset>
           <button id="generate" class="primary" type="submit" disabled>サイトを生成</button>
           <p class="feedback" id="live-mode">AIによる新規生成と修正にはAPI料金が発生します。</p>
@@ -93,6 +112,7 @@
         <form id="revision-form" autocomplete="off">
           <label for="revision">追加指示</label>
           <textarea name="revision" id="revision" rows="2" maxlength="800" required disabled placeholder="例）見出しを大きくして、背景を深い緑に"></textarea>
+          <p id="revision-target" class="feedback"></p>
           <button id="revise" class="secondary" type="submit" disabled>修正を反映</button>
           <p class="feedback" role="status" id="revision-status"></p>
         </form>

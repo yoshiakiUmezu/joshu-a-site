@@ -92,6 +92,18 @@ function showMessage(element, message, isError = false) {
   element.textContent = message;
 }
 
+function showRevisionTarget() {
+  if (!currentSite) return;
+  const savedName = currentSite.brief.name.trim();
+  const nextName = byId("name").value.trim();
+  const rename = nextName && nextName !== savedName;
+  byId("revision-target").textContent = rename
+    ? "「" + savedName + "」を「" + nextName + "」に改名し、上の入力内容と追加指示を反映します。"
+    : "「" + savedName + "」に、上の入力内容と追加指示を反映します。";
+  byId("revise").textContent = rename ? "改名して修正を反映" : "修正を反映";
+}
+byId("name").addEventListener("input", showRevisionTarget);
+
 async function displayArtwork(choice, site = currentSite) {
   const html = await composeArtwork(site.modelHtml, choice);
   if (new Blob([html]).size > limits.maxHtmlBytes) throw new Error("表紙を含むHTMLが保存サイズの上限を超えます。");
@@ -119,6 +131,8 @@ async function displayDraft(data, brief, choice) {
   fitPreview();
   revision.value = "";
   byId("generate").textContent = "新しいサイトを生成";
+  for (const field of briefForm.querySelectorAll("[name]")) field.value = brief[field.name] ?? "";
+  showRevisionTarget();
 }
 
 artwork.addEventListener("change", async () => {
@@ -139,8 +153,9 @@ artwork.addEventListener("change", async () => {
 
 async function generate(isRevision) {
   if (busy || !remaining || !liveEnabled || (isRevision && !currentSite)) return;
+  if (!briefForm.reportValidity()) return;
   const status = byId(isRevision ? "revision-status" : "generate-status");
-  const brief = isRevision ? currentSite.brief : Object.fromEntries(new FormData(briefForm));
+  const brief = Object.fromEntries(new FormData(briefForm));
   const body = { brief };
   if (isRevision) {
     body.previousHtml = currentSite.modelHtml;
@@ -295,7 +310,6 @@ byId("load-example").addEventListener("click", async () => {
   try {
     const data = await studioRequest("/api/examples", { id: exampleList.value });
     await displayDraft(data, data.brief, data.choice);
-    for (const field of ["purpose", "name", "mood", "request"]) byId(field).value = data.brief[field] || "";
     showMessage(byId("generate-status"), "");
     showMessage(byId("revision-status"), "");
     showMessage(exampleStatus, "「" + data.brief.name + "」を開きました。");

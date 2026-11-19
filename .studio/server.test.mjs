@@ -19,7 +19,7 @@ const response = {
 
 async function setup(t, fetchImpl, limits) {
   const dir = await mkdtemp(join(tmpdir(), 'studio-test-'));
-  const options = { password, apiKey: 'local-fixture', ledgerPath: join(dir, 'usage.json'), fetchImpl, limits };
+  const options = { password, apiKey: 'local-fixture', designInstructions: () => 'fixture', ledgerPath: join(dir, 'usage.json'), fetchImpl, limits };
   const app = await startStudio(options);
   t.after(async () => {
     await app.close();
