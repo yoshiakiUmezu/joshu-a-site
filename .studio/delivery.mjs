@@ -1,8 +1,8 @@
 import { createHash, randomBytes } from 'node:crypto';
-import { existsSync } from 'node:fs';
 import { access, mkdir, mkdtemp, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { ART_IDS, MAX_HTML_BYTES } from './engine.mjs';
+import { chromiumOptions } from './chromium.mjs';
 
 const idPattern = /^[a-f0-9]{48}$/;
 const fail = (status, message) => Object.assign(new Error(message), { status });
@@ -11,17 +11,7 @@ const privateFile = { mode: 0o600 };
 
 async function launchBrowser() {
   const { chromium } = await import('playwright');
-  const installed = [chromium.executablePath()];
-  if (process.platform === 'win32') {
-    for (const directory of [process.env.ProgramFiles, process.env['ProgramFiles(x86)'], process.env.LOCALAPPDATA].filter(Boolean)) {
-      installed.push(join(directory, 'Google/Chrome/Application/chrome.exe'), join(directory, 'Microsoft/Edge/Application/msedge.exe'));
-    }
-  }
-  return chromium.launch({
-    executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || installed.find(path => existsSync(path)),
-    env: Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(OPENAI_API_KEY|STUDIO_PASSWORD)$/i.test(key))),
-    timeout: 15_000,
-  });
+  return chromium.launch(await chromiumOptions());
 }
 
 async function compose(browser, html, choice) {

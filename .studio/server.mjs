@@ -230,18 +230,30 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const state = process.env.LOCALAPPDATA || process.env.XDG_STATE_HOME || join(homedir(), '.local', 'state');
   const examplesOnly = process.argv.includes('--examples-only');
-  const sessionPassword = examplesOnly || process.argv.includes('--session-password');
+  const openWindow = process.argv.includes('--open');
+  const sessionPassword = openWindow || examplesOnly || process.argv.includes('--session-password');
   const password = sessionPassword ? randomBytes(18).toString('base64url') : process.env.STUDIO_PASSWORD;
   // All operator sessions use one port and one private, persistent allowance.
   startStudio({ port: examplesOnly ? 4313 : 4312, ledgerPath: join(state, examplesOnly ? 'joshu-a-studio-examples' : 'joshu-a-studio', 'usage.json'),
     password, examplesOnly, apiKey: examplesOnly ? undefined : process.env.OPENAI_API_KEY })
-    .then(({ origin }) => {
+    .then(async ({ origin, close }) => {
       if (examplesOnly) console.log('作例モード（API利用なし）');
+      if (openWindow) {
+        try {
+          const { openStudioWindow } = await import('./local-browser.mjs');
+          const studio = await openStudioWindow({ origin, password });
+          console.log('制作室を開きました。専用ウィンドウを閉じると終了します。');
+          await studio.closed;
+        } finally {
+          await close();
+        }
+        return;
+      }
       if (sessionPassword) console.log('ログイン名 developer\n今回のローカルパスワード ' + password);
       console.log('制作画面 ' + origin + '/studio/');
     })
     .catch(error => {
-      console.error(error.code === 'EADDRINUSE' ? '制作サーバーはすでに起動中です。' : error.message);
+      console.error(error.code === 'EADDRINUSE' ? '制作室はすでに起動中です。開いている制作画面を使用するか、前の制作室を終了して起動し直してください。' : error.message);
       process.exitCode = 1;
     });
 }

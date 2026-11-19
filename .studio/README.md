@@ -6,16 +6,18 @@
 
 ## ローカル起動
 
-Node.js 22以降を使用します。確認画像の作成にはリポジトリのルートで `npm ci` を実行し、Playwrightを用意します。Windowsではインストール済みのChromeまたはEdgeを使用できます。他の環境は `npx playwright install chromium` でブラウザを用意するか、`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` にChromium系ブラウザの実行ファイルを指定します。
+Node.js 22以降を使用します。専用ウィンドウと確認画像の作成にはリポジトリのルートで `npm ci` を実行し、Playwrightを用意します。Windowsではインストール済みのChromeまたはEdgeを使用できます。他の環境は `npx playwright install chromium` でブラウザを用意するか、`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` にChromium系ブラウザの実行ファイルを指定します。
 
-**作例を無課金で試す**には `node .studio/server.mjs --examples-only` を実行します。同じPCで `http://127.0.0.1:4313/studio/` を開き、ユーザー名 `developer` と端末に表示された今回のパスワードでログインします。喫茶店と音楽公演は実生成の修正版、建築作品集「間庭設計室」は追加条件を使って1回で生成した初稿です。APIキーは不要です。
+**作例を無課金で試す**には `node .studio/server.mjs --examples-only --open` を実行します。ログイン済みの専用ブラウザに制作画面が自動で開きます。喫茶店と音楽公演は実生成の修正版、建築作品集「間庭設計室」は追加条件を使って1回で生成した初稿です。APIキーは不要です。
 
 **自分の依頼でAI生成・修正する**場合は次の手順を使います。「サイトを生成」「修正を反映」を実行するとAPI料金が発生します。有料検証は予算と回数の承認後に実施してください。
 
 1. **リポジトリの外**に、自分だけが読める `studio-secrets.env` を用意します。`OPENAI_API_KEY=…` を設定します。OSからサーバープロセスに環境変数を渡すこともできます。
    通常モードには運営者の非公開制作設定も必要です。既定の場所はリポジトリの親の `studio-design-policy.mjs` です。別の場所に用意する場合は `STUDIO_DESIGN_FILE` にリポジトリ外のファイルのパスを設定してください。運営者が事前に用意した参照画像も公開ディレクトリの外に保管します。サーバーはこのモジュールから制作指示・参照画像・使用素材と表示方法を受け取ります。作例モードは公開チェックアウトのみで利用できます。
-2. リポジトリの親にSecretファイルを置いた場合、リポジトリ直下から `node --env-file=../studio-secrets.env .studio/server.mjs --session-password` を実行します。毎回新しいログイン用パスワードを端末に表示します。固定したい場合は、Secretに16文字以上のランダムな `STUDIO_PASSWORD` を設定し、`--session-password` を外してください。
-3. 同じPCのブラウザで `http://127.0.0.1:4312/studio/` を開き、ユーザー名 `developer` とそのパスワードで認証します。終了はターミナルの Ctrl+C です。
+2. リポジトリの親にSecretファイルを置いた場合、リポジトリ直下から `node --env-file=../studio-secrets.env .studio/server.mjs --open` を実行します。
+3. 自動で開く専用ウィンドウで制作します。起動ごとに発行したログイン情報を、このウィンドウにだけ設定します。最後の制作室タブを閉じるとサーバーも終了します。
+
+普段のブラウザで手動ログインしたい場合は、`--open` を `--session-password` に替えます。端末のURLを開き、ユーザー名 `developer` と表示されたパスワードで認証します。通常モードで固定パスワードを使う場合は、フラグを外し、16文字以上の `STUDIO_PASSWORD` をSecretに設定します。
 
 制作サーバーはループバックで待ち受け、制作画面とすべての `/api/` 操作で開発者を認証します。生成リクエストは制作画面と同じOriginからのJSON POSTに限ります。Cloudflare Pagesの構成と公開サイトの導線を維持しています。`_redirects` で制作室のファイルへのアクセスを404ページに転送します。
 
