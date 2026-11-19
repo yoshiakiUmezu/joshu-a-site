@@ -1,16 +1,31 @@
 # 助手A ホームページ制作室
 
-用途・名称・雰囲気・自由な要望から1ページを制作する開発者用の試作です。画面の「サイトを生成」で初稿を作り、「追加指示」で現在の版を修正します。PCは1,280px、スマホは390pxの幅で表示し、「HTMLを保存」で現在の版を端末に保存できます。画面を再読み込みすると下書きは消えます。
+用途・名称・雰囲気・自由な要望から1ページを制作する開発者用の試作です。「サイトを生成」で初稿を作り、「追加指示」で修正します。PCは1,280px、スマホは390pxの幅で表示し、「HTMLを保存」で現在の版を端末に保存できます。購入前の画像確認と、模擬購入後のHTML受け取りも同じPCで試せます。
 
 ## ローカル起動
 
-Node.js 22以降を使用します。実際に「サイトを生成」「修正を反映」を実行するとOpenAI APIの料金が発生します。有料検証は予算と回数について承認を得てから実行してください。
+Node.js 22以降を使用します。確認画像の作成にはリポジトリのルートで `npm ci` を実行し、Playwrightを用意します。Windowsではインストール済みのChromeまたはEdgeを使用できます。他の環境は `npx playwright install chromium` でブラウザを用意するか、`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` にChromium系ブラウザの実行ファイルを指定します。
 
-1. **リポジトリの外**に、自分だけが読める `studio-secrets.env` を用意します。`OPENAI_API_KEY` と `STUDIO_PASSWORD` の2つを `名前=値` の形式で設定します。パスワードには16文字以上のランダムな値を使用してください。OSからサーバープロセスに環境変数を渡すこともできます。
-2. リポジトリの親にSecretファイルを置いた場合、リポジトリ直下から `node --env-file=../studio-secrets.env .studio/server.mjs` を実行します。
-3. 同じPCのブラウザで `http://127.0.0.1:4312/studio/` を開き、ユーザー名 `developer` と設定したパスワードで認証します。終了はターミナルの Ctrl+C です。
+**作例を無課金で試す**には `node .studio/server.mjs --examples-only` を実行します。同じPCで `http://127.0.0.1:4313/studio/` を開き、ユーザー名 `developer` と端末に表示された今回のパスワードでログインします。作例は実際に生成・修正した喫茶店・音楽公演・建築作品集の3件です。APIキーは不要です。
 
-制作サーバーはループバックの固定アドレスで待ち受け、画面・APIの両方で認証します。生成リクエストは制作画面と同じOriginからのJSON POSTに限ります。既存のCloudflare Pagesには実行用のエンドポイントを設置しません。Pagesの公開ディレクトリがリポジトリ直下なので、`_redirects` で制作室のファイルへのアクセスを404ページに転送します。
+**自分の依頼でAI生成・修正する**場合は次の手順を使います。「サイトを生成」「修正を反映」を実行するとAPI料金が発生します。有料検証は予算と回数の承認後に実施してください。
+
+1. **リポジトリの外**に、自分だけが読める `studio-secrets.env` を用意します。`OPENAI_API_KEY=…` を設定します。OSからサーバープロセスに環境変数を渡すこともできます。
+2. リポジトリの親にSecretファイルを置いた場合、リポジトリ直下から `node --env-file=../studio-secrets.env .studio/server.mjs --session-password` を実行します。毎回新しいログイン用パスワードを端末に表示します。固定したい場合は、Secretに16文字以上のランダムな `STUDIO_PASSWORD` を設定し、`--session-password` を外してください。
+3. 同じPCのブラウザで `http://127.0.0.1:4312/studio/` を開き、ユーザー名 `developer` とそのパスワードで認証します。終了はターミナルの Ctrl+C です。
+
+制作サーバーはループバックで待ち受け、制作画面とすべての `/api/` 操作で開発者を認証します。生成リクエストは制作画面と同じOriginからのJSON POSTに限ります。Cloudflare Pagesの構成と公開サイトの導線を維持しています。`_redirects` で制作室のファイルへのアクセスを404ページに転送します。
+
+## 購入前確認からHTMLの受け取りまで
+
+1. 制作画面で生成・修正したサイト、または保存済みの作例を開きます。必要なら表紙素材を選び、「この版の確認画面を作成」を押します。
+2. 「購入者の確認画面」を開き、PC・スマホの画像を切り替えて「この版を確認する」を押します。確認画面にはその版のページ全体を撮ったJPEGが届きます。画像内のリンクや開閉操作は制作画面で検証できます。
+3. 制作画面で「状態を更新」を押し、同じ版を選んで模擬購入を確定します。料金は発生しません。
+4. 購入者の画面で「納品状況を更新」からHTMLをダウンロードします。写真を含む単一の `index.html` をオフラインで開けます。後から制作画面を修正しても、固定済みの版の内容は変わりません。
+
+固定した版はローカルの使用台帳と同じフォルダー内の `deliveries/` に保存されます。固定済みの版は再起動後も一覧から開けます。固定前の下書きは画面の再読み込みで消えます。作例モードと通常の制作室は別々の保存先を使います。画像の保存上限は1ページの高さ16,000pxです。
+
+確認URLには版ごとのランダムな受け取り用トークンが入ります。同じPCでそのURLを知る人が確認でき、模擬購入確定後はその版を再ダウンロードできます。これは開発用の購入試験です。実際の販売には決済結果と購入者を結び付けた配布、受け取り権限の期限・再発行・取り消しの設計が必要です。
 
 ## 生成と記録
 
@@ -32,4 +47,4 @@ API送信前に、入力のUTF-8バイト数と構造分の余裕、最大出力
 
 時刻・操作・予約量・成否・トークン数・HTMLバイト数をローカルの `usage.json` に記録します。入力本文、生成HTML、認証情報は含めません。Windowsの保存先は `%LOCALAPPDATA%\joshu-a-studio\usage.json`、他のOSでは `$XDG_STATE_HOME/joshu-a-studio/usage.json`（既定 `~/.local/state/joshu-a-studio/usage.json`）です。再起動後も同じ枠を使います。次の検証枠を用意する場合は、費用の承認後、サーバーを停止し、既存の台帳を保管してから開始してください。
 
-無課金で接続境界・保存・使用量処理を検証するコマンドは `node --test .studio/engine.test.mjs .studio/server.test.mjs` です。ブラウザでのページ内移動は、既存のPlaywrightとChromiumを用意して `node --test .studio/preview.playwright.test.mjs` で確認できます。システムのChromium系ブラウザを使う場合は、その実行ファイルを `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` に指定します。モデル単価は[OpenAIのモデル仕様](https://developers.openai.com/api/docs/models/gpt-6-luna)を参照してください。
+無課金で接続境界・保存・使用量処理を検証するコマンドは `node --test .studio/engine.test.mjs .studio/server.test.mjs` です。ブラウザでのページ内移動と確認・納品の操作は `node --test .studio/preview.playwright.test.mjs .studio/delivery.playwright.test.mjs` で確認できます。システムのChromium系ブラウザを使う場合は、その実行ファイルを `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` に指定します。モデル単価は[OpenAIのモデル仕様](https://developers.openai.com/api/docs/models/gpt-6-luna)を参照してください。

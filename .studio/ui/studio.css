@@ -98,17 +98,31 @@ iframe { position: absolute; inset: 0 auto auto 0; display: block; border: 0; tr
 .cover-choice { display: flex; align-items: center; gap: .5rem; font-size: .875rem; }
 .cover-choice select { color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: .4rem; padding: .5rem; font: inherit; }
 .cover-feedback:not(:empty) { padding: 0 1.2rem .8rem; margin: 0; }
+.delivery-panel { margin-top: 1rem; padding: 1.35rem; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1fr); column-gap: 2rem; }
+.delivery-draft > p { color: var(--muted); font-size: .9rem; margin: .5rem 0 1rem; max-width: 42ch; }
+.delivery-history { min-width: 0; }
+.examples { margin-top: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+.examples select:focus-visible { outline: 2px solid #b8d8ff; outline-offset: 3px; }
+.offer-picker, .delivery-actions { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+.offer-picker select { flex: 1; min-width: 0; min-height: 2.75rem; max-width: 100%; font: inherit; color: var(--text); border: 1px solid #455366; border-radius: .45rem; background: #0b1016; padding: .5rem; }
+.delivery-actions > :not([hidden]) { margin-top: .8rem; }
+.action-link { display: inline-flex; align-items: center; gap: .35em; min-height: 2.75rem; padding: .5rem 1.05rem; border: 1px solid #455366; border-radius: .48rem; font-size: .925rem; font-weight: 650; color: inherit; text-decoration: none; }
+.action-link:hover { background: #2a3544; }
+.delivery-panel :is(a, select):focus-visible { outline: 2px solid #b8d8ff; outline-offset: 3px; }
+#offer-feedback { grid-column: 1 / -1; }
 .limits { padding: 1.15rem 0 2rem; }
 @media (max-width: 57rem) {
   .intro { align-items: start; flex-direction: column; padding-top: 2rem; }
   .workspace { grid-template-columns: minmax(0,1fr); grid-template-areas: "brief" "preview" "revision"; }
+  .delivery-panel { grid-template-columns: minmax(0,1fr); }
+  .delivery-history { border-top: 1px solid var(--line); margin-top: 1.2rem; padding-top: 1rem; }
   .stage { height: clamp(26rem, 62vh, 46rem); }
 }
 @media (max-width: 30rem) {
   .intro { gap: 1.2rem; padding-bottom: 1.35rem; }
   .meter { flex-wrap: wrap; gap: .75rem; }
   .meter > div { padding-inline-start: .7rem; }
-  .brief-panel, .revision-panel { padding: 1.1rem; }
+  .brief-panel, .revision-panel, .delivery-panel { padding: 1.1rem; }
   .preview-head, .preview-foot { padding-inline: .8rem; }
   .stage { padding: .35rem; }
 }

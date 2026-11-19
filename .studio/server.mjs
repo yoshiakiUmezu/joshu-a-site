@@ -1,11 +1,13 @@
-import { createHash, timingSafeEqual } from 'node:crypto';
+import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import http from 'node:http';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { ART_IDS, buildResponseRequest, callResponses, MAX_HTML_BYTES, MAX_OUTPUT_TOKENS } from './engine.mjs';
+import { ART_IDS, buildResponseRequest, callResponses, MAX_HTML_BYTES, MAX_OUTPUT_TOKENS, renderSite } from './engine.mjs';
 import { openLedger } from './ledger.mjs';
+import { createDeliveryStore } from './delivery.mjs';
+import { reviewPage } from './review.mjs';
 
 const defaults = { maxCalls: 6, maxTotalTokens: 240_000, maxOutputTokens: MAX_OUTPUT_TOKENS, maxHtmlBytes: MAX_HTML_BYTES };
 const files = new Map([
@@ -19,7 +21,7 @@ const files = new Map([
 const fail = (status, message) => Object.assign(new Error(message), { status });
 const digest = value => createHash('sha256').update(value).digest();
 
-async function readInput(req) {
+async function readJson(req, maxBytes) {
   if (req.headers['content-type']?.split(';')[0].trim() !== 'application/json') {
     throw fail(415, 'JSON形式で送信してください。');
   }
@@ -27,12 +29,18 @@ async function readInput(req) {
   let bytes = 0;
   for await (const chunk of req) {
     bytes += chunk.length;
-    if (bytes > MAX_HTML_BYTES + 128 * 1024) throw fail(413, 'リクエストが大きすぎます。');
+    if (bytes > maxBytes) throw fail(413, 'リクエストが大きすぎます。');
     chunks.push(chunk);
   }
   let data;
   try { data = JSON.parse(Buffer.concat(chunks).toString('utf8')); }
   catch { throw fail(400, '入力内容を読み取れません。'); }
+  if (!data || typeof data !== 'object' || Array.isArray(data)) throw fail(400, '入力内容を読み取れません。');
+  return data;
+}
+
+async function readInput(req) {
+  const data = await readJson(req, MAX_HTML_BYTES + 128 * 1024);
   const brief = {};
   for (const [key, max] of Object.entries({ purpose: 120, name: 120, mood: 160, request: 1200 })) {
     const value = data?.brief?.[key] ?? '';
@@ -49,11 +57,15 @@ async function readInput(req) {
   return { brief, instruction: instruction.trim(), previousHtml: previousHtml.trim() };
 }
 
-export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetchImpl = fetch, limits = defaults }) {
-  if (!apiKey?.trim() || typeof password !== 'string' || password.length < 16) {
+export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetchImpl = fetch, limits = defaults, examplesOnly = false }) {
+  if ((!examplesOnly && !apiKey?.trim()) || typeof password !== 'string' || password.length < 16) {
     throw new Error('OPENAI_API_KEY と16文字以上の STUDIO_PASSWORD をサーバーに設定してください。');
   }
   const auth = digest('Basic ' + Buffer.from('developer:' + password).toString('base64'));
+  const store = createDeliveryStore(join(dirname(ledgerPath), 'deliveries'));
+  const drafts = new Map();
+  const pendingOffers = new Map();
+  const examples = JSON.parse(await readFile(new URL('./examples.json', import.meta.url), 'utf8'));
   let ledger;
   let origin;
   const server = http.createServer(async (req, res) => {
@@ -64,9 +76,35 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Referrer-Policy', 'no-referrer');
     res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
     res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-src data:; frame-ancestors 'none'; base-uri 'none'; form-action 'none'");
     try {
       if (('http://' + req.headers.host) !== origin) throw fail(403, 'このホストからは利用できません。');
+      if (req.url.startsWith('/review/')) {
+        const match = /^\/review\/([0-9a-f]{48})\/(|desktop\.jpg|mobile\.jpg|confirm|download)$/.exec(req.url);
+        if (!match) throw fail(404, '確認ページが見つかりません。');
+        const [, id, action] = match;
+        res.setHeader('Referrer-Policy', 'strict-origin');
+        res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; img-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
+        if (action === 'confirm') {
+          if (req.method !== 'POST') throw fail(405, '確認画面から送信してください。');
+          if (req.headers.origin !== origin) throw fail(403, '確認画面から送信してください。');
+          await store.confirm(id);
+          res.writeHead(303, { Location: '/review/' + id + '/' });
+          return res.end();
+        }
+        if (req.method !== 'GET') throw fail(405, 'この操作は利用できません。');
+        if (!action) {
+          const offer = await store.get(id);
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          return res.end(reviewPage(offer));
+        }
+        const kind = action === 'download' ? 'download' : action.split('.')[0];
+        const content = await store.asset(id, kind);
+        if (kind === 'download') res.setHeader('Content-Disposition', 'attachment; filename="index.html"');
+        res.writeHead(200, { 'Content-Type': kind === 'download' ? 'text/html; charset=utf-8' : 'image/jpeg' });
+        return res.end(content);
+      }
       if (!timingSafeEqual(digest(req.headers.authorization ?? ''), auth)) {
         res.setHeader('WWW-Authenticate', 'Basic realm="Joshu A Studio", charset="UTF-8"');
         throw fail(401, '開発者の認証が必要です。');
@@ -77,10 +115,44 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
         res.writeHead(200, { 'Content-Type': type });
         return res.end(content);
       }
-      if (req.method === 'GET' && req.url === '/api/status') return json(200, { limits, ledger: ledger.summary() });
+      if (req.method === 'GET' && req.url === '/api/status') return json(200, {
+        limits, ledger: ledger.summary(), liveEnabled: !examplesOnly,
+        examples: examples.map(({ id, brief }) => ({ id, name: brief.name, brief })),
+      });
+      if (req.method === 'GET' && req.url === '/api/offers') return json(200, { offers: await store.list() });
+      if (req.method === 'POST' && req.headers.origin !== origin) throw fail(403, '制作画面から送信してください。');
+      if (req.method === 'POST' && req.url === '/api/examples') {
+        const { id } = await readJson(req, 512);
+        const example = examples.find(item => item.id === id);
+        if (!example) throw fail(404, '作例が見つかりません。');
+        const html = renderSite(example.site);
+        const draftId = 'example-' + id;
+        drafts.set(draftId, { html, name: example.brief.name });
+        return json(200, { draftId, html, brief: example.brief, choice: example.choice });
+      }
+      if (req.url === '/api/offers' && req.method === 'POST') {
+        const { draftId, choice, sha256 } = await readJson(req, 2048);
+        const draft = drafts.get(draftId);
+        if (!draft) throw fail(404, 'この制作結果が見つかりません。');
+        if (!['auto', ...ART_IDS].includes(choice) || typeof sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(sha256)) {
+          throw fail(400, '使用する表紙画像とHTMLの版を確認してください。');
+        }
+        const key = [draftId, choice, sha256].join('/');
+        if (!pendingOffers.has(key)) {
+          const creation = store.create({ ...draft, choice }, sha256).finally(() => pendingOffers.delete(key));
+          pendingOffers.set(key, creation);
+        }
+        return json(200, { offer: await pendingOffers.get(key) });
+      }
+      const release = /^\/api\/offers\/([a-f0-9]{48})\/release$/.exec(req.url);
+      if (release) {
+        if (req.method !== 'POST') throw fail(405, 'POSTで送信してください。');
+        await readJson(req, 2048);
+        return json(200, { offer: await store.release(release[1]) });
+      }
       if (req.url !== '/api/generate') throw fail(404, 'ページが見つかりません。');
       if (req.method !== 'POST') throw fail(405, 'POSTで送信してください。');
-      if (req.headers.origin !== origin) throw fail(403, '制作画面から送信してください。');
+      if (examplesOnly) throw fail(403, '作例モードです。実際のAI生成は通常の制作室で利用できます。');
       const input = await readInput(req);
       const body = buildResponseRequest(input);
       // UTF-8 byte count bounds text tokens conservatively. Include the schema,
@@ -95,7 +167,9 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
         return json(502, { error: error.message, ledger: ledger.summary() });
       }
       ledger.finish(id, 'ok', result.usage, Buffer.byteLength(result.html));
-      return json(200, { ...result, ledger: ledger.summary() });
+      const draftId = randomUUID();
+      drafts.set(draftId, { name: input.brief.name, html: result.html });
+      return json(200, { ...result, draftId, ledger: ledger.summary() });
     } catch (error) {
       const message = error.status ? error.message : '制作サーバーの処理に失敗しました。';
       return json(error.status ?? 500, error.status === 429 ? { error: message, ledger: ledger.summary() } : { error: message });
@@ -121,10 +195,17 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const state = process.env.LOCALAPPDATA || process.env.XDG_STATE_HOME || join(homedir(), '.local', 'state');
+  const examplesOnly = process.argv.includes('--examples-only');
+  const sessionPassword = examplesOnly || process.argv.includes('--session-password');
+  const password = sessionPassword ? randomBytes(18).toString('base64url') : process.env.STUDIO_PASSWORD;
   // All operator sessions use one port and one private, persistent allowance.
-  startStudio({ port: 4312, ledgerPath: join(state, 'joshu-a-studio', 'usage.json'),
-    password: process.env.STUDIO_PASSWORD, apiKey: process.env.OPENAI_API_KEY })
-    .then(({ origin }) => console.log('制作画面 ' + origin + '/studio/'))
+  startStudio({ port: examplesOnly ? 4313 : 4312, ledgerPath: join(state, examplesOnly ? 'joshu-a-studio-examples' : 'joshu-a-studio', 'usage.json'),
+    password, examplesOnly, apiKey: examplesOnly ? undefined : process.env.OPENAI_API_KEY })
+    .then(({ origin }) => {
+      if (examplesOnly) console.log('作例モード（API利用なし）');
+      if (sessionPassword) console.log('ログイン名 developer\n今回のローカルパスワード ' + password);
+      console.log('制作画面 ' + origin + '/studio/');
+    })
     .catch(error => {
       console.error(error.code === 'EADDRINUSE' ? '制作サーバーはすでに起動中です。' : error.message);
       process.exitCode = 1;

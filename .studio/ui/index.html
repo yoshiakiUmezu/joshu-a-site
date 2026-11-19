@@ -30,6 +30,15 @@
     <div class="workspace">
       <section class="panel brief-panel" aria-labelledby="brief-title">
         <h2 id="brief-title">サイトの仕様</h2>
+        <div class="examples" id="examples" hidden>
+          <label for="example-list">生成済みの作例を試す</label>
+          <div class="offer-picker">
+            <select id="example-list"></select>
+            <button id="load-example" class="secondary" type="button" disabled>作例を開く</button>
+          </div>
+          <p class="feedback">作例のプレビューと納品テストは無料です。</p>
+          <p class="feedback" role="status" id="example-status"></p>
+        </div>
         <form id="brief-form" autocomplete="off">
           <fieldset id="brief-fields">
             <label for="purpose">用途 <small>必須</small></label>
@@ -42,6 +51,7 @@
             <textarea id="request" name="request" rows="3" maxlength="1200" placeholder="載せたい内容、色使い、訪れる人に伝えたいことなど"></textarea>
           </fieldset>
           <button id="generate" class="primary" type="submit" disabled>サイトを生成</button>
+          <p class="feedback" id="live-mode">AIによる新規生成と修正にはAPI料金が発生します。</p>
           <p class="feedback" role="status" id="generate-status"></p>
         </form>
       </section>
@@ -88,6 +98,26 @@
         </form>
       </section>
     </div>
+    <section class="panel delivery-panel" aria-labelledby="delivery-title">
+      <div class="delivery-draft">
+        <h2 id="delivery-title">購入前確認と納品</h2>
+        <p>現在のデザインを固定し、PCとスマホの確認用画像を作ります。ローカルの購入テストです。料金は発生しません。</p>
+        <button id="create-offer" class="secondary" type="button" disabled>この版の確認画面を作成</button>
+      </div>
+      <div class="delivery-history">
+        <label for="offer-list">保存した版</label>
+        <div class="offer-picker">
+          <select id="offer-list" disabled><option value="">保存した版はありません</option></select>
+          <button id="refresh-offers" class="secondary" type="button">状態を更新</button>
+        </div>
+        <p id="offer-state" class="feedback" role="status"></p>
+        <div class="delivery-actions">
+          <a id="open-review" class="action-link secondary" target="_blank" rel="noopener noreferrer" hidden>購入者の確認画面を開く<span aria-hidden="true"> ↗</span></a>
+          <button id="release-offer" class="secondary" type="button" hidden>模擬購入を確定して納品</button>
+        </div>
+      </div>
+      <p id="offer-feedback" class="feedback" role="status"></p>
+    </section>
     <p class="limits" id="limits" role="status"></p>
   </main>
 </body>

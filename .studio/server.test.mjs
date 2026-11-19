@@ -47,6 +47,28 @@ test('authentication, origin and input checks happen before reservation or provi
   assert.equal(sent, 0);
 });
 
+test('examples-only mode opens all recorded examples without a key or a paid reservation', async t => {
+  const dir = await mkdtemp(join(tmpdir(), 'studio-examples-'));
+  const app = await startStudio({ password, examplesOnly: true, ledgerPath: join(dir, 'usage.json'),
+    fetchImpl: () => assert.fail('unexpected provider request') });
+  t.after(async () => { await app.close(); await rm(dir, { recursive: true, force: true }); });
+  const { origin } = app;
+  const status = () => fetch(origin + '/api/status', { headers: { authorization } }).then(r => r.json());
+  const { examples, liveEnabled } = await status();
+  assert.equal(liveEnabled, false);
+  assert.equal(examples.length, 3);
+  for (const { id, name } of examples) {
+    const res = await fetch(origin + '/api/examples', { method: 'POST',
+      headers: { authorization, origin, 'content-type': 'application/json' }, body: JSON.stringify({ id }) });
+    assert.equal(res.status, 200);
+    const value = await res.json();
+    assert.equal(value.brief.name, name);
+    assert.ok(value.draftId && value.html.startsWith('<!doctype html>'));
+  }
+  assert.equal((await send(origin)).status, 403);
+  assert.equal((await status()).ledger.calls, 0);
+});
+
 test('a pending generation consumes the last slot, and its final usage survives restart', async t => {
   const started = Promise.withResolvers();
   const release = Promise.withResolvers();
