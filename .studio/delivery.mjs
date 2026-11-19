@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { access, mkdir, mkdtemp, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { ART_IDS, MAX_HTML_BYTES } from './engine.mjs';
+import { COVER_IDS, MAX_HTML_BYTES } from './engine.mjs';
 import { chromiumOptions } from './chromium.mjs';
 
 const idPattern = /^[a-f0-9]{48}$/;
@@ -99,7 +99,7 @@ export function createDeliveryStore(root) {
     async create({ name, html, choice = 'auto' }, expectedHash) {
       if (typeof name !== 'string' || !name.trim() || name.length > 120 ||
           typeof html !== 'string' || !html || Buffer.byteLength(html) > MAX_HTML_BYTES ||
-          (choice !== 'auto' && !ART_IDS.includes(choice))) throw fail(400, '制作内容または素材を確認してください。');
+          (choice !== 'auto' && !COVER_IDS.includes(choice))) throw fail(400, '制作内容または素材を確認してください。');
       if (rendering) throw fail(409, '別のプレビューを作成しています。少し待ってから再実行してください。');
       rendering = true;
       let browser;

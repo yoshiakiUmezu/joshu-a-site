@@ -4,7 +4,7 @@ import http from 'node:http';
 import { homedir } from 'node:os';
 import { dirname, isAbsolute, join, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { ART_IDS, buildResponseRequest, callResponses, MAX_HTML_BYTES, MAX_OUTPUT_TOKENS, renderSite } from './engine.mjs';
+import { COVER_IDS, validMaterialSet, buildResponseRequest, callResponses, MAX_HTML_BYTES, MAX_OUTPUT_TOKENS, renderSite } from './engine.mjs';
 import { openLedger } from './ledger.mjs';
 import { createDeliveryStore } from './delivery.mjs';
 import { reviewPage } from './review.mjs';
@@ -15,7 +15,7 @@ const files = new Map([
   ['/studio/studio.css', ['ui/studio.css', 'text/css; charset=utf-8']],
   ['/studio/studio.js', ['ui/studio.js', 'text/javascript; charset=utf-8']],
   ['/studio/artwork.js', ['ui/artwork.js', 'text/javascript; charset=utf-8']],
-  ...ART_IDS.map(id => ['/studio/art/' + id + '.webp', ['art/' + id + '.webp', 'image/webp']]),
+  ...COVER_IDS.map(id => ['/studio/art/' + id + '.webp', ['art/' + id + '.webp', 'image/webp']]),
   ['/assets/brand-mark.png', ['../assets/brand-mark.png', 'image/png']],
 ]);
 const fail = (status, message) => Object.assign(new Error(message), { status });
@@ -156,7 +156,7 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
         const { draftId, choice, sha256 } = await readJson(req, 2048);
         const draft = drafts.get(draftId);
         if (!draft) throw fail(404, 'この制作結果が見つかりません。');
-        if (!['auto', ...ART_IDS].includes(choice) || typeof sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(sha256)) {
+        if (!['auto', ...COVER_IDS].includes(choice) || typeof sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(sha256)) {
           throw fail(400, '使用する表紙画像とHTMLの版を確認してください。');
         }
         const key = [draftId, choice, sha256].join('/');
@@ -183,7 +183,7 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       }
       if (typeof plan.reference !== 'string' || plan.reference.length > 210_000
           || !/^data:image\/jpeg;base64,\/9j\/[A-Za-z0-9+/]+=*$/.test(plan.reference)
-          || !(plan.art === null || ART_IDS.includes(plan.art))
+          || !validMaterialSet(plan.art, plan.supporting)
           || !['wide', 'split', 'poster'].includes(plan.placement)
           || !/^(?:100|[1-9]?\d)% (?:100|[1-9]?\d)%$/.test(plan.position)) {
         throw fail(503, '非公開の参照画像と素材設定を確認してください。');

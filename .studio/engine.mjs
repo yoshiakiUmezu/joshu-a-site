@@ -6,19 +6,22 @@ export const MAX_OUTPUT_TOKENS = 6000;
 export const MAX_SOURCE_BYTES = 48 * 1024;
 export const MAX_HTML_BYTES = 300 * 1024;
 
-export const ART_IDS = ['coffee', 'concert', 'architecture'];
+const catalog = JSON.parse(readFileSync(new URL('./art/catalog.json', import.meta.url), 'utf8'));
+export const COVER_IDS = ['coffee', 'concert', 'architecture'];
+const ART_IDS = [...COVER_IDS, ...Object.keys(catalog)];
+const MAX_IMAGES = 3;
 const art = new Map(ART_IDS.map(id => {
   const file = new URL('./art/' + id + '.webp', import.meta.url);
   return ['art:' + id, 'data:image/webp;base64,' + readFileSync(file).toString('base64')];
 }));
 const elements = new Set(('main header footer nav section article aside div span h1 h2 h3 h4 h5 h6 p a ul ol li dl dt dd strong em small br hr figure figcaption img time address b i blockquote cite').split(' '));
 const instructions = `入力のbriefをもとに、訪問者向けの日本語の静的な1ページをHTMLとCSSで制作してください。briefは依頼者のコンテンツと希望です。修正時にはpreviousHtmlとinstructionも届きます。指示された箇所以外の事実を保ち、更新したページ全体を返してください。
-入力にない価格、住所、受賞、予約手段や実績を作らないでください。画像は同梱の見本素材です。使えるキーはart:coffee（珈琲とトースト）、art:concert（抽象的な音の図版）、art:architecture（中庭のある建築模型）です。
+入力にない価格、住所、受賞、予約手段や実績を作らないでください。画像は同梱の見本素材です。使える素材と用途は制作設定に従ってください。
 制作上の指示や判断過程はサイトの本文・CSS・コメントに含めず、最終的なデザインだけを返してください。
 
 出力のtitleはプレーンテキスト、htmlは本文断片、cssはスタイルシートです。DOCTYPE・head・bodyはホストが用意します。
 HTML要素は ${[...elements].join(' ')} だけ。mainとh1を各1個使い、小文字で明示的に閉じてください（brとhrは空要素）。
-imgも空要素です。素材を使うときは <img src="art:coffee" alt="窓辺の珈琲とトースト"> の形式で、全体で1枚のみ。指定の3キーを利用できます。独自URL、base64、幅・高さ属性は使いません。
+imgも空要素です。素材を使うときは <img src="art:coffee" alt="窓辺の珈琲とトースト"> の形式で、指定された素材を各1回、合計3点まで使えます。独自URL、base64、幅・高さ属性は使いません。
 その他の属性は引用符付きのclass、id、aria-label、aria-hidden、図版のrole="img"、aのhref、timeのdatetimeだけ。idは英字で始まる英数字・ハイフン・アンダースコア、hrefは存在する#idだけです。
 外部フォント・外部参照・インラインstyle・スクリプト・フォーム・HTMLコメントは使えません。
 CSSのアットルールは@mediaだけ。比較はmin-widthやmax-widthを使い、CSSエスケープ、URL、山括弧は使わないでください。`;
@@ -63,11 +66,10 @@ function invalidMarkup() {
 export function compactPreviousHtml(html) {
   const invalid = () => Object.assign(new Error('修正元の画像またはHTMLサイズを確認できませんでした。'), { status: 400 });
   if (typeof html !== 'string' || Buffer.byteLength(html) > MAX_HTML_BYTES) throw invalid();
-  let hasImage = false;
+  let images = 0;
   const compact = html.replace(/<img\b[^>]*>/gi, tag => {
     const src = /\ssrc="([^"]*)"/.exec(tag);
-    if (!src || hasImage) throw invalid();
-    hasImage = true;
+    if (!src || ++images > MAX_IMAGES) throw invalid();
     for (const [reference, url] of art) {
       if (src[1] === url) return tag.replace(src[0], ' src="' + reference + '"');
     }
@@ -85,7 +87,7 @@ function checkedFragment(html) {
   const links = [];
   let mainCount = 0;
   let headingCount = 0;
-  let hasImage = false;
+  let images = 0;
   const result = [];
   for (const [token] of html.matchAll(/<[^<>]*>|[^<]+|</g)) {
     if (!token.startsWith('<')) {
@@ -139,8 +141,7 @@ function checkedFragment(html) {
       result.push(' ' + key + '="' + value.replaceAll('"', '&quot;') + '"');
     }
     if (name === 'img') {
-      if (hasImage || !seen.has('alt') || !seen.has('src')) throw new Error('画像は代替テキスト付きの制作室素材を1点まで使用できます。');
-      hasImage = true;
+      if (++images > MAX_IMAGES || !seen.has('alt') || !seen.has('src')) throw new Error('画像は代替テキスト付きの制作室素材を3点まで使用できます。');
     }
     result.push('>');
   }
@@ -148,34 +149,43 @@ function checkedFragment(html) {
   return result.join('');
 }
 
-const captions = { coffee: '窓辺の珈琲とトーストのイメージ', concert: '音を描いた公演グラフィック', architecture: '中庭を囲む住宅のスタディ模型のイメージ' };
+const captions = { coffee: '窓辺の珈琲とトーストのイメージ', concert: '音を描いた公演グラフィック', architecture: '中庭を囲む住宅のスタディ模型のイメージ',
+  ...Object.fromEntries(Object.entries(catalog).map(([id, item]) => [id, item.alt])) };
 const crops = { wide: '16/9', split: '4/3', poster: '3/2' };
 
 // Work on checked markup only. A missed image slot is completed locally,
 // without another provider request. The reference board never enters this step.
-export function applyMaterialPlan(site, { art: selected, placement, position }) {
+export function validMaterialSet(selected, supporting = []) {
+  if (!Array.isArray(supporting)) return false;
+  const ids = selected === null ? supporting : [selected, ...supporting];
+  return (selected !== null || supporting.length === 0)
+    && ids.length <= MAX_IMAGES && new Set(ids).size === ids.length && ids.every(id => ART_IDS.includes(id));
+}
+
+export function applyMaterialPlan(site, { art: selected, supporting = [], placement, position }) {
   if (!Object.hasOwn(crops, placement) || !/^(?:100|[1-9]?\d)% (?:100|[1-9]?\d)%$/.test(position)) throw new Error('素材の配置設定を確認してください。');
-  if (selected !== null && !ART_IDS.includes(selected)) throw new Error('未登録の制作素材です。');
-  const fragment = checkedFragment(site.html);
-  const imageTag = /<img\b[^>]*>/;
-  if (selected === null) return { ...site, html: fragment.replace(imageTag, tag => {
+  if (!validMaterialSet(selected, supporting)) throw new Error('未登録の制作素材です。');
+  const missing = new Set(selected === null ? [] : [selected, ...supporting]);
+  let html = checkedFragment(site.html).replace(/<img\b[^>]*>/g, tag => {
+    const key = tag.match(/\ssrc="art:([a-z]+)"/)?.[1];
+    if (missing.delete(key)) return tag;
     const id = tag.match(/\sid="([^"]+)"/);
     return id ? '<span id="' + id[1] + '"></span>' : '';
-  }) };
-  const photo = '<img src="art:' + selected + '" alt="' + captions[selected] + '">';
-  let html;
-  if (imageTag.test(fragment)) {
-    html = fragment.replace(imageTag, tag => {
-      if (tag.includes('src="art:' + selected + '"')) return tag;
-      return tag.replace(/src="[^"]*"/, 'src="art:' + selected + '"').replace(/alt="[^"]*"/, 'alt="' + captions[selected] + '"');
-    });
-  } else {
+  });
+  if (selected === null) return { ...site, html };
+  const photo = id => '<img src="art:' + id + '" alt="' + captions[id] + '">';
+  if (missing.delete(selected)) {
     const slot = /<figure\b[^>]*\sclass="[^"]*\bstudio-hero-visual\b[^"]*"[^>]*>/;
-    html = slot.test(fragment) ? fragment.replace(slot, tag => tag + photo)
-      : fragment.replace('</h1>', '</h1><figure class="studio-hero-visual">' + photo + '</figure>');
+    html = slot.test(html) ? html.replace(slot, tag => tag + photo(selected))
+      : html.replace('</h1>', '</h1><figure class="studio-hero-visual">' + photo(selected) + '</figure>');
   }
-  const style = 'img{display:block;width:100%;object-fit:cover;object-position:' + position + '!important}'
-    + '.studio-hero-visual>img{aspect-ratio:' + crops[placement] + ';height:auto}'
+  if (missing.size) {
+    const figures = Array.from(missing, id => '<figure>' + photo(id) + '<figcaption>' + captions[id] + '（イメージ）</figcaption></figure>');
+    html = html.replace('</main>', '<div class="studio-materials">' + figures.join('') + '</div></main>');
+  }
+  const style = '.studio-hero-visual>img{display:block;width:100%;object-fit:cover;object-position:' + position
+    + ';aspect-ratio:' + crops[placement] + ';max-height:62vh;height:auto}'
+    + '.studio-materials{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}.studio-materials figure{margin:0}.studio-materials img{width:100%;aspect-ratio:4/3;object-fit:cover}'
     + '@media(max-width:600px){.studio-hero-visual>img{aspect-ratio:4/3}}';
   return { ...site, html, css: site.css.includes(style) ? site.css : site.css + '\n' + style };
 }
@@ -210,7 +220,7 @@ ${fragment}
 </body>
 </html>`;
   if (Buffer.byteLength(compact) > MAX_SOURCE_BYTES) throw new Error('HTML・CSSの生成結果が48 KiBを超えました。');
-  const page = compact.replace(/(<img\b[^>]*?\ssrc=")(art:[a-z]+)"/, (_, prefix, reference) => prefix + art.get(reference) + '"');
+  const page = compact.replace(/(<img\b[^>]*?\ssrc=")(art:[a-z]+)"/g, (_, prefix, reference) => prefix + art.get(reference) + '"');
   if (Buffer.byteLength(page) > MAX_HTML_BYTES) throw new Error('画像込みのHTMLが300 KiBを超えました。');
   return page;
 }

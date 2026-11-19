@@ -80,7 +80,7 @@ test('standalone art matches local WebP, and only its catalog reference is sent 
     '<img src="art:missing" alt="イメージ">',
     '<img src="art:coffee">',
     '<img src="https://example.org/cover.webp" alt="イメージ">',
-    '<img src="art:coffee" alt="窓辺"><img src="art:concert" alt="波形">',
+    '<img src="art:haircut" alt="髪"><img src="art:haircut" alt="髪"><img src="art:haircut" alt="髪"><img src="art:haircut" alt="髪">',
   ]) assert.throws(() => renderSite(withImage(tag)));
 
   const prior = '  ' + renderSite(site) + '\n';
@@ -108,4 +108,15 @@ test('verbatim private direction in a generated page is withheld with its usage 
     content: [{ type: 'output_text', text: JSON.stringify(copy) }] }] };
   await assert.rejects(callResponses({}, { apiKey: 'fixture', privateNotes, fetchImpl: async () => Response.json(data) }),
     error => error.usage?.totalTokens === 190 && !error.message.includes(privateNotes));
+});
+
+test('three distinct materials survive export and revision, including omitted slots', () => {
+  const plan = { art: 'salonroom', supporting: ['hairwave', 'haircut'], placement: 'split', position: '50% 50%' };
+  const partial = { ...site, html: site.html.replace('<p>', '<img src="art:hairwave" alt="ウェーブ"><p>') };
+  const html = renderSite(applyMaterialPlan(partial, plan));
+  const editable = compactPreviousHtml(html);
+  assert.equal((html.match(/src="data:image/g) || []).length, 3);
+  for (const id of [plan.art, ...plan.supporting]) assert.equal(editable.split('src="art:' + id + '"').length, 2);
+  assert.doesNotMatch(editable, /base64/);
+  assert.throws(() => applyMaterialPlan(site, { ...plan, supporting: ['missing'] }));
 });

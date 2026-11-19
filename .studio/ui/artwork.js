@@ -34,7 +34,7 @@ export async function composeArtwork(html, choice = "auto") {
   const art = artwork[choice];
   const src = await readArtwork(choice);
   const doc = new DOMParser().parseFromString(html, "text/html");
-  const originalImage = doc.querySelector("img");
+  const originalImage = doc.querySelector(".studio-hero-visual img") ?? doc.querySelector("img");
   if (originalImage) {
     if (originalImage.getAttribute("src") === src) return html;
     originalImage.src = src;
