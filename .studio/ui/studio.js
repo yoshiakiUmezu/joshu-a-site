@@ -239,7 +239,10 @@ async function generate(isRevision) {
     showMessage(exampleStatus, "");
     if (!isRevision) showMessage(byId("revision-status"), "");
     const result = isRevision ? "修正しました。" : "生成しました。";
-    showMessage(status, result + " 今回の使用量 " + number.format(data.usage.totalTokens) + " トークン");
+    const layout = data.layout;
+    const inspection = !layout?.checked ? "ブラウザ確認は未実施です。" : layout.issues.length
+      ? layout.issues.join("。") + "。" : "PC・タブレット・スマホ幅の画像・リンク・横幅を確認しました。";
+    showMessage(status, result + " 今回の使用量 " + number.format(data.usage.totalTokens) + " トークン。" + inspection);
   } catch (error) {
     showMessage(status, error instanceof SyntaxError || error instanceof TypeError
       ? "サーバーから結果を取得できませんでした。利用記録を確認してください。"

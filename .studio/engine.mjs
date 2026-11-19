@@ -20,10 +20,11 @@ const instructions = `入力のbriefをもとに、訪問者向けの日本語�
 制作上の指示や判断過程はサイトの本文・CSS・コメントに含めず、最終的なデザインだけを返してください。
 
 ホストがサイト名入りの共通ヘッダー、h2から作るページ内目次、フッターを追加します。htmlにはmainをルートに本文のみを書き、冒頭にサイトの目的とh1、その後に提供内容・判断材料・次の行動を用途に応じて構成します。主要区画には短く具体的なh2を付けてください。短い告知は区画を統合できます。
+出力のdesignは非公開の短い制作方針です。先に読者の目的、要望の素材感を画面のどこにどう見せるか、各節で新しく伝える内容を具体化し、その方針をhtmlとcssで形にしてください。h2には本文とは別に短い目次名（例 data-nav="作品"）を付けられます。
 出力のtitleはプレーンテキスト、htmlは本文断片、cssはスタイルシートです。DOCTYPE・head・bodyはホストが用意します。
 HTML要素は ${[...elements].join(' ')} だけ。mainとh1を各1個使い、小文字で明示的に閉じてください（brとhrは空要素）。
 imgも空要素です。素材を使うときは <img src="art:coffee" alt="窓辺の珈琲とトースト"> の形式で、指定された素材を各1回、合計3点まで使えます。独自URL、base64、幅・高さ属性は使いません。
-その他の属性は引用符付きのclass、id、aria-label、aria-hidden、図版のrole="img"、aのhref、timeのdatetimeだけ。idは英字で始まる英数字・ハイフン・アンダースコア、hrefは存在する#idだけです。
+h2のdata-nav以外の属性は引用符付きのclass、id、aria-label、aria-hidden、図版のrole="img"、aのhref、timeのdatetimeだけ。idは英字で始まる英数字・ハイフン・アンダースコア、hrefは存在する#idだけです。
 外部フォント・外部参照・インラインstyle・スクリプト・フォーム・HTMLコメントは使えません。
 CSSのアットルールは@mediaだけ。比較はmin-widthやmax-widthを使い、CSSエスケープ、URL、山括弧は使わないでください。`;
 
@@ -48,8 +49,8 @@ export function buildResponseRequest({ brief, instruction = '', previousHtml = '
       strict: true,
       schema: {
         type: 'object',
-        properties: { title: { type: 'string' }, html: { type: 'string' }, css: { type: 'string' } },
-        required: ['title', 'html', 'css'],
+        properties: { design: { type: 'string' }, title: { type: 'string' }, html: { type: 'string' }, css: { type: 'string' } },
+        required: ['design', 'title', 'html', 'css'],
         additionalProperties: false,
       },
     } },
@@ -133,6 +134,8 @@ function checkedFragment(html) {
         if (!art.has(value)) throw new Error('生成画像の参照先が制作室の素材一覧にありません。');
       } else if ((key === 'alt' && name === 'img') || (key === 'datetime' && name === 'time')) {
         if (!value.trim()) invalidMarkup();
+      } else if (key === 'data-nav' && name === 'h2') {
+        if (!value.trim()) invalidMarkup();
       } else if (key === 'role') {
         if (value !== 'img' || !['div', 'span', 'figure'].includes(name)) invalidMarkup();
       } else if (key === 'aria-hidden') {
@@ -206,7 +209,8 @@ function pageFrame(fragment, name) {
   const index = unique('studio-index');
   const links = [];
   const content = fragment.replace(/<h2( [^>]*)?>([\s\S]*?)<\/h2>/g, (heading, attrs = '', inner) => {
-    const label = inner.replace(/<br>/g, ' ').replace(/<[^>]+>/g, '').trim();
+    const shortName = / data-nav="([^"]+)"/.exec(attrs)?.[1].trim();
+    const label = shortName || inner.replace(/<br>/g, ' ').replace(/<[^>]+>/g, '').trim();
     if (!label || links.length >= 5) return heading;
     const existing = / id="([^"]+)"/.exec(attrs);
     const target = existing?.[1] || unique('studio-section-' + (links.length + 1));
@@ -317,7 +321,7 @@ export async function callResponses(body, { apiKey, fetchImpl = fetch, privateNo
   } catch {
     throw providerError('生成結果の形式を読み取れませんでした。', usage);
   }
-  const encodedSite = JSON.stringify(site);
+  const encodedSite = JSON.stringify([site?.title, site?.html, site?.css]);
   if (privateNotes.split(/[。！？\n]/u).some(sentence => sentence.trim().length >= 24 && encodedSite.includes(sentence.trim()))) {
     throw providerError('制作条件の文章が出力に混入したため、この版の表示を見送りました。', usage);
   }

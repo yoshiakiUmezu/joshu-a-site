@@ -43,12 +43,20 @@ async function compose(browser, html, choice) {
   }
 }
 
-async function screenshot(browser, html, viewport) {
+async function withRenderedPage(browser, html, viewport, inspect) {
   const context = await browser.newContext({ viewport, javaScriptEnabled: false, offline: true, serviceWorkers: 'block' });
   try {
     await context.route('**/*', route => route.abort());
     const page = await context.newPage();
     await page.setContent(html, { waitUntil: 'load' });
+    return await inspect(page);
+  } finally {
+    await context.close();
+  }
+}
+
+async function screenshot(browser, html, viewport) {
+  return withRenderedPage(browser, html, viewport, async page => {
     const size = await page.evaluate(async () => {
       await Promise.all([document.fonts.ready, ...Array.from(document.images, image => image.decode())]);
       return {
@@ -60,8 +68,35 @@ async function screenshot(browser, html, viewport) {
       throw fail(422, 'プレビューが表示幅または保存可能なページ高（16,000px）を超えています。');
     }
     return await page.screenshot({ type: 'jpeg', quality: 85, fullPage: true, animations: 'disabled', timeout: 10_000 });
+  });
+}
+
+// Diagnostic only: an unavailable browser must not discard a paid draft.
+export async function inspectDraft(html) {
+  let browser;
+  try {
+    browser = await launchBrowser();
+    const issues = [];
+    for (const width of [1440, 768, 390]) {
+      const findings = await withRenderedPage(browser, html, { width, height: 844 }, page => page.evaluate(() => {
+        const notes = [];
+        const overflow = Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) - innerWidth;
+        if (overflow > 1) notes.push('ページが横に' + overflow + 'pxはみ出します');
+        if ([...document.images].some(image => !image.complete || !image.naturalWidth)) notes.push('読み込めない画像があります');
+        if ([...document.querySelectorAll('.studio-mast a')].some(link => {
+          const box = link.closest('.studio-first-link') || link;
+          return box.getBoundingClientRect().width > 0 && box.scrollWidth > box.clientWidth + 1;
+        })) notes.push('ヘッダーのリンク名が途中で切れています');
+        if ([...document.querySelectorAll('a[href^="#"]')].some(link => !document.getElementById(link.hash.slice(1)))) notes.push('移動先のないリンクがあります');
+        return notes;
+      }));
+      issues.push(...findings.map(note => width + 'px幅：' + note));
+    }
+    return { checked: true, issues };
+  } catch {
+    return { checked: false, issues: [] };
   } finally {
-    await context.close();
+    if (browser) await browser.close().catch(() => {});
   }
 }
 

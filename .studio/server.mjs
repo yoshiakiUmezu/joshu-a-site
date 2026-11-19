@@ -6,7 +6,7 @@ import { dirname, isAbsolute, join, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { COVER_IDS, validMaterialSet, buildResponseRequest, callResponses, MAX_HTML_BYTES, MAX_OUTPUT_TOKENS, renderSite } from './engine.mjs';
 import { openLedger } from './ledger.mjs';
-import { createDeliveryStore } from './delivery.mjs';
+import { createDeliveryStore, inspectDraft } from './delivery.mjs';
 import { reviewPage } from './review.mjs';
 
 const defaults = { maxCalls: 6, maxTotalTokens: 240_000, maxOutputTokens: MAX_OUTPUT_TOKENS, maxHtmlBytes: MAX_HTML_BYTES };
@@ -188,7 +188,10 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
           || !/^(?:100|[1-9]?\d)% (?:100|[1-9]?\d)%$/.test(plan.position)) {
         throw fail(503, '非公開の参照画像と素材設定を確認してください。');
       }
-      const body = buildResponseRequest(input, notes, plan.reference);
+      const previous = input.previousHtml && [...drafts.values()].find(draft => draft.html === input.previousHtml);
+      const findings = previous?.layout?.issues || [];
+      const direction = findings.length ? notes + '\n前の版で実測した表示上の問題も修正してください。\n' + findings.join('\n') : notes;
+      const body = buildResponseRequest(input, direction, plan.reference);
       // Deliberately reserve the full serialized payload, including the image
       // transport. The provider's measured token counts replace this reservation.
       const budget = Buffer.byteLength(JSON.stringify(body)) + 1024 + MAX_OUTPUT_TOKENS;
@@ -202,8 +205,9 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       }
       ledger.finish(id, 'ok', result.usage, Buffer.byteLength(result.html));
       const draftId = randomUUID();
-      drafts.set(draftId, { name: input.brief.name, html: result.html });
-      return json(200, { ...result, draftId, ledger: ledger.summary() });
+      const layout = await inspectDraft(result.html);
+      drafts.set(draftId, { name: input.brief.name, html: result.html, layout });
+      return json(200, { ...result, draftId, layout, ledger: ledger.summary() });
     } catch (error) {
       const message = error.status ? error.message : '制作サーバーの処理に失敗しました。';
       return json(error.status ?? 500, error.status === 429 ? { error: message, ledger: ledger.summary() } : { error: message });

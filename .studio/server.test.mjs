@@ -35,6 +35,28 @@ function send(origin, body = { brief }, headers = {}) {
     body: JSON.stringify(body) });
 }
 
+test('only a requested revision receives measured draft findings', async t => {
+  const requests = [];
+  const { origin } = await setup(t, async (_url, options) => {
+    requests.push(JSON.parse(options.body));
+    const fixture = structuredClone(response);
+    fixture.output[0].content[0].text = JSON.stringify({
+      design: 'Internal test direction', title: '試作',
+      html: '<main><h1>試作</h1><h2 data-nav="施術">施術の内容を見る</h2></main>',
+      css: requests.length === 1 ? 'main{width:600px}' : 'main{width:100%}',
+    });
+    return Response.json(fixture);
+  });
+  const first = await (await send(origin)).json();
+  assert.equal(requests.length, 1);
+  assert.ok(first.layout.issues.some(issue => issue.includes('390px')));
+  assert.ok(!first.html.includes('Internal test direction'));
+  assert.match(first.html, /<a href="#studio-section-1">施術<\/a>/);
+  const second = await (await send(origin, { brief, revision: '整えて', previousHtml: first.html })).json();
+  assert.ok(requests[1].instructions.includes(first.layout.issues[0]));
+  assert.deepEqual(second.layout, { checked: true, issues: [] });
+});
+
 test('authentication, origin and input checks happen before reservation or provider access', async t => {
   let sent = 0;
   const { origin } = await setup(t, () => { sent++; throw new Error(); });
