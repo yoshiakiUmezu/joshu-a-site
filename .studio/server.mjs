@@ -195,7 +195,7 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       const id = ledger.reserve(input.previousHtml ? 'revise' : 'generate', budget);
       let result;
       try {
-        result = await callResponses(body, { apiKey, fetchImpl, privateNotes: notes, material: plan });
+        result = await callResponses(body, { apiKey, fetchImpl, privateNotes: notes, material: plan, siteName: input.brief.name });
       } catch (error) {
         ledger.finish(id, 'failed', error.usage ?? null, 0);
         return json(502, { error: error.message, ledger: ledger.summary() });

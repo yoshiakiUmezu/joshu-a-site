@@ -19,6 +19,7 @@ const instructions = `入力のbriefをもとに、訪問者向けの日本語�
 入力にない価格、住所、受賞、予約手段や実績を作らないでください。画像は同梱の見本素材です。使える素材と用途は制作設定に従ってください。
 制作上の指示や判断過程はサイトの本文・CSS・コメントに含めず、最終的なデザインだけを返してください。
 
+ホストがサイト名入りの共通ヘッダー、h2から作るページ内目次、フッターを追加します。htmlにはmainをルートに本文のみを書き、冒頭にサイトの目的とh1、その後に提供内容・判断材料・次の行動を用途に応じて構成します。主要区画には短く具体的なh2を付けてください。短い告知は区画を統合できます。
 出力のtitleはプレーンテキスト、htmlは本文断片、cssはスタイルシートです。DOCTYPE・head・bodyはホストが用意します。
 HTML要素は ${[...elements].join(' ')} だけ。mainとh1を各1個使い、小文字で明示的に閉じてください（brとhrは空要素）。
 imgも空要素です。素材を使うときは <img src="art:coffee" alt="窓辺の珈琲とトースト"> の形式で、指定された素材を各1回、合計3点まで使えます。独自URL、base64、幅・高さ属性は使いません。
@@ -27,7 +28,9 @@ imgも空要素です。素材を使うときは <img src="art:coffee" alt="窓�
 CSSのアットルールは@mediaだけ。比較はmin-widthやmax-widthを使い、CSSエスケープ、URL、山括弧は使わないでください。`;
 
 export function buildResponseRequest({ brief, instruction = '', previousHtml = '' }, designNotes = '', reference = '') {
-  const textInput = JSON.stringify({ brief, instruction, previousHtml: compactPreviousHtml(previousHtml) });
+  const textInput = JSON.stringify({ brief, instruction, previousHtml: compactPreviousHtml(previousHtml)
+    .replace(frameStyle, '').replace(/<div id="studio-top(?:-\d+)?"><\/div>(?=<!--studio-frame-start-->)/, '')
+    .replace(/<!--studio-frame-start-->[\s\S]*?<!--studio-frame-end-->/g, '') });
   return {
     model: MODEL,
     store: false,
@@ -190,7 +193,46 @@ export function applyMaterialPlan(site, { art: selected, supporting = [], placem
   return { ...site, html, css: site.css.includes(style) ? site.css : site.css + '\n' + style };
 }
 
-export function renderSite(site) {
+// The fragment is already normalized by checkedFragment; reuse existing anchor targets.
+function pageFrame(fragment, name) {
+  const used = new Set(Array.from(fragment.matchAll(/ id="([^"]+)"/g), match => match[1]));
+  function unique(base) {
+    let id = base;
+    for (let i = 2; used.has(id); i++) id = base + '-' + i;
+    used.add(id);
+    return id;
+  }
+  const top = unique('studio-top');
+  const index = unique('studio-index');
+  const links = [];
+  const content = fragment.replace(/<h2( [^>]*)?>([\s\S]*?)<\/h2>/g, (heading, attrs = '', inner) => {
+    const label = inner.replace(/<br>/g, ' ').replace(/<[^>]+>/g, '').trim();
+    if (!label || links.length >= 5) return heading;
+    const existing = / id="([^"]+)"/.exec(attrs);
+    const target = existing?.[1] || unique('studio-section-' + (links.length + 1));
+    links.push('<a href="#' + target + '">' + label + '</a>');
+    return existing ? heading : '<h2' + attrs + ' id="' + target + '">' + inner + '</h2>';
+  });
+  const brand = escapeText(name);
+  const menu = links.length ? '<nav aria-label="主要な区画">' + links.join('') + '</nav>' : '';
+  const mobile = links.length ? '<span class="studio-first-link">' + links[0] + '</span><a class="studio-index-link" href="#' + index + '">目次</a>' : '';
+  const header = '<header class="studio-mast' + (links.length >= 2 ? ' studio-follow' : '') + '"><a href="#' + top + '">' + brand + '</a>' + menu + mobile + '</header>';
+  const footer = '<footer class="studio-end" id="' + index + '"><strong>' + brand + '</strong>' + menu + '<a href="#' + top + '">ページ先頭へ</a></footer>';
+  return '<div id="' + top + '"></div><!--studio-frame-start-->' + header + '<!--studio-frame-end-->' + content + '<!--studio-frame-start-->' + footer + '<!--studio-frame-end-->';
+}
+
+const frameStyle = `
+.studio-mast,.studio-end{box-sizing:border-box;margin:0;padding:.65rem clamp(1rem,4vw,4rem);background:Canvas;color:CanvasText;font:500 1rem/1.4 system-ui,sans-serif;display:flex;align-items:center;gap:1rem;justify-content:space-between}
+.studio-mast{border-bottom:1px solid currentColor}.studio-mast.studio-follow{position:sticky;top:0;z-index:10}
+.studio-mast>a:first-child{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.studio-mast nav,.studio-end nav{display:flex;align-items:center;gap:1em}.studio-mast nav{min-width:0}
+.studio-mast nav a{display:block;min-width:0;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.studio-mast a,.studio-end a{color:inherit;padding:.3em 0;text-underline-offset:.2em}
+.studio-mast .studio-index-link,.studio-mast .studio-first-link{display:none}.studio-end{flex-wrap:wrap;border-top:1px solid currentColor}.studio-end nav{flex-wrap:wrap}
+body:has(.studio-follow) [id]{scroll-margin-top:4.5rem}
+@media(max-width:700px){.studio-mast nav{display:none}.studio-mast .studio-first-link{display:block;min-width:0;max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.studio-mast .studio-index-link{display:inline-block;flex:none}.studio-end{align-items:flex-start;flex-direction:column}}
+`;
+export function renderSite(site, siteName) {
   if (!site || !['title', 'html', 'css'].every(key => typeof site[key] === 'string' && site[key].trim())) {
     throw new Error('生成結果にタイトル・HTML・CSSが揃っていません。');
   }
@@ -211,12 +253,13 @@ export function renderSite(site) {
 <title>${escapeText(title)}</title>
 <style>*,*::before,*::after{box-sizing:border-box}body{margin:0;overflow-wrap:anywhere}img{display:block;max-width:100%;height:auto}h1,h2,h3{text-wrap:balance;word-break:auto-phrase;line-break:strict}
 ${css}
+${siteName ? frameStyle : ''}
 [role="img"] > div{max-width:100%}
 @media(max-width:600px){nav{flex-wrap:wrap}nav a[href]{display:inline-flex;align-items:center;min-block-size:2rem;font-size:max(.875rem,1em)}}
 </style>
 </head>
 <body>
-${fragment}
+${siteName ? pageFrame(fragment, siteName) : fragment}
 </body>
 </html>`;
   if (Buffer.byteLength(compact) > MAX_SOURCE_BYTES) throw new Error('HTML・CSSの生成結果が48 KiBを超えました。');
@@ -243,7 +286,7 @@ function providerError(message, usage = null) {
   return Object.assign(new Error(message), { usage });
 }
 
-export async function callResponses(body, { apiKey, fetchImpl = fetch, privateNotes = '', material }) {
+export async function callResponses(body, { apiKey, fetchImpl = fetch, privateNotes = '', material, siteName }) {
   let response;
   let data;
   try {
@@ -279,7 +322,7 @@ export async function callResponses(body, { apiKey, fetchImpl = fetch, privateNo
     throw providerError('制作条件の文章が出力に混入したため、この版の表示を見送りました。', usage);
   }
   try {
-    return { html: renderSite(material ? applyMaterialPlan(site, material) : site), usage };
+    return { html: renderSite(material ? applyMaterialPlan(site, material) : site, siteName), usage };
   } catch (error) {
     throw providerError(error.message, usage);
   }

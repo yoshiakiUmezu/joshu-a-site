@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import { chromium } from 'playwright';
+import { buildResponseRequest, renderSite } from './engine.mjs';
 import { startStudio } from './server.mjs';
 import { fixturePlan } from './test-plan.mjs';
 
@@ -46,4 +47,24 @@ test('the sandbox decodes the embedded editorial art and keeps fragment navigati
   assert.ok(await page.locator('#preview').getAttribute('src') === original);
   const status = await (await page.request.get(app.origin + '/api/status')).json();
   assert.equal(status.ledger.calls, 1);
+});
+
+test('site navigation reaches real headings on desktop and mobile and stays out of revisions', async t => {
+  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
+  t.after(() => browser.close());
+  const page = await browser.newPage({ javaScriptEnabled: false });
+  const html = renderSite({ title: '試験', html: '<main id="studio-top"><h1>A</h1><section><h2>作品</h2></section><section><h2 id="info">ご案内</h2></section></main>',
+    css: 'section{min-height:110vh}' }, 'A & B');
+  await page.setContent(html);
+  const mast = page.getByRole('banner');
+  await mast.getByRole('link', { name: 'ご案内' }).click();
+  assert.equal(await mast.evaluate(el => el.getBoundingClientRect().top), 0);
+  assert.ok(await page.locator('#info').evaluate(el => el.getBoundingClientRect().top >= document.querySelector('header').offsetHeight));
+  await page.setViewportSize({ width: 320, height: 720 });
+  await mast.getByRole('link', { name: '目次' }).click();
+  await page.getByRole('contentinfo').getByRole('link', { name: '作品' }).click();
+  assert.ok(await page.evaluate(() => document.querySelector(location.hash).textContent === '作品'));
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 320);
+  const body = buildResponseRequest({ brief: {}, previousHtml: html, instruction: '色を変更' });
+  assert.doesNotMatch(JSON.parse(body.input).previousHtml, /studio-frame-start|studio-mast/);
 });
