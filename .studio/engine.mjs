@@ -133,6 +133,9 @@ function checkedFragment(html) {
       } else if (key === 'href' && name === 'a') {
         if (!/^#[A-Za-z][\w-]*$/.test(value)) invalidMarkup();
         links.push(value.slice(1));
+      } else if (key === 'aria-labelledby') {
+        if (!/^[A-Za-z][\w-]*$/.test(value)) invalidMarkup();
+        links.push(value);
       } else if (key === 'src' && name === 'img') {
         if (!art.has(value)) throw new Error('生成画像の参照先が制作室の素材一覧にありません。');
       } else if ((key === 'alt' && name === 'img') || (key === 'datetime' && name === 'time')) {
@@ -192,10 +195,10 @@ export function applyMaterialPlan(site, { art: selected, supporting = [], placem
     const figures = Array.from(missing, id => '<figure>' + photo(id) + '<figcaption>' + captions[id] + '（イメージ）</figcaption></figure>');
     html = html.replace('</main>', '<div class="studio-materials">' + figures.join('') + '</div></main>');
   }
-  const style = '.studio-hero-visual>img{display:block;width:100%;object-fit:cover;object-position:' + position
+  const style = ':where(.studio-hero-visual)>:where(img){display:block;width:100%;object-fit:cover;object-position:' + position
     + ';aspect-ratio:' + crops[placement] + ';max-height:62vh;height:auto}'
     + '.studio-materials{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}.studio-materials figure{margin:0}.studio-materials img{width:100%;aspect-ratio:4/3;object-fit:cover}'
-    + '@media(max-width:600px){.studio-hero-visual>img{aspect-ratio:4/3}}';
+    + '@media(max-width:600px){:where(.studio-hero-visual)>:where(img){aspect-ratio:4/3}}';
   return { ...site, html, css: site.css.includes(style) ? site.css : site.css + '\n' + style };
 }
 
@@ -229,7 +232,7 @@ function pageFrame(fragment, name) {
 }
 
 const frameStyle = `
-.studio-mast,.studio-end{box-sizing:border-box;margin:0;padding:.65rem clamp(1rem,4vw,4rem);background:Canvas;color:CanvasText;font:500 1rem/1.4 system-ui,sans-serif;display:flex;align-items:center;gap:1rem;justify-content:space-between}
+.studio-mast,.studio-end{box-sizing:border-box;margin:0;padding:.65rem clamp(1rem,4vw,4rem);background:var(--studio-paper,Canvas);color:var(--studio-ink,CanvasText);font:500 1rem/1.4 system-ui,sans-serif;display:flex;align-items:center;gap:1rem;justify-content:space-between}
 .studio-mast{border-bottom:1px solid currentColor}.studio-mast.studio-follow{position:sticky;top:0;z-index:10}
 .studio-mast>a:first-child{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .studio-mast nav,.studio-end nav{display:flex;align-items:center;gap:1em}.studio-mast nav{min-width:0}
