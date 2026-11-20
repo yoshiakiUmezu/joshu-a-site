@@ -76,9 +76,9 @@ export function openLedger(file, limits) {
       persist([...entries, { at: new Date().toISOString(), action, budget, status: 'pending', usage: null }]);
       return id;
     },
-    finish(id, status, usage, htmlBytes) {
+    finish(id, status, usage, htmlBytes, searches) {
       const next = entries.slice();
-      next[id] = { ...entries[id], status, usage, htmlBytes };
+      next[id] = { ...entries[id], status, usage, htmlBytes, searches };
       persist(next);
     },
   };

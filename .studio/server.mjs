@@ -4,7 +4,7 @@ import http from 'node:http';
 import { homedir } from 'node:os';
 import { dirname, isAbsolute, join, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { COVER_IDS, validMaterialSet, buildResponseRequest, callResponses, MAX_HTML_BYTES, MAX_OUTPUT_TOKENS, renderSite } from './engine.mjs';
+import { COVER_IDS, validMaterialSet, buildResponseRequest, callResponses, requestText, MAX_HTML_BYTES, MAX_OUTPUT_TOKENS, renderSite } from './engine.mjs';
 import { openLedger } from './ledger.mjs';
 import { createDeliveryStore, inspectDraft } from './delivery.mjs';
 import { reviewPage } from './review.mjs';
@@ -192,9 +192,9 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       const findings = previous?.layout?.issues || [];
       const direction = findings.length ? notes + '\n前の版で実測した表示上の問題も修正してください。\n' + findings.join('\n') : notes;
       const body = buildResponseRequest(input, direction, plan.reference);
-      async function generate(request, action, privateNotes) {
+      async function generate(request, action, privateNotes, reservation) {
         const budget = Buffer.byteLength(JSON.stringify(request)) + 1024 + MAX_OUTPUT_TOKENS;
-        const id = ledger.reserve(action, budget);
+        const id = reservation ?? ledger.reserve(action, budget);
         let candidate;
         try {
           candidate = await callResponses(request, { apiKey, fetchImpl, privateNotes, material: plan, siteName: input.brief.name });
@@ -205,7 +205,55 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
         ledger.finish(id, 'ok', candidate.usage, Buffer.byteLength(candidate.html));
         return candidate;
       }
-      let result = await generate(body, input.previousHtml ? 'revise' : 'generate', notes);
+      let preparationTokens = 0;
+      const stages = [];
+      let specification = '';
+      let reservation;
+      if (!input.previousHtml && plan.planning) {
+        // Protect the implementation call before spending any allowance on optional preparation.
+        reservation = ledger.reserve('generate', Buffer.byteLength(JSON.stringify(body)) + MAX_OUTPUT_TOKENS + 13000);
+        async function prepare(request, action) {
+          let id;
+          try {
+            id = ledger.reserve(action, Buffer.byteLength(JSON.stringify(request)) + request.max_output_tokens +
+              (request.tools ? 16000 : 1024));
+          } catch (error) {
+            if (error.status === 429) return '';
+            throw error;
+          }
+          let output;
+          try {
+            output = await requestText(request, { apiKey, fetchImpl });
+          } catch (error) {
+            ledger.finish(id, 'failed', error.usage ?? null, 0);
+            preparationTokens += error.usage?.totalTokens ?? 0;
+            return '';
+          }
+          preparationTokens += output.usage.totalTokens;
+          const usable = output.text.trim() && Buffer.byteLength(output.text) <= 10000 &&
+            (!request.tools || output.searches === 1);
+          ledger.finish(id, usable ? 'ok' : 'failed', output.usage, 0, output.searches);
+          if (!usable) return '';
+          stages.push(action);
+          return output.text;
+        }
+        const base = { model: body.model, store: false, service_tier: body.service_tier, reasoning: { effort: 'low' } };
+        let research = '';
+        if (ledger.summary().calls + 2 <= limits.maxCalls) {
+          research = await prepare({ ...base, max_output_tokens: 700, tools: [{ type: 'web_search' }],
+            tool_choice: { type: 'web_search' }, max_tool_calls: 1,
+            input: plan.researchQuery }, 'research');
+        }
+        const planningInput = [{ role: 'user', content: [
+          { type: 'input_text', text: JSON.stringify({ brief: input.brief, material: notes, research }) },
+          { type: 'input_image', detail: 'high', image_url: plan.reference },
+        ] }];
+        specification = await prepare({ ...base, reasoning: body.reasoning, max_output_tokens: 1800,
+          instructions: plan.planning, input: planningInput }, 'design-plan');
+        if (!specification && research) body.instructions += '\n参考例の観察メモ（掲載用の文章ではありません）\n' + research;
+        if (specification) body.instructions += '\n内部の制作仕様書。公開ページには設計メモを表示しない。\n' + specification;
+      }
+      let result = await generate(body, input.previousHtml ? 'revise' : 'generate', notes, reservation);
       const previews = !input.previousHtml && plan.visualReview ? [] : undefined;
       let layout = await inspectDraft(result.html, previews);
       let review = '';
@@ -213,7 +261,7 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       if (previews) {
         review = '画面を取得できず、生成した版を表示しています。';
         if (layout.checked && previews.length === 2) {
-          const reviewNotes = notes + '\n' + plan.visualReview;
+          const reviewNotes = notes + '\n' + plan.visualReview + (specification ? '\n今回の制作仕様書\n' + specification : '');
           const request = buildResponseRequest({ ...input, previousHtml: result.html,
             instruction: '完成画面を確認して初稿を仕上げてください。' + layout.issues.join('。') }, reviewNotes, previews[0]);
           request.input[0].content.push({ type: 'input_image', detail: 'high', image_url: previews[1] });
@@ -238,7 +286,7 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       }
       const draftId = randomUUID();
       drafts.set(draftId, { name: input.brief.name, html: result.html, layout });
-      return json(200, { ...result, draftId, layout, review, reviewTokens, ledger: ledger.summary() });
+      return json(200, { ...result, draftId, layout, review, reviewTokens, preparationTokens, stages, ledger: ledger.summary() });
     } catch (error) {
       const message = error.status ? error.message : '制作サーバーの処理に失敗しました。';
       return json(error.status ?? 500, [429, 502].includes(error.status) ? { error: message, ledger: ledger.summary() } : { error: message });

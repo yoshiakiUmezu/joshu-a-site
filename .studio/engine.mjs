@@ -15,7 +15,7 @@ const art = new Map(ART_IDS.map(id => {
   const file = new URL('./art/' + id + '.webp', import.meta.url);
   return ['art:' + id, 'data:image/webp;base64,' + readFileSync(file).toString('base64')];
 }));
-const elements = new Set(('main header footer nav section article aside div span h1 h2 h3 h4 h5 h6 p a ul ol li dl dt dd strong em small br hr figure figcaption img time address b i blockquote cite').split(' '));
+const elements = new Set(('main header footer nav section article aside div span h1 h2 h3 h4 h5 h6 p a ul ol li dl dt dd strong em small br hr figure figcaption img time address b i blockquote cite details summary').split(' '));
 const instructions = `入力のbriefをもとに、訪問者向けの日本語の静的な1ページをHTMLとCSSで制作してください。briefは依頼者のコンテンツと希望です。修正時にはpreviousHtmlとinstructionも届きます。指示された箇所以外の事実を保ち、更新したページ全体を返してください。
 入力にない価格、住所、受賞、予約手段や実績を作らないでください。画像は同梱の見本素材です。使える素材と用途は制作設定に従ってください。
 制作上の指示や判断過程はサイトの本文・CSS・コメントに含めず、最終的なデザインだけを返してください。
@@ -294,7 +294,7 @@ function providerError(message, usage = null) {
   return Object.assign(new Error(message), { usage });
 }
 
-export async function callResponses(body, { apiKey, fetchImpl = fetch, privateNotes = '', material, siteName }) {
+export async function requestText(body, { apiKey, fetchImpl = fetch }) {
   let response;
   let data;
   try {
@@ -318,10 +318,15 @@ export async function callResponses(body, { apiKey, fetchImpl = fetch, privateNo
     .flatMap(item => Array.isArray(item.content) ? item.content : []);
   if (content.some(part => part?.type === 'refusal')) throw providerError('OpenAIがこの依頼の生成を見送りました。', usage);
   if (!usage) throw providerError('API使用量を確認できないため、結果を保存できませんでした。');
+  return { text: content.filter(part => part.type === 'output_text').map(part => part.text).join(''),
+    searches: data.output.filter(item => item.type === 'web_search_call' && item.status === 'completed').length, usage };
+}
+
+export async function callResponses(body, { apiKey, fetchImpl, privateNotes = '', material, siteName }) {
+  const { text, usage } = await requestText(body, { apiKey, fetchImpl });
   let site;
   try {
-    site = JSON.parse(content.filter(part => part?.type === 'output_text' && typeof part.text === 'string')
-      .map(part => part.text).join(''));
+    site = JSON.parse(text);
   } catch {
     throw providerError('生成結果の形式を読み取れませんでした。', usage);
   }

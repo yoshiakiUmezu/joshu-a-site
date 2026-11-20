@@ -251,7 +251,9 @@ async function generate(isRevision) {
     const layout = data.layout;
     const inspection = !layout?.checked ? "ブラウザ確認は未実施です。" : layout.issues.length
       ? layout.issues.join("。") + "。" : "PC・タブレット・スマホ幅の画像・リンク・横幅を確認しました。";
-    showMessage(status, result + " 今回の使用量 " + number.format(data.usage.totalTokens + (data.reviewTokens || 0)) + " トークン（記録済み）。" + inspection + (data.review || ""));
+    const steps = (data.stages || []).map(step => step === "research" ? "実例調査" : "設計書作成");
+    const prepared = steps.length ? steps.join("・") + "を完了。" : "";
+    showMessage(status, result + prepared + " 今回の使用量 " + number.format(data.usage.totalTokens + (data.preparationTokens || 0) + (data.reviewTokens || 0)) + " トークン（記録済み）。" + inspection + (data.review || ""));
   } catch (error) {
     showMessage(status, error instanceof SyntaxError || error instanceof TypeError
       ? "サーバーから結果を取得できませんでした。利用記録を確認してください。"

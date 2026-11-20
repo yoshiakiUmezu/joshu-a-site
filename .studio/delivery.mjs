@@ -91,6 +91,24 @@ export async function inspectDraft(html, previews) {
           if ([...document.querySelectorAll('a[href^="#"]')].some(link => !document.getElementById(link.hash.slice(1)))) notes.push('移動先のないリンクがあります');
           return notes;
         });
+        if (width === 390) {
+          const disclosures = await page.locator('details > summary:first-child').all();
+          for (const summary of disclosures.slice(0, 6)) {
+            if (!await summary.isVisible()) continue;
+            const details = summary.locator('..');
+            const initial = await details.evaluate(node => node.open);
+            try {
+              await summary.click({ timeout: 1200 });
+              if (await details.evaluate(node => node.open) === initial) throw new Error();
+              await summary.click({ timeout: 1200 });
+              if (await details.evaluate(node => node.open) !== initial) throw new Error();
+            } catch {
+              notes.push('開閉できない案内があります');
+              break;
+            }
+          }
+          await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+        }
         if (previews && width !== 768) {
           const shot = await page.screenshot({ type: 'jpeg', quality: 65, animations: 'disabled',
             fullPage: width === 1440 && await page.evaluate(() => document.documentElement.scrollHeight <= 6000) });
