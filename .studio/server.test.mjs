@@ -18,9 +18,9 @@ const response = {
   }) }] }],
 };
 
-async function setup(t, fetchImpl, limits) {
+async function setup(t, fetchImpl, limits, designInstructions = () => fixturePlan()) {
   const dir = await mkdtemp(join(tmpdir(), 'studio-test-'));
-  const options = { password, apiKey: 'local-fixture', designInstructions: () => fixturePlan(), ledgerPath: join(dir, 'usage.json'), fetchImpl, limits };
+  const options = { password, apiKey: 'local-fixture', designInstructions, ledgerPath: join(dir, 'usage.json'), fetchImpl, limits };
   const app = await startStudio(options);
   t.after(async () => {
     await app.close();
@@ -55,6 +55,26 @@ test('only a requested revision receives measured draft findings', async t => {
   const second = await (await send(origin, { brief, revision: '整えて', previousHtml: first.html })).json();
   assert.ok(requests[1].instructions.includes(first.layout.issues[0]));
   assert.deepEqual(second.layout, { checked: true, issues: [] });
+});
+
+test('one click can review two rendered screens while preserving a draft at the call limit', async t => {
+  for (const maxCalls of [1, 2]) {
+    const requests = [];
+    const { origin } = await setup(t, async (_url, options) => {
+      requests.push(JSON.parse(options.body));
+      return Response.json(response);
+    }, { maxCalls, maxTotalTokens: 240000 }, () => ({ ...fixturePlan(), visualReview: '画面を確認して整える' }));
+    const draft = await (await send(origin)).json();
+    assert.ok(draft.html.includes('試作'));
+    assert.equal(requests.length, maxCalls);
+    assert.equal(draft.ledger.calls, maxCalls);
+    if (maxCalls === 1) assert.match(draft.review, /残り枠/);
+    else {
+      assert.equal(requests[1].input[0].content.filter(part => part.type === 'input_image').length, 2);
+      assert.equal(draft.reviewTokens, 280);
+      assert.match(draft.review, /仕上げた版/);
+    }
+  }
 });
 
 test('authentication, origin and input checks happen before reservation or provider access', async t => {

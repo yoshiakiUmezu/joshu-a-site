@@ -192,25 +192,56 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       const findings = previous?.layout?.issues || [];
       const direction = findings.length ? notes + '\n前の版で実測した表示上の問題も修正してください。\n' + findings.join('\n') : notes;
       const body = buildResponseRequest(input, direction, plan.reference);
-      // Deliberately reserve the full serialized payload, including the image
-      // transport. The provider's measured token counts replace this reservation.
-      const budget = Buffer.byteLength(JSON.stringify(body)) + 1024 + MAX_OUTPUT_TOKENS;
-      const id = ledger.reserve(input.previousHtml ? 'revise' : 'generate', budget);
-      let result;
-      try {
-        result = await callResponses(body, { apiKey, fetchImpl, privateNotes: notes, material: plan, siteName: input.brief.name });
-      } catch (error) {
-        ledger.finish(id, 'failed', error.usage ?? null, 0);
-        return json(502, { error: error.message, ledger: ledger.summary() });
+      async function generate(request, action, privateNotes) {
+        const budget = Buffer.byteLength(JSON.stringify(request)) + 1024 + MAX_OUTPUT_TOKENS;
+        const id = ledger.reserve(action, budget);
+        let candidate;
+        try {
+          candidate = await callResponses(request, { apiKey, fetchImpl, privateNotes, material: plan, siteName: input.brief.name });
+        } catch (error) {
+          ledger.finish(id, 'failed', error.usage ?? null, 0);
+          throw Object.assign(error, { status: 502 });
+        }
+        ledger.finish(id, 'ok', candidate.usage, Buffer.byteLength(candidate.html));
+        return candidate;
       }
-      ledger.finish(id, 'ok', result.usage, Buffer.byteLength(result.html));
+      let result = await generate(body, input.previousHtml ? 'revise' : 'generate', notes);
+      const previews = !input.previousHtml && plan.visualReview ? [] : undefined;
+      let layout = await inspectDraft(result.html, previews);
+      let review = '';
+      let reviewTokens = 0;
+      if (previews) {
+        review = '画面を取得できず、生成した版を表示しています。';
+        if (layout.checked && previews.length === 2) {
+          const reviewNotes = notes + '\n' + plan.visualReview;
+          const request = buildResponseRequest({ ...input, previousHtml: result.html,
+            instruction: '完成画面を確認して初稿を仕上げてください。' + layout.issues.join('。') }, reviewNotes, previews[0]);
+          request.input[0].content.push({ type: 'input_image', detail: 'high', image_url: previews[1] });
+          try {
+            const polished = await generate(request, 'visual-review', reviewNotes);
+            reviewTokens = polished.usage.totalTokens;
+            const checked = await inspectDraft(polished.html);
+            if (checked.checked && !checked.issues.length) {
+              result = { ...result, html: polished.html };
+              layout = checked;
+              review = '画面を見て仕上げた版です。';
+            } else {
+              review = '仕上げ版の表示検査を通過しなかったため、元の版を表示しています。';
+            }
+          } catch (error) {
+            if (![429, 502].includes(error.status)) throw error;
+            reviewTokens = error.usage?.totalTokens ?? 0;
+            review = error.status === 429 ? '残り枠のため、最初に生成した版を表示しています。'
+              : '画面を見た仕上げに失敗したため、元の版を表示しています。';
+          }
+        }
+      }
       const draftId = randomUUID();
-      const layout = await inspectDraft(result.html);
       drafts.set(draftId, { name: input.brief.name, html: result.html, layout });
-      return json(200, { ...result, draftId, layout, ledger: ledger.summary() });
+      return json(200, { ...result, draftId, layout, review, reviewTokens, ledger: ledger.summary() });
     } catch (error) {
       const message = error.status ? error.message : '制作サーバーの処理に失敗しました。';
-      return json(error.status ?? 500, error.status === 429 ? { error: message, ledger: ledger.summary() } : { error: message });
+      return json(error.status ?? 500, [429, 502].includes(error.status) ? { error: message, ledger: ledger.summary() } : { error: message });
     }
   });
   await new Promise((resolve, reject) => {

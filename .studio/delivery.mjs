@@ -43,8 +43,8 @@ async function compose(browser, html, choice) {
   }
 }
 
-async function withRenderedPage(browser, html, viewport, inspect) {
-  const context = await browser.newContext({ viewport, javaScriptEnabled: false, offline: true, serviceWorkers: 'block' });
+async function withRenderedPage(browser, html, viewport, inspect, scale = 1) {
+  const context = await browser.newContext({ viewport, deviceScaleFactor: scale, reducedMotion: 'reduce', javaScriptEnabled: false, offline: true, serviceWorkers: 'block' });
   try {
     await context.route('**/*', route => route.abort());
     const page = await context.newPage();
@@ -72,24 +72,32 @@ async function screenshot(browser, html, viewport) {
 }
 
 // Diagnostic only: an unavailable browser must not discard a paid draft.
-export async function inspectDraft(html) {
+export async function inspectDraft(html, previews) {
   let browser;
   try {
     browser = await launchBrowser();
     const issues = [];
     for (const width of [1440, 768, 390]) {
-      const findings = await withRenderedPage(browser, html, { width, height: 844 }, page => page.evaluate(() => {
-        const notes = [];
-        const overflow = Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) - innerWidth;
-        if (overflow > 1) notes.push('ページが横に' + overflow + 'pxはみ出します');
-        if ([...document.images].some(image => !image.complete || !image.naturalWidth)) notes.push('読み込めない画像があります');
-        if ([...document.querySelectorAll('.studio-mast a')].some(link => {
-          const box = link.closest('.studio-first-link') || link;
-          return box.getBoundingClientRect().width > 0 && box.scrollWidth > box.clientWidth + 1;
-        })) notes.push('ヘッダーのリンク名が途中で切れています');
-        if ([...document.querySelectorAll('a[href^="#"]')].some(link => !document.getElementById(link.hash.slice(1)))) notes.push('移動先のないリンクがあります');
+      const findings = await withRenderedPage(browser, html, { width, height: 844 }, async page => {
+        const notes = await page.evaluate(() => {
+          const notes = [];
+          const overflow = Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) - innerWidth;
+          if (overflow > 1) notes.push('ページが横に' + overflow + 'pxはみ出します');
+          if ([...document.images].some(image => !image.complete || !image.naturalWidth)) notes.push('読み込めない画像があります');
+          if ([...document.querySelectorAll('.studio-mast a')].some(link => {
+            const box = link.closest('.studio-first-link') || link;
+            return box.getBoundingClientRect().width > 0 && box.scrollWidth > box.clientWidth + 1;
+          })) notes.push('ヘッダーのリンク名が途中で切れています');
+          if ([...document.querySelectorAll('a[href^="#"]')].some(link => !document.getElementById(link.hash.slice(1)))) notes.push('移動先のないリンクがあります');
+          return notes;
+        });
+        if (previews && width !== 768) {
+          const shot = await page.screenshot({ type: 'jpeg', quality: 65, animations: 'disabled',
+            fullPage: width === 1440 && await page.evaluate(() => document.documentElement.scrollHeight <= 6000) });
+          previews.push('data:image/jpeg;base64,' + shot.toString('base64'));
+        }
         return notes;
-      }));
+      }, previews && width === 1440 ? 0.5 : 1);
       issues.push(...findings.map(note => width + 'px幅：' + note));
     }
     return { checked: true, issues };
