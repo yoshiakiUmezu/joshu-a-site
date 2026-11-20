@@ -82,21 +82,24 @@ test('the search sees only the public topic and the private plan reaches both im
   const { origin } = await setup(t, async (_url, options) => {
     const body = JSON.parse(options.body);
     requests.push(body);
-    if (requests.length > 2) return Response.json(response);
+    if (requests.length === 3 || requests.length === 5) return Response.json(response);
     const raw = structuredClone(response);
-    raw.output[0].content[0].text = body.tools ? 'reference observation' : 'private layout specification';
+    raw.output[0].content[0].text = body.tools ? 'reference observation' : requests.length === 4 ? 'mobile footer observation' : 'private layout specification';
     if (body.tools) raw.output.unshift({ type: 'web_search_call', status: 'completed' });
     return Response.json(raw);
-  }, { maxCalls: 4, maxTotalTokens: 240000 }, () => ({ ...fixturePlan(), planning: 'design', researchQuery: 'public topic', visualReview: 'review' }));
+  }, { maxCalls: 5, maxTotalTokens: 240000 }, () => ({ ...fixturePlan(), critique: 'inspect', planning: 'design', researchQuery: 'public topic', visualReview: 'review' }));
   const draft = await (await send(origin)).json();
-  assert.equal(requests.length, 4);
+  assert.equal(requests.length, 5);
   assert.equal(requests[0].input, 'public topic');
   assert.ok(!JSON.stringify(requests[0]).includes(brief.name));
   assert.ok(requests[1].input[0].content[0].text.includes('reference observation'));
-  for (const body of requests.slice(2)) assert.match(body.instructions, /private layout specification/);
+  assert.equal(requests[3].input[0].content.filter(part => part.type === 'input_image').length, 3);
+  assert.match(requests[4].input[0].content[0].text, /mobile footer observation/);
+  assert.ok(!JSON.stringify(draft).includes('mobile footer observation'));
+  for (const body of [requests[2], requests[4]]) assert.match(body.instructions, /private layout specification/);
   assert.ok(!JSON.stringify(draft).includes('private layout specification'));
-  assert.deepEqual(draft.stages, ['research', 'design-plan']);
-  assert.equal(draft.preparationTokens, 560);
+  assert.deepEqual(draft.stages, ['research', 'design-plan', 'visual-critique']);
+  assert.equal(draft.preparationTokens, 840);
 });
 
 test('authentication, origin and input checks happen before reservation or provider access', async t => {

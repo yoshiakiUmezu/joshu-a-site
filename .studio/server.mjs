@@ -209,34 +209,34 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       const stages = [];
       let specification = '';
       let reservation;
+      async function prepare(request, action) {
+        let id;
+        try {
+          id = ledger.reserve(action, Buffer.byteLength(JSON.stringify(request)) + request.max_output_tokens +
+            (request.tools ? 16000 : 1024));
+        } catch (error) {
+          if (error.status === 429) return '';
+          throw error;
+        }
+        let output;
+        try {
+          output = await requestText(request, { apiKey, fetchImpl });
+        } catch (error) {
+          ledger.finish(id, 'failed', error.usage ?? null, 0);
+          preparationTokens += error.usage?.totalTokens ?? 0;
+          return '';
+        }
+        preparationTokens += output.usage.totalTokens;
+        const usable = output.text.trim() && Buffer.byteLength(output.text) <= 10000 &&
+          (!request.tools || output.searches === 1);
+        ledger.finish(id, usable ? 'ok' : 'failed', output.usage, 0, output.searches);
+        if (!usable) return '';
+        stages.push(action);
+        return output.text;
+      }
       if (!input.previousHtml && plan.planning) {
         // Protect the implementation call before spending any allowance on optional preparation.
         reservation = ledger.reserve('generate', Buffer.byteLength(JSON.stringify(body)) + MAX_OUTPUT_TOKENS + 13000);
-        async function prepare(request, action) {
-          let id;
-          try {
-            id = ledger.reserve(action, Buffer.byteLength(JSON.stringify(request)) + request.max_output_tokens +
-              (request.tools ? 16000 : 1024));
-          } catch (error) {
-            if (error.status === 429) return '';
-            throw error;
-          }
-          let output;
-          try {
-            output = await requestText(request, { apiKey, fetchImpl });
-          } catch (error) {
-            ledger.finish(id, 'failed', error.usage ?? null, 0);
-            preparationTokens += error.usage?.totalTokens ?? 0;
-            return '';
-          }
-          preparationTokens += output.usage.totalTokens;
-          const usable = output.text.trim() && Buffer.byteLength(output.text) <= 10000 &&
-            (!request.tools || output.searches === 1);
-          ledger.finish(id, usable ? 'ok' : 'failed', output.usage, 0, output.searches);
-          if (!usable) return '';
-          stages.push(action);
-          return output.text;
-        }
         const base = { model: body.model, store: false, service_tier: body.service_tier, reasoning: { effort: 'low' } };
         let research = '';
         if (ledger.summary().calls + 2 <= limits.maxCalls) {
@@ -255,15 +255,23 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       }
       let result = await generate(body, input.previousHtml ? 'revise' : 'generate', notes, reservation);
       const previews = !input.previousHtml && plan.visualReview ? [] : undefined;
-      let layout = await inspectDraft(result.html, previews);
+      let layout = await inspectDraft(result.html, previews, Boolean(plan.critique));
       let review = '';
       let reviewTokens = 0;
       if (previews) {
         review = '画面を取得できず、生成した版を表示しています。';
-        if (layout.checked && previews.length === 2) {
+        if (layout.checked && previews.length >= 2) {
+          let critique = '';
+          if (plan.critique && previews.length === 3 && ledger.summary().calls + 2 <= limits.maxCalls) {
+            const content = [{ type: 'input_text', text: JSON.stringify({ brief: input.brief, specification }) },
+              ...previews.map(image_url => ({ type: 'input_image', detail: 'high', image_url }))];
+            critique = await prepare({ model: body.model, store: false, service_tier: body.service_tier,
+              reasoning: body.reasoning, max_output_tokens: 900, instructions: plan.critique,
+              input: [{ role: 'user', content }] }, 'visual-critique');
+          }
           const reviewNotes = notes + '\n' + plan.visualReview + (specification ? '\n今回の制作仕様書\n' + specification : '');
           const request = buildResponseRequest({ ...input, previousHtml: result.html,
-            instruction: '完成画面を確認して初稿を仕上げてください。' + layout.issues.join('。') }, reviewNotes, previews[0]);
+            instruction: '完成画面を確認して初稿を仕上げてください。' + layout.issues.join('。') + (critique ? '\n画面評価の指摘：\n' + critique : '') }, reviewNotes, previews[0]);
           request.input[0].content.push({ type: 'input_image', detail: 'high', image_url: previews[1] });
           try {
             const polished = await generate(request, 'visual-review', reviewNotes);

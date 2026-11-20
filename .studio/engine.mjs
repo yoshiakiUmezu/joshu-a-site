@@ -20,7 +20,7 @@ const instructions = `入力のbriefをもとに、訪問者向けの日本語�
 入力にない価格、住所、受賞、予約手段や実績を作らないでください。画像は同梱の見本素材です。使える素材と用途は制作設定に従ってください。
 制作上の指示や判断過程はサイトの本文・CSS・コメントに含めず、最終的なデザインだけを返してください。
 
-ホストがサイト名入りの共通ヘッダー、h2から作るページ内目次、フッターを追加します。htmlにはmainをルートに本文のみを書き、冒頭にサイトの目的とh1、その後に提供内容・判断材料・次の行動を用途に応じて構成します。主要区画には短く具体的なh2を付けてください。短い告知は区画を統合できます。
+ホストがサイト名入りの共通ヘッダー、h2から作るページ内目次、末尾の移動リンクを追加します。作品独自の終わりを設計する場合はmainの最後にfooterを1つ置き、本文と同じ美術方針で制作してください。htmlにはmainをルートに本文のみを書き、冒頭にサイトの目的とh1、その後に提供内容・判断材料・次の行動を用途に応じて構成します。主要区画には短く具体的なh2を付けてください。短い告知は区画を統合できます。
 出力のdesignは非公開の短い制作方針です。先に読者の目的、要望の素材感を画面のどこにどう見せるか、各節で新しく伝える内容を具体化し、その方針をhtmlとcssで形にしてください。h2には本文とは別に短い目次名（例 data-nav="作品"）を付けられます。
 依頼に合わせてmotionを選ぶ。softは静かな浮かび上がり、editorialは印刷面が開くような登場、rhythmicは短く弾むリズム。動きを望まない依頼はstill。冒頭の主役が図や写真ならその要素にstudio-motion-lead、スクロールで見せたい作品・図やカードにstudio-motion-detailというclassを付ける。動きはホストがCSSで適用する。修正時は依頼に関係のない動きの設定を引き継ぐ。
 出力のtitleはプレーンテキスト、htmlは本文断片、cssはスタイルシートです。DOCTYPE・head・bodyはホストが用意します。
@@ -227,12 +227,26 @@ function pageFrame(fragment, name) {
   const menu = links.length ? '<nav aria-label="主要な区画">' + links.join('') + '</nav>' : '';
   const mobile = links.length ? '<span class="studio-first-link">' + links[0] + '</span><a class="studio-index-link" href="#' + index + '">目次</a>' : '';
   const header = '<header class="studio-mast' + (links.length >= 2 ? ' studio-follow' : '') + '"><a href="#' + top + '">' + brand + '</a>' + menu + mobile + '</header>';
+  if (/<\/footer>\s*<\/main>$/.test(content)) {
+    const closing = content.slice(content.lastIndexOf('<footer'));
+    const footerTargets = new Set(Array.from(closing.matchAll(/<a\b[^>]* href="([^"]+)"/g), match => match[1]));
+    const missingLinks = links.filter(link => !footerTargets.has(link.match(/href="([^"]+)"/)[1]));
+    const extraMenu = missingLinks.length ? '<nav aria-label="その他の区画">' + missingLinks.join('') + '</nav>' : '';
+    const indexLinks = '<!--studio-frame-start--><div id="' + index + '" class="studio-closing-links">' + extraMenu
+      + '<a href="#' + top + '">ページ先頭へ</a></div><!--studio-frame-end-->';
+    const closingId = closing.match(/^<footer\b[^>]* id="([^"]+)"/)?.[1];
+    const closingAnchor = closingId || unique('studio-closing');
+    const withAnchor = closingId ? content : content.slice(0, content.lastIndexOf('<footer')) + closing.replace('<footer', '<footer id="' + closingAnchor + '"');
+    return '<div id="' + top + '"></div><!--studio-frame-start-->' + header.replace('href="#' + index + '"', 'href="#' + closingAnchor + '"') + '<!--studio-frame-end-->'
+      + withAnchor.replace(/<\/footer>(\s*<\/main>)$/, () => indexLinks + '</footer></main>');
+  }
   const footer = '<footer class="studio-end" id="' + index + '"><strong>' + brand + '</strong>' + menu + '<a href="#' + top + '">ページ先頭へ</a></footer>';
   return '<div id="' + top + '"></div><!--studio-frame-start-->' + header + '<!--studio-frame-end-->' + content + '<!--studio-frame-start-->' + footer + '<!--studio-frame-end-->';
 }
 
 const frameStyle = `
 .studio-mast,.studio-end{box-sizing:border-box;margin:0;padding:.65rem clamp(1rem,4vw,4rem);background:var(--studio-paper,Canvas);color:var(--studio-ink,CanvasText);font:500 1rem/1.4 system-ui,sans-serif;display:flex;align-items:center;gap:1rem;justify-content:space-between}
+.studio-closing-links,.studio-closing-links nav{display:flex;align-items:center;flex-wrap:wrap;gap:.8em}.studio-closing-links{margin-top:1.25rem}.studio-closing-links a{color:inherit}
 .studio-mast{border-bottom:1px solid currentColor}.studio-mast.studio-follow{position:sticky;top:0;z-index:10}
 .studio-mast>a:first-child{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .studio-mast nav,.studio-end nav{display:flex;align-items:center;gap:1em}.studio-mast nav{min-width:0}

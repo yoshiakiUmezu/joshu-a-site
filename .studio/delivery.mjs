@@ -72,7 +72,7 @@ async function screenshot(browser, html, viewport) {
 }
 
 // Diagnostic only: an unavailable browser must not discard a paid draft.
-export async function inspectDraft(html, previews) {
+export async function inspectDraft(html, previews, captureEnding = false) {
   let browser;
   try {
     browser = await launchBrowser();
@@ -113,6 +113,11 @@ export async function inspectDraft(html, previews) {
           const shot = await page.screenshot({ type: 'jpeg', quality: 65, animations: 'disabled',
             fullPage: width === 1440 && await page.evaluate(() => document.documentElement.scrollHeight <= 6000) });
           previews.push('data:image/jpeg;base64,' + shot.toString('base64'));
+          if (captureEnding && width === 390) {
+            await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+            const ending = await page.screenshot({ type: 'jpeg', quality: 52, animations: 'disabled' });
+            previews.push('data:image/jpeg;base64,' + ending.toString('base64'));
+          }
         }
         return notes;
       }, previews && width === 1440 ? 0.5 : 1);

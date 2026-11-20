@@ -120,3 +120,12 @@ test('three distinct materials survive export and revision, including omitted sl
   assert.doesNotMatch(editable, /base64/);
   assert.throws(() => applyMaterialPlan(site, { ...plan, supporting: ['missing'] }));
 });
+
+test('an authored closing keeps its own content and gains working studio navigation', () => {
+  const html = renderSite({ ...site, html: '<main><h1>題名</h1><h2>案内</h2><footer class="closing"><p>また明日</p></footer></main>' }, '題名');
+  assert.equal((html.match(/<footer\b/g) || []).length, 1);
+  assert.match(html, /<footer[^>]* class="closing"><p>また明日<\/p>/);
+  assert.match(html, /id="studio-index" class="studio-closing-links"/);
+  const prior = JSON.parse(buildResponseRequest({ brief: {}, previousHtml: html }).input).previousHtml;
+  assert.match(prior, /<footer[^>]* class="closing"><p>また明日<\/p><\/footer>/);
+});
