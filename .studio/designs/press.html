@@ -1,0 +1,162 @@
+<!doctype html><html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>余白通信｜独立出版・雑誌</title>
+<style>
+:root {
+  --paper:#f6f2e7;
+  --ink:#231e1b;
+}
+* {
+  box-sizing:border-box;
+}
+html {
+  scroll-behavior:smooth;
+}
+body {
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font:1rem/1.8 system-ui,sans-serif;
+  overflow-wrap:anywhere;
+}
+img {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+a {
+  color:inherit;
+  text-underline-offset:.28em;
+}
+h1,h2,h3,p,figure {
+  margin:0;
+}
+h1,h2 {
+  line-height:1.12;
+  text-wrap:balance;
+}
+h1 {
+  font-size:clamp(3.4rem,8vw,8.8rem);
+  letter-spacing:-.055em;
+}
+h2 {
+  font-size:clamp(1.75rem,4vw,3.5rem);
+}
+header,footer,.bar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:1rem;
+  flex-wrap:wrap;
+}
+header,footer,section {
+  padding:clamp(1.1rem,4vw,4rem);
+}
+header {
+  padding-block:1rem;
+  border-bottom:1px solid;
+}
+header a,footer a {
+  font-size:.9rem;
+}
+footer {
+  border-top:1px solid;
+}
+nav {
+  display:flex;
+  gap:1.2rem;
+}
+.rows {
+  margin:1.4rem 0 0;
+}
+.row {
+  padding:1.05rem 0;
+  border-top:1px solid;
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  align-items:baseline;
+}
+.row span {
+  max-width:65%;
+}
+.cap {
+  font:600 .8rem/1.5 system-ui;
+  letter-spacing:.13em;
+}
+.action {
+  display:inline-block;
+  margin-top:1.3rem;
+  font-weight:650;
+}
+.copy {
+  max-width:38rem;
+  margin-top:1rem;
+}
+figure {
+  overflow:hidden;
+}
+@media(prefers-reduced-motion:reduce) {
+  html {
+    scroll-behavior:auto;
+  }
+}
+.mast h1 {
+  font:900 clamp(4.2rem,15vw,13rem)/1.15 serif;
+  letter-spacing:.02em;
+  text-align:center;
+  border-block:5px double;
+}
+.lede {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4vw;
+  max-width:860px;
+  margin:3rem auto 0;
+}
+.lede h2,.row b {
+  font-family:serif;
+}
+#detail {
+  border-block:1px solid;
+}
+#visit {
+  max-width:760px;
+}
+@media(max-width:550px) {
+  .lede {
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+<body id="top">
+<header><strong>余白通信</strong>
+<nav><a href="#detail">目次</a><a href="#visit">購読</a></nav>
+</header>
+<main>
+<section class="mast">
+<p class="cap">季刊誌　｜　秋号</p>
+<h1>余白通信</h1>
+<div class="lede">
+<h2>道具が語る、<br>暮らしの記憶。</h2>
+<p>今号の特集は台所の道具。柄の減った匙や小さなカップから、時間の跡をたどります。</p></div>
+</section>
+<section id="detail">
+<h2>秋号の目次</h2>
+<div class="rows">
+<div class="row"><b>巻頭随筆</b><span>毎朝のカップ</span></div>
+<div class="row"><b>聞き書き</b><span>修理しながら暮らす</span></div>
+<div class="row"><b>写真帖</b><span>閉店後の台所</span></div></div>
+</section>
+<section id="visit">
+<h2>購読案内</h2>
+<p>年4回発行。最新号は取り扱い書店の雑誌棚へ。</p>
+</section>
+</main>
+<footer><strong>余白通信</strong><a href="#top">先頭へ ↑</a></footer>
+</body>
+</html>

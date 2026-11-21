@@ -1,0 +1,161 @@
+<!doctype html><html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>直す室｜自転車修理</title>
+<style>
+:root {
+  --paper:#edf2ec;
+  --ink:#19332c;
+}
+* {
+  box-sizing:border-box;
+}
+html {
+  scroll-behavior:smooth;
+}
+body {
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font:1rem/1.8 system-ui,sans-serif;
+  overflow-wrap:anywhere;
+}
+img {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+a {
+  color:inherit;
+  text-underline-offset:.28em;
+}
+h1,h2,h3,p,figure {
+  margin:0;
+}
+h1,h2 {
+  line-height:1.12;
+  text-wrap:balance;
+}
+h1 {
+  font-size:clamp(3.4rem,8vw,8.8rem);
+  letter-spacing:-.055em;
+}
+h2 {
+  font-size:clamp(1.75rem,4vw,3.5rem);
+}
+header,footer,.bar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:1rem;
+  flex-wrap:wrap;
+}
+header,footer,section {
+  padding:clamp(1.1rem,4vw,4rem);
+}
+header {
+  padding-block:1rem;
+  border-bottom:1px solid;
+}
+header a,footer a {
+  font-size:.9rem;
+}
+footer {
+  border-top:1px solid;
+}
+nav {
+  display:flex;
+  gap:1.2rem;
+}
+.rows {
+  margin:1.4rem 0 0;
+}
+.row {
+  padding:1.05rem 0;
+  border-top:1px solid;
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  align-items:baseline;
+}
+.row span {
+  max-width:65%;
+}
+.cap {
+  font:600 .8rem/1.5 system-ui;
+  letter-spacing:.13em;
+}
+.action {
+  display:inline-block;
+  margin-top:1.3rem;
+  font-weight:650;
+}
+.copy {
+  max-width:38rem;
+  margin-top:1rem;
+}
+figure {
+  overflow:hidden;
+}
+@media(prefers-reduced-motion:reduce) {
+  html {
+    scroll-behavior:auto;
+  }
+}
+.service {
+  border-left:clamp(12px,3vw,38px) solid #e6a321;
+}
+.service h1 {
+  font-weight:900;
+  line-height:1.03;
+}
+.service .action {
+  padding:.6rem 1.2rem;
+  background:var(--ink);
+  color:var(--paper);
+}
+#detail {
+  background:#fff;
+}
+details {
+  padding:1rem 0;
+  border-bottom:1px solid;
+}
+summary {
+  cursor:pointer;
+  font-size:1.2rem;
+  font-weight:700;
+}
+details p {
+  margin:.8rem 0;
+}
+</style>
+</head>
+<body id="top">
+<header><strong>直す室</strong>
+<nav><a href="#detail">症状</a><a href="#visit">受付</a></nav>
+</header>
+<main>
+<section class="service">
+<p class="cap">自転車修理受付</p>
+<h1>どこが<br>気になる？</h1><a class="action" href="#detail">症状から探す ↓</a>
+</section>
+<section id="detail">
+<h2>修理の相談</h2>
+<details><summary>タイヤの空気が抜ける</summary>
+<p>パンクやバルブの状態を点検します。自転車を押してお持ちください。</p></details>
+<details><summary>ブレーキが鳴る</summary>
+<p>パッドの摩耗とワイヤーを確認します。</p></details>
+<details><summary>チェーンが外れる</summary>
+<p>変速機の位置やチェーンの伸びを調べます。</p></details>
+</section>
+<section id="visit">
+<h2>持ち込み受付</h2>
+<p>水曜から日曜の10:00–17:00。修理内容と見積もりをご案内してから作業します。</p>
+</section>
+</main>
+<footer><strong>直す室</strong><a href="#top">先頭へ ↑</a></footer>
+</body>
+</html>

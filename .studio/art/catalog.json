@@ -1,0 +1,117 @@
+{
+  "salonlight": {
+    "alt": "淡いピンクの背景に広がる髪と手",
+    "source": "https://www.pexels.com/photo/973401/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "salonroom": {
+    "alt": "鏡越しに見るサロンの施術風景",
+    "source": "https://www.pexels.com/photo/3993320/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "haircut": {
+    "alt": "髪の毛先にはさみを入れる手元",
+    "source": "https://www.pexels.com/photo/3993453/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "hairwave": {
+    "alt": "ウェーブがかかった髪の後ろ姿",
+    "source": "https://www.pexels.com/photo/3065209/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "latte": {
+    "alt": "ミルクを注ぐバリスタの手元",
+    "source": "https://www.pexels.com/photo/302899/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "coffeecup": {
+    "alt": "手で包んだラテのカップ",
+    "source": "https://www.pexels.com/photo/373639/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "dining": {
+    "alt": "料理をテーブルへ運ぶ様子",
+    "source": "https://www.pexels.com/photo/262978/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "salad": {
+    "alt": "野菜と豆を使った一皿",
+    "source": "https://www.pexels.com/photo/1640777/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "plates": {
+    "alt": "複数の料理が並ぶ食卓",
+    "source": "https://www.pexels.com/photo/958545/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "interior": {
+    "alt": "階段とリビングのある室内",
+    "source": "https://www.pexels.com/photo/1571460/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "facade": {
+    "alt": "窓と壁面の対比が見える住宅外観",
+    "source": "https://www.pexels.com/photo/323780/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "audience": {
+    "alt": "照明を見上げる客席",
+    "source": "https://www.pexels.com/photo/1105666/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "sounddesk": {
+    "alt": "音響スタジオのミキサー",
+    "source": "https://www.pexels.com/photo/164938/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "meeting": {
+    "alt": "机を囲んで資料を確認する場面",
+    "source": "https://www.pexels.com/photo/3184291/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "consult": {
+    "alt": "打ち合わせで握手をする手元",
+    "source": "https://www.pexels.com/photo/3184465/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "lesson": {
+    "alt": "机の端末でオンライン授業を見る様子",
+    "source": "https://www.pexels.com/photo/4145190/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "letters": {
+    "alt": "机に並んだ英字のピース",
+    "source": "https://www.pexels.com/photo/256417/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "rack": {
+    "alt": "色順に服が掛かったラック",
+    "source": "https://www.pexels.com/photo/5698851/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "denim": {
+    "alt": "折り重ねたデニムの質感",
+    "source": "https://www.pexels.com/photo/4210860/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "outfit": {
+    "alt": "服と小物を組み合わせた例",
+    "source": "https://www.pexels.com/photo/934070/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "coast": {
+    "alt": "青い海と白い砂浜",
+    "source": "https://www.pexels.com/photo/248797/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "falls": {
+    "alt": "岩の間を流れ落ちる滝",
+    "source": "https://www.pexels.com/photo/2387873/",
+    "license": "https://www.pexels.com/license/"
+  },
+  "amberwave": {
+    "alt": "暗闇を横切って琥珀色の音の層が立ち上がる抽象グラフィック",
+    "source": "助手A制作室オリジナル",
+    "license": "制作室素材（サイトへの埋め込み可）"
+  }
+}

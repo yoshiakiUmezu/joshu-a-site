@@ -1,0 +1,162 @@
+<!doctype html><html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>凪の間｜宿泊施設</title>
+<style>
+:root {
+  --paper:#f4f0e6;
+  --ink:#34332c;
+}
+* {
+  box-sizing:border-box;
+}
+html {
+  scroll-behavior:smooth;
+}
+body {
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font:1rem/1.8 system-ui,sans-serif;
+  overflow-wrap:anywhere;
+}
+img {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+a {
+  color:inherit;
+  text-underline-offset:.28em;
+}
+h1,h2,h3,p,figure {
+  margin:0;
+}
+h1,h2 {
+  line-height:1.12;
+  text-wrap:balance;
+}
+h1 {
+  font-size:clamp(3.4rem,8vw,8.8rem);
+  letter-spacing:-.055em;
+}
+h2 {
+  font-size:clamp(1.75rem,4vw,3.5rem);
+}
+header,footer,.bar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:1rem;
+  flex-wrap:wrap;
+}
+header,footer,section {
+  padding:clamp(1.1rem,4vw,4rem);
+}
+header {
+  padding-block:1rem;
+  border-bottom:1px solid;
+}
+header a,footer a {
+  font-size:.9rem;
+}
+footer {
+  border-top:1px solid;
+}
+nav {
+  display:flex;
+  gap:1.2rem;
+}
+.rows {
+  margin:1.4rem 0 0;
+}
+.row {
+  padding:1.05rem 0;
+  border-top:1px solid;
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  align-items:baseline;
+}
+.row span {
+  max-width:65%;
+}
+.cap {
+  font:600 .8rem/1.5 system-ui;
+  letter-spacing:.13em;
+}
+.action {
+  display:inline-block;
+  margin-top:1.3rem;
+  font-weight:650;
+}
+.copy {
+  max-width:38rem;
+  margin-top:1rem;
+}
+figure {
+  overflow:hidden;
+}
+@media(prefers-reduced-motion:reduce) {
+  html {
+    scroll-behavior:auto;
+  }
+}
+.room {
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:5vw;
+  padding:4vw 9vw;
+}
+.room figure {
+  height:62vh;
+}
+.room h1 {
+  writing-mode:vertical-rl;
+  font-family:serif;
+  font-weight:400;
+  letter-spacing:.25em;
+}
+.copy {
+  font-family:serif;
+  font-size:1.2rem;
+}
+#detail,#visit {
+  max-width:800px;
+  margin:auto;
+}
+#detail {
+  text-align:center;
+}
+#detail .copy {
+  margin:2rem auto;
+}
+</style>
+</head>
+<body id="top">
+<header><strong>凪の間</strong>
+<nav><a href="#detail">客室</a><a href="#visit">滞在案内</a></nav>
+</header>
+<main>
+<section class="room">
+<figure><img src="../art/interior.webp" alt="光の入る静かな室内"></figure>
+<h1>凪の間</h1>
+</section>
+<section id="detail">
+<h2>泊まるという余白</h2>
+<p class="copy">窓を開けて、風の音を聞く。木の床と小さな机を備えた、一組のための部屋です。</p>
+</section>
+<section id="visit">
+<h2>滞在のしおり</h2>
+<div class="rows">
+<div class="row"><b>到着</b><span>15:00–18:00</span></div>
+<div class="row"><b>出発</b><span>翌朝 10:00まで</span></div>
+<div class="row"><b>朝食</b><span>土間のテーブルで 8:00から</span></div></div>
+</section>
+</main>
+<footer><strong>凪の間</strong><a href="#top">先頭へ ↑</a></footer>
+</body>
+</html>
