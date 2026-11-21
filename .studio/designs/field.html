@@ -1,166 +1,95 @@
-<!doctype html><html lang="ja">
+<!doctype html>
+<html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>潮路を歩く｜海辺の観光</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="初めての岬歩き。潮目案内所の海辺の散歩ルート、集合と持ち物の案内。">
+<title>潮目案内所｜岬をめぐる海辺の散歩</title>
 <style>
-:root {
-  --paper:#f0f3e9;
-  --ink:#224c46;
-}
-* {
-  box-sizing:border-box;
-}
-html {
-  scroll-behavior:smooth;
-}
-body {
-  margin:0;
-  background:var(--paper);
-  color:var(--ink);
-  font:1rem/1.8 system-ui,sans-serif;
-  overflow-wrap:anywhere;
-}
-img {
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-a {
-  color:inherit;
-  text-underline-offset:.28em;
-}
-h1,h2,h3,p,figure {
-  margin:0;
-}
-h1,h2 {
-  line-height:1.12;
-  text-wrap:balance;
-}
-h1 {
-  font-size:clamp(3.4rem,8vw,8.8rem);
-  letter-spacing:-.055em;
-}
-h2 {
-  font-size:clamp(1.75rem,4vw,3.5rem);
-}
-header,footer,.bar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:1rem;
-  flex-wrap:wrap;
-}
-header,footer,section {
-  padding:clamp(1.1rem,4vw,4rem);
-}
-header {
-  padding-block:1rem;
-  border-bottom:1px solid;
-}
-header a,footer a {
-  font-size:.9rem;
-}
-footer {
-  border-top:1px solid;
-}
-nav {
-  display:flex;
-  gap:1.2rem;
-}
-.rows {
-  margin:1.4rem 0 0;
-}
-.row {
-  padding:1.05rem 0;
-  border-top:1px solid;
-  display:flex;
-  justify-content:space-between;
-  gap:1rem;
-  align-items:baseline;
-}
-.row span {
-  max-width:65%;
-}
-.cap {
-  font:600 .8rem/1.5 system-ui;
-  letter-spacing:.13em;
-}
-.action {
-  display:inline-block;
-  margin-top:1.3rem;
-  font-weight:650;
-}
-.copy {
-  max-width:38rem;
-  margin-top:1rem;
-}
-figure {
-  overflow:hidden;
-}
-@media(prefers-reduced-motion:reduce) {
-  html {
-    scroll-behavior:auto;
-  }
-}
-.panorama {
-  padding:0;
-  height:42vh;
-}
-.intro {
-  text-align:center;
-}
-.intro h1 {
-  font-family:serif;
-}
-#detail {
-  max-width:760px;
-  margin:auto;
-}
-.rows {
-  border-left:2px dashed;
-  padding-left:1.5rem;
-}
-.row {
-  display:block;
-  border:0;
-  position:relative;
-}
-.row:before {
-  content:"●";
-  position:absolute;
-  left:-2.05rem;
-}
-.row span {
-  display:block;
-  max-width:none;
+@font-face{font-family:"Studio Sans";src:url("media/sans.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Studio Serif";src:url("media/serif.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Space Grotesk";src:url("media/space.woff2") format("woff2");font-weight:100 900;font-display:swap}
+
+:root{--sans:"Studio Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;--serif:"Studio Serif","Yu Mincho",serif;--space:"Space Grotesk",Arial,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font:400 1rem/1.8 var(--sans);overflow-wrap:break-word}
+h1,h2,h3,p,figure,blockquote,dl,dd{margin:0}
+p{line-break:strict;text-wrap:pretty}
+img{display:block;width:100%;height:auto}
+a{color:inherit;text-underline-offset:.24em}
+a:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:5px}
+nav{display:flex;flex-wrap:wrap;column-gap:1.25rem;row-gap:.25rem}
+small{font-size:.82rem}
+summary{cursor:pointer}
+[id]{scroll-margin-top:1.25rem}
+.gallery-link{display:inline-block;font-size:.82rem}
+
+:root{--main:#153e58;--sub:#e6c669;--ink:#19384a;--paper:#edf3ef;--line:#879e9e}
+body{background:var(--paper);color:var(--ink)}
+.wrap{width:min(100% - clamp(2.2rem,10vw,10rem),1210px);margin:auto}
+.mast{padding-block:1.1rem;display:flex;justify-content:space-between;align-items:center;gap:.65rem}
+.mast p{font-family:var(--serif);font-weight:800;letter-spacing:.11em;line-height:1.4}
+nav{font-size:.88rem}
+.hero{position:relative;isolation:isolate;text-align:center;padding:clamp(1.6rem,4vw,4rem) 0 0}
+.hero h1{font:650 clamp(2.75rem,7.15vw,7rem)/1.16 var(--serif);letter-spacing:-.06em;text-wrap:balance}
+.hero h1 span{display:inline-block}
+.hero .sub{margin:.6rem 0 1.4rem;font-weight:550}
+.window{width:100%;height:clamp(405px,43vw,665px);border-radius:50% 50% 3% 3% / 46% 46% 4% 4%;object-fit:cover;object-position:50% 57%}
+.distance{position:absolute;right:4%;bottom:7%;width:clamp(105px,13.5vw,170px);aspect-ratio:1;border:1px solid #213746;border-radius:50%;display:grid;place-content:center;text-align:center;color:#19384a;background:color-mix(in srgb,var(--sub) 31%,#eed58d);box-shadow:0 0 0 5px #fff4d1ad;font-size:.84rem;line-height:1.35;transform:rotate(8deg)}
+.distance strong{font:650 clamp(1.5rem,4vw,3rem)/1.1 var(--space);letter-spacing:-.075em}
+.stats{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;padding:.9rem 0 1rem;border-bottom:1px solid var(--line);font-size:.9rem}
+.stats strong{font-weight:750}
+.route{display:grid;grid-template-columns:1.04fr 1.3fr;gap:clamp(2rem,6vw,6rem);padding-block:clamp(3.3rem,8vw,8rem)}
+h2{font:650 clamp(2.05rem,4.8vw,4.3rem)/1.35 var(--serif);letter-spacing:-.06em;margin-bottom:.8rem}
+.route header p{max-width:26em}
+.route ol{margin:0;padding:0 0 0 1.55rem;list-style:none;border-left:1px dashed #526e76}
+.route li{position:relative;padding:0 0 1.7rem}
+.route li::before{content:"";position:absolute;left:-1.91rem;top:.65rem;width:.72rem;height:.72rem;border:1px solid #153e58;background:#e7c568;border-radius:50%}
+.route li:last-child{padding-bottom:0}
+.route h3{font-family:var(--serif);font-weight:780;font-size:1.24rem}
+.route h3 small{font:550 .8rem var(--sans);margin-left:.6rem;white-space:nowrap}
+footer{background:color-mix(in srgb,var(--main) 28%,#14364b);color:#f4f5e9;border-top:5px solid #e8ce87}
+.dock{padding-block:clamp(2.7rem,7vw,5.5rem);display:grid;grid-template-columns:1fr 1fr;gap:1rem 4rem}
+.dock h2{font-size:clamp(2rem,4vw,3.4rem)}
+.dock dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.65rem 1.1rem;align-content:start}
+.dock dt{font-weight:700}
+.dock .gallery-link{grid-column:1/-1;margin-top:1rem}
+@media(max-width:630px){
+ .mast{padding-block:.95rem}
+ nav{gap:.75rem}
+ .hero .sub{font-size:.88rem}
+ .window{height:clamp(290px,97vw,444px);object-position:61% 53%}
+ .distance{right:4%;bottom:5%}
+ .stats{gap:.4rem 1.2rem;justify-content:flex-start}
+ .route,.dock{grid-template-columns:1fr}
 }
 </style>
 </head>
-<body id="top">
-<header><strong>潮路を歩く</strong>
-<nav><a href="#detail">散歩道</a><a href="#visit">持ち物</a></nav>
-</header>
+<body>
+<header class="mast wrap" id="top"><p>潮目案内所</p><nav aria-label="散歩の案内"><a href="#route">歩く順路</a><a href="#meet">集合と準備</a></nav></header>
 <main>
-<section class="panorama"><img src="../art/coast.webp" alt="海岸と遠くの岬">
-</section>
-<section class="intro">
-<p class="cap">海岸散歩 · 徒歩 90分</p>
-<h1>潮路を歩く</h1>
-</section>
-<section id="detail">
-<h2>海辺の散歩道</h2>
-<div class="rows">
-<div class="row"><b>港の朝市</b><span>出発。桟橋を右に見て海沿いへ。</span></div>
-<div class="row"><b>岬の踊り場</b><span>35分。坂を上がれば湾を見渡せます。</span></div>
-<div class="row"><b>浜の休憩所</b><span>90分。海沿いのベンチが終点です。</span></div></div>
-</section>
-<section id="visit">
-<h2>歩く前に</h2>
-<p>潮風を防ぐ上着と歩きやすい靴を。強風の日は海沿いを避けてください。</p>
-</section>
+  <section class="hero wrap" aria-labelledby="title">
+    <h1 id="title"><span>岬の先まで、</span><wbr><span>潮風と。</span></h1>
+    <p class="sub">入り江から展望台へ。海辺のガイド散歩</p>
+    <img class="window" src="media/field.webp" width="1536" height="1024" alt="草の生えた岬に沿う細い道と、白波の立つ海岸線">
+    <p class="distance">歩く距離<strong>2.4 km</strong></p>
+  </section>
+  <p class="stats wrap"><span><strong>約90分</strong> 休憩込み</span><span><strong>高低差 45m</strong></span><span>小学生以上</span></p>
+  <section class="route wrap" id="route">
+    <header><h2>海が開けるまで</h2><p>港からゆっくり登り、波の音を聞きながら岬の裏手へ。ガイドが風向きを見て、休憩する場所を選びます。</p></header>
+    <ol>
+      <li><h3>小舟の入り江 <small>出発</small></h3><p>港の掲示板でその日の風と順路を確認。石段は手すり側を一列で進みます。</p></li>
+      <li><h3>風待ちの草地 <small>約30分</small></h3><p>海を背に、低い草の道へ。振り返ると、湾の地形が一望できます。</p></li>
+      <li><h3>岬の見晴らし台 <small>約55分</small></h3><p>足を止めて、沖の白波を眺めます。帰りは林の道を通って港へ戻ります。</p></li>
+    </ol>
+  </section>
 </main>
-<footer><strong>潮路を歩く</strong><a href="#top">先頭へ ↑</a></footer>
+<footer id="meet">
+  <div class="dock wrap">
+    <div><h2>朝、港の掲示板で。</h2><p>出発は土・日の9:30。10分前に、小舟の入り江の掲示板前に集合します。</p></div>
+    <dl><dt>持ち物</dt><dd>滑りにくい靴、飲み物、防風着</dd><dt>参加費</dt><dd>1人2,000円、小学生1,000円</dd><dt>荒天時</dt><dd>雨や強い風の日は中止。現地の掲示板に案内を出します。</dd></dl>
+    <a class="gallery-link" href="index.html">作例一覧</a>
+  </div>
+</footer>
 </body>
 </html>

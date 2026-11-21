@@ -1,165 +1,106 @@
-<!doctype html><html lang="ja">
+<!doctype html>
+<html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LOOM STOCK｜古着店</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="色落ちや縫い目を手がかりに古着を見る。SEAMの入荷と店頭試着の案内。">
+<title>SEAM｜着込まれた服の店</title>
 <style>
-:root {
-  --paper:#faf5ef;
-  --ink:#312a29;
-}
-* {
-  box-sizing:border-box;
-}
-html {
-  scroll-behavior:smooth;
-}
-body {
-  margin:0;
-  background:var(--paper);
-  color:var(--ink);
-  font:1rem/1.8 system-ui,sans-serif;
-  overflow-wrap:anywhere;
-}
-img {
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-a {
-  color:inherit;
-  text-underline-offset:.28em;
-}
-h1,h2,h3,p,figure {
-  margin:0;
-}
-h1,h2 {
-  line-height:1.12;
-  text-wrap:balance;
-}
-h1 {
-  font-size:clamp(3.4rem,8vw,8.8rem);
-  letter-spacing:-.055em;
-}
-h2 {
-  font-size:clamp(1.75rem,4vw,3.5rem);
-}
-header,footer,.bar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:1rem;
-  flex-wrap:wrap;
-}
-header,footer,section {
-  padding:clamp(1.1rem,4vw,4rem);
-}
-header {
-  padding-block:1rem;
-  border-bottom:1px solid;
-}
-header a,footer a {
-  font-size:.9rem;
-}
-footer {
-  border-top:1px solid;
-}
-nav {
-  display:flex;
-  gap:1.2rem;
-}
-.rows {
-  margin:1.4rem 0 0;
-}
-.row {
-  padding:1.05rem 0;
-  border-top:1px solid;
-  display:flex;
-  justify-content:space-between;
-  gap:1rem;
-  align-items:baseline;
-}
-.row span {
-  max-width:65%;
-}
-.cap {
-  font:600 .8rem/1.5 system-ui;
-  letter-spacing:.13em;
-}
-.action {
-  display:inline-block;
-  margin-top:1.3rem;
-  font-weight:650;
-}
-.copy {
-  max-width:38rem;
-  margin-top:1rem;
-}
-figure {
-  overflow:hidden;
-}
-@media(prefers-reduced-motion:reduce) {
-  html {
-    scroll-behavior:auto;
-  }
-}
-.look {
-  display:grid;
-  grid-template-columns:1fr .9fr .55fr;
-  align-items:end;
-  gap:1vw;
-}
-.look h1 {
-  font:900 clamp(2.8rem,8vw,8rem)/.83 Arial;
-  letter-spacing:-.07em;
-}
-.look figure {
-  height:55vh;
-}
-.look figure:last-child {
-  height:33vh;
-}
-#detail figure {
-  height:30vh;
-  margin-top:2rem;
-}
-#visit {
-  background:#d9cebd;
-}
-@media(max-width:600px) {
-  .look {
-    grid-template-columns:1fr .65fr;
-  }
-  .look h1 {
-    grid-column:1/-1;
-  }
-  .look figure {
-    height:36vh;
-  }
+@font-face{font-family:"Studio Sans";src:url("media/sans.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Space Grotesk";src:url("media/space.woff2") format("woff2");font-weight:100 900;font-display:swap}
+
+:root{--sans:"Studio Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;--serif:"Studio Serif","Yu Mincho",serif;--space:"Space Grotesk",Arial,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font:400 1rem/1.8 var(--sans);overflow-wrap:break-word}
+h1,h2,h3,p,figure,blockquote,dl,dd{margin:0}
+p{line-break:strict;text-wrap:pretty}
+img{display:block;width:100%;height:auto}
+a{color:inherit;text-underline-offset:.24em}
+a:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:5px}
+nav{display:flex;flex-wrap:wrap;column-gap:1.25rem;row-gap:.25rem}
+small{font-size:.82rem}
+summary{cursor:pointer}
+[id]{scroll-margin-top:1.25rem}
+.gallery-link{display:inline-block;font-size:.82rem}
+
+:root{--main:#273a59;--sub:#ee9148;--paper:#e7e5dc;--ink:#172435;--line:#8590a0}
+body{background:var(--paper);color:var(--ink)}
+.wrap{width:min(100% - clamp(2.25rem,8vw,7rem),1300px);margin:auto}
+.mast{display:flex;justify-content:space-between;align-items:center;padding:.85rem 0;gap:.7rem;border-bottom:1px dashed #73819a}
+.mast a{text-decoration:none}
+.mast>a{font:700 1.55rem/.95 var(--space);letter-spacing:-.1em}
+.mast nav{font-size:.9rem}
+.mast nav a{border-bottom:1px solid #73819a}
+.look{display:grid;grid-template-columns:1.1fr .9fr;align-items:stretch;position:relative;margin-block:clamp(1.4rem,3vw,3.1rem)}
+.look::before{content:"";position:absolute;inset:0;pointer-events:none;border:1px dashed #f9f8f2a0;outline:1px solid var(--line);outline-offset:-1px;margin:.55rem;z-index:1}
+.look figure{position:relative;min-height:clamp(545px,53vw,790px);overflow:hidden;background:#2c3949}
+.look img{position:absolute;inset:0;height:100%;object-fit:cover;object-position:center 47%}
+.look figcaption{position:absolute;bottom:1.2rem;left:1.3rem;max-width:calc(100% - 2.6rem);background:#e7e5dc;color:#172435;padding:.25rem .65rem;font-size:.8rem;font-weight:650}
+.tag{align-content:center;position:relative;padding:clamp(1.75rem,5vw,5rem);color:#f7f4e9;background:repeating-linear-gradient(120deg,#fff1 0 1px,transparent 1px 5px),color-mix(in srgb,var(--main) 28%,#203049)}
+.tag p:first-child{font-size:.9rem;color:#ffe1b9;border-top:1px dashed #ffdebc;padding-top:.8rem;width:max-content;max-width:100%}
+h1{font:700 clamp(5.8rem,14vw,13rem)/.88 var(--space);letter-spacing:-.12em;margin:.4rem 0 1rem;white-space:nowrap}
+.tag .lead{font-size:clamp(1.05rem,2.4vw,1.6rem);font-weight:750;letter-spacing:.1em}
+.tag a{display:inline-block;margin-top:1.6rem;font-weight:650;color:#fff0d8}
+.spread{display:grid;grid-template-columns:1fr 1.35fr;gap:clamp(1.7rem,7.4vw,7rem);align-items:start;padding-block:clamp(3rem,7vw,6rem)}
+.swatch{height:clamp(235px,32vw,480px);overflow:hidden;position:relative;background:#213447}
+.swatch img{height:100%;object-fit:cover;object-position:54% 64%;transform:scale(2.35);transform-origin:60% 55%}
+.spread figure{align-self:center;margin-top:clamp(0px,4vw,4rem)}
+.spread figcaption{font-size:.86rem;margin-top:.4rem}
+h2{font:760 clamp(1.9rem,4.4vw,4.2rem)/1.15 var(--sans);letter-spacing:-.07em;margin:.4rem 0 1rem}
+.product>p:first-child{font-weight:740;font-size:.88rem;letter-spacing:.14em}
+.product>p{max-width:32em}
+.spec{margin-top:1.5rem;border-top:1px dashed #6f7e8f}
+.spec div{display:grid;grid-template-columns:5rem 1fr;gap:1rem;padding:.65rem .2rem;border-bottom:1px dashed #6f7e8f}
+.spec dt{font-size:.88rem;font-weight:750}
+.price{margin-top:1rem;font:650 1.55rem/1 var(--space)}
+footer{padding-block:clamp(2.2rem,6vw,5.3rem);background:color-mix(in srgb,var(--sub) 20%,#f0a76a);color:#1d2937}
+.fitting{display:grid;grid-template-columns:1.2fr 1fr;gap:1rem 4rem;align-items:center}
+.fitting dl{border-block:1px dashed #3a3a37;padding:.65rem 0}
+.fitting dl div{display:grid;grid-template-columns:6rem 1fr;gap:.45rem}
+.fitting dt{font-weight:750}
+.fitting .gallery-link{grid-column:1/-1}
+@media(max-width:900px){h1{font-size:12vw}}
+@media(max-width:620px){
+ .mast nav{gap:.8rem}
+ .look{grid-template-columns:1fr;margin-block:1rem}
+ .look figure{min-height:0;height:clamp(355px,103vw,540px)}
+ .look figcaption{bottom:.9rem;left:1rem}
+ .tag{padding:1.4rem 1.25rem 1.55rem}
+ h1{font-size:clamp(4.8rem,21vw,7rem);margin:.22rem 0 .55rem}
+ .tag a{margin-top:.75rem}
+ .spread,.fitting{grid-template-columns:1fr}
+ .spread figure{grid-row:2;margin-top:0}
+ .swatch{height:255px}
 }
 </style>
 </head>
-<body id="top">
-<header><strong>LOOM STOCK</strong>
-<nav><a href="#detail">入荷</a><a href="#visit">試着</a></nav>
+<body>
+<header class="mast wrap" id="top">
+  <a href="#top" lang="en">SEAM</a>
+  <nav aria-label="古着店の案内"><a href="#stock">今回の入荷</a><a href="#fitting">店頭で試す</a></nav>
 </header>
-<main>
-<section class="look">
-<h1>LOOM<br>STOCK</h1>
-<figure><img src="../art/outfit.webp" alt="コーディネートのイメージ"></figure>
-<figure><img src="../art/denim.webp" alt="デニムの質感"></figure>
-</section>
-<section id="detail">
-<h2>今週のラック</h2>
-<p class="copy">色褪せたインディゴ、やわらかな生成り。着込んだからこそ生まれた表情を選びました。</p>
-<figure><img src="../art/rack.webp" alt="服が並ぶラック"></figure>
-</section>
-<section id="visit">
-<h2>試着のご案内</h2>
-<p>土・日 12:00–18:00。気になる一着は店頭でご試着いただけます。</p>
-</section>
+<main class="wrap">
+  <section class="look" aria-labelledby="title">
+    <figure><img src="media/loom.webp" width="960" height="1440" alt="使い込んだ紺のデニムジャケットを着て椅子に座る人"><figcaption>入荷から一着　デニムのワークジャケット</figcaption></figure>
+    <div class="tag"><p>着込まれた服の店</p><h1 id="title" lang="en">SEAM</h1><p class="lead">縫い目に、時間が出る。</p><a href="#stock">生地と実寸を見る</a></div>
+  </section>
+  <section class="spread" id="stock" aria-labelledby="stock-title">
+    <figure><div class="swatch"><img src="media/loom.webp" width="960" height="1440" loading="lazy" alt="デニムの前身頃を拡大した写真。ポケットの角や袖口に色落ちが見える"></div><figcaption>前身頃の縫い目とポケット</figcaption></figure>
+    <div class="product">
+      <p>今回の入荷</p>
+      <h2 id="stock-title">ワークジャケット</h2>
+      <p>濃紺が残る身頃と、白くなった袖口。着込んだ箇所が先にやわらかくなっていて、羽織ると肩がすっと落ちます。</p>
+      <dl class="spec"><div><dt>素材</dt><dd>コットンデニム</dd></div><div><dt>平置き実寸</dt><dd>肩幅46・身幅56・着丈64cm</dd></div><div><dt>状態</dt><dd>袖口に擦れ、前ポケットの角に補修跡</dd></div></dl>
+      <p class="price">¥18,700</p>
+    </div>
+  </section>
 </main>
-<footer><strong>LOOM STOCK</strong><a href="#top">先頭へ ↑</a></footer>
+<footer id="fitting">
+  <div class="fitting wrap">
+    <div><h2>袖を通して、決める。</h2><p>店頭の鏡で丈を見たり、持参した服を重ねたり。<br>気になった一着はスタッフに品名をお伝えください。</p></div>
+    <dl><div><dt>営業</dt><dd>木〜月 13:00–19:00</dd></div><div><dt>店の目印</dt><dd>中通りの紺色の扉</dd></div><div><dt>取り置き</dt><dd>店頭で受付。当日の閉店まで</dd></div></dl>
+    <a class="gallery-link" href="index.html">作例一覧</a>
+  </div>
+</footer>
 </body>
 </html>
