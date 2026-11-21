@@ -1,86 +1,124 @@
-<!doctype html><html lang="ja">
+<!doctype html>
+<html lang="ja">
+<head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>デザイン10選｜助手A制作室</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>デザイン10選｜助手A ホームページ制作室</title>
 <style>
-* {
-  box-sizing:border-box;
-}
-body {
-  margin:0;
-  color:#1e332c;
-  background:#f5f4ef;
-  font:1rem/1.6 system-ui;
-}
-header,main {
-  max-width:1320px;
-  margin:auto;
-  padding:clamp(1rem,3vw,3rem);
-}
-h1 {
-  font:500 clamp(2.8rem,7vw,6.4rem)/1.1 serif;
-  letter-spacing:-.045em;
-  margin:0;
-}
-header p {
-  margin:1rem 0 0;
-}
-main {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));
-  gap:2.2rem 1.5rem;
-}
-a {
-  display:block;
-  text-decoration:none;
-  color:inherit;
-  border-top:1px solid #8d998e;
-  padding-top:.65rem;
-}
-a:hover h2,a:focus-visible h2 {
-  text-decoration:underline;
-}
-img {
-  display:block;
-  width:100%;
-  height:auto;
-}
-h2 {
-  font:500 1.55rem/1.2 serif;
-  margin:.3rem 0;
-}
-small {
-  display:block;
-  margin-top:.6rem;
-}
-a p {
-  margin:.2rem 0;
-}
+@font-face{font-family:"Studio Sans";src:url("media/sans.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Studio Serif";src:url("media/serif.woff2") format("woff2");font-weight:100 900;font-display:swap}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:#f3f1e9;color:#242921;font:400 1rem/1.65 "Studio Sans","Yu Gothic",sans-serif}
+.shell{width:min(100% - clamp(2.3rem,9vw,8rem),1330px);margin:auto}
+header{padding-block:clamp(2.35rem,7vw,6rem) clamp(1.8rem,4vw,3.4rem);border-bottom:1px solid #666855}
+header p:first-child{font-size:.9rem;font-weight:700;color:#4f5849}
+h1{margin:.3rem 0 .7rem;font:660 clamp(2.75rem,7vw,7rem)/1.12 "Studio Serif","Yu Mincho",serif;letter-spacing:-.075em}
+header p{margin:0}
+main{padding-block:2.4rem clamp(3rem,5vw,5rem)}
+.grid{padding:0;margin:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(1.7rem,4.5vw,4rem) clamp(1rem,3vw,2.7rem)}
+a{color:inherit;text-underline-offset:.24em}
+a:focus-visible{outline:2px solid #465343;outline-offset:6px}
+.work{display:block;text-decoration:none;border-bottom:1px solid #a1a08f;padding-bottom:.9rem}
+.work:hover h2,.work:focus-visible h2{text-decoration:underline}
+.work img{display:block;width:100%;height:auto;aspect-ratio:16/10;background:#e3e1d8;object-fit:cover;border:1px solid #2b322721}
+.info{display:flex;gap:.3rem 1rem;flex-wrap:wrap;align-items:baseline;justify-content:space-between;margin-top:.65rem}
+.info h2{margin:0;font:700 clamp(1.17rem,2.5vw,1.95rem)/1.35 "Studio Sans","Yu Gothic",sans-serif;letter-spacing:-.055em}
+.info span{font-size:.87rem;color:#414a3e}
+.work p{font-size:.96rem;margin:.4rem 0 0}
+footer{background:#25332b;color:#faf5e8;padding-block:2.25rem}
+footer h2,footer p{margin:0}
+footer h2{font:650 1.6rem/1.35 "Studio Serif","Yu Mincho",serif;margin-bottom:.5rem}
+footer a:focus-visible{outline-color:#faf5e8}
+footer nav{display:flex;flex-wrap:wrap;gap:.35rem 1.4rem;margin-top:.75rem}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.work p{font-size:.91rem}main{padding-top:1.5rem}}
 </style>
-<header>
-<h1>デザイン10選</h1>
-<p>気になる作例を開くと、ページの最後まで見られます。制作室では用途や配色を別に指定できます。</p>
+</head>
+<body>
+<header class="shell">
+  <p>助手A ホームページ制作室</p>
+  <h1>デザイン10選</h1>
+  <p>表紙を選ぶと作例が開きます。制作室では、作例とお好みの配色を組み合わせて指定できます。</p>
 </header>
-<main><a href="table.html"><img width="640" height="400" src="table.jpg" alt="匙と皿の表紙"><small>食堂</small>
-<h2>匙と皿</h2>
-<p>献立を最初に読むメニュー表 ↗</p></a><a href="studio.html"><img width="640" height="400" src="studio.jpg" alt="稜線建築の表紙"><small>建築設計</small>
-<h2>稜線建築</h2>
-<p>大判写真から作品へ入る展示型 ↗</p></a><a href="pulse.html"><img width="640" height="400" src="pulse.jpg" alt="PULSE HALLの表紙"><small>電子音楽公演</small>
-<h2>PULSE HALL</h2>
-<p>タイポグラフィポスターと時刻表 ↗</p></a><a href="field.html"><img width="640" height="400" src="field.jpg" alt="潮路を歩くの表紙"><small>海辺の観光</small>
-<h2>潮路を歩く</h2>
-<p>旅の順序をたどるルートガイド ↗</p></a><a href="loom.html"><img width="640" height="400" src="loom.jpg" alt="LOOM STOCKの表紙"><small>古着店</small>
-<h2>LOOM STOCK</h2>
-<p>写真の大小で見せるルックブック ↗</p></a><a href="lesson.html"><img width="640" height="400" src="lesson.jpg" alt="ことのは教室の表紙"><small>語学スクール</small>
-<h2>ことのは教室</h2>
-<p>学びたい目的から選ぶ分岐型 ↗</p></a><a href="press.html"><img width="640" height="400" src="press.jpg" alt="余白通信の表紙"><small>独立出版・雑誌</small>
-<h2>余白通信</h2>
-<p>大見出しと段組の新聞型 ↗</p></a><a href="repair.html"><img width="640" height="400" src="repair.jpg" alt="直す室の表紙"><small>自転車修理</small>
-<h2>直す室</h2>
-<p>症状から答えを開く相談窓口 ↗</p></a><a href="still.html"><img width="640" height="400" src="still.jpg" alt="凪の間の表紙"><small>宿泊施設</small>
-<h2>凪の間</h2>
-<p>余白と一枚の室内写真で迎える宿案内 ↗</p></a><a href="meter.html"><img width="640" height="400" src="meter.jpg" alt="粒子観測所の表紙"><small>科学展示</small>
-<h2>粒子観測所</h2>
-<p>数値と実験記録を読む展示台帳 ↗</p></a>
+<main class="shell">
+  <ul class="grid" aria-label="業種別のデザイン作例">
+    <li>
+      <a class="work" href="table.html">
+        <img src="table.jpg" width="640" height="400" alt="">
+        <div class="info"><h2>ひと盆食堂</h2><span>食堂</span></div>
+        <p>湯気の立つ定食と朱の献立札</p>
+      </a>
+    </li>
+    <li>
+      <a class="work" href="studio.html">
+        <img src="studio.jpg" width="640" height="400" alt="">
+        <div class="info"><h2>継目設計室</h2><span>建築設計事務所</span></div>
+        <p>大判の空間写真と素材の断面</p>
+      </a>
+    </li>
+    <li>
+      <a class="work" href="pulse.html">
+        <img src="pulse.jpg" width="640" height="400" alt="" loading="lazy">
+        <div class="info"><h2>AFTER TONE</h2><span>電子音楽公演</span></div>
+        <p>残像のポスターと演目の時刻表</p>
+      </a>
+    </li>
+    <li>
+      <a class="work" href="field.html">
+        <img src="field.jpg" width="640" height="400" alt="" loading="lazy">
+        <div class="info"><h2>潮目案内所</h2><span>海辺の観光ガイド</span></div>
+        <p>海をのぞく丸窓と岬の順路</p>
+      </a>
+    </li>
+    <li>
+      <a class="work" href="loom.html">
+        <img src="loom.jpg" width="640" height="400" alt="" loading="lazy">
+        <div class="info"><h2>SEAM</h2><span>古着店</span></div>
+        <p>デニムの接写と実寸のタグ</p>
+      </a>
+    </li>
+    <li>
+      <a class="work" href="lesson.html">
+        <img src="lesson.jpg" width="640" height="400" alt="" loading="lazy">
+        <div class="info"><h2>となりの英語</h2><span>語学教室</span></div>
+        <p>会話の吹き出しと少人数クラス案内</p>
+      </a>
+    </li>
+    <li>
+      <a class="work" href="press.html">
+        <img src="press.jpg" width="640" height="400" alt="" loading="lazy">
+        <div class="info"><h2>低地通信</h2><span>独立出版・雑誌</span></div>
+        <p>刷り色を生かした表紙と試し読み</p>
+      </a>
+    </li>
+    <li>
+      <a class="work" href="repair.html">
+        <img src="repair.jpg" width="640" height="400" alt="" loading="lazy">
+        <div class="info"><h2>まちの輪</h2><span>自転車修理店</span></div>
+        <p>工房の作業台と症状別の料金</p>
+      </a>
+    </li>
+    <li>
+      <a class="work" href="still.html">
+        <img src="still.jpg" width="640" height="400" alt="" loading="lazy">
+        <div class="info"><h2>水際の二間</h2><span>小規模な宿</span></div>
+        <p>湖の一枚絵と縦組みの宿案内</p>
+      </a>
+    </li>
+    <li>
+      <a class="work" href="meter.html">
+        <img src="meter.jpg" width="640" height="400" alt="" loading="lazy">
+        <div class="info"><h2>光の計測室</h2><span>科学展示</span></div>
+        <p>操作できる光の実験台と展示案内</p>
+      </a>
+    </li>
+  </ul>
 </main>
+<footer>
+  <div class="shell">
+    <h2>画面を見比べる</h2>
+    <p>作例公開用に用意した、架空の店舗・催しです。</p>
+    <nav aria-label="ブラウザで撮影した作例の一覧"><a href="review/desktop.jpg">PC版の一覧画像</a><a href="review/mobile.jpg">スマホ版の一覧画像</a></nav>
+  </div>
+</footer>
+</body>
 </html>

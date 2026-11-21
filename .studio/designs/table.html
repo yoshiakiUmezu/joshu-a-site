@@ -1,159 +1,111 @@
-<!doctype html><html lang="ja">
+<!doctype html>
+<html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>匙と皿｜食堂</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="昼の定食と、季節の小鉢。ひと盆食堂の献立と営業案内。">
+<title>ひと盆食堂</title>
 <style>
-:root {
-  --paper:#fbf4de;
-  --ink:#372a1b;
+@font-face{font-family:"Studio Sans";src:url("media/sans.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Studio Serif";src:url("media/serif.woff2") format("woff2");font-weight:100 900;font-display:swap}
+
+:root{--sans:"Studio Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;--serif:"Studio Serif","Yu Mincho",serif;--space:"Space Grotesk",Arial,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font:400 1rem/1.8 var(--sans);overflow-wrap:break-word}
+h1,h2,h3,p,figure,blockquote,dl,dd{margin:0}
+p{line-break:strict;text-wrap:pretty}
+img{display:block;width:100%;height:auto}
+a{color:inherit;text-underline-offset:.24em}
+a:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:5px}
+nav{display:flex;flex-wrap:wrap;column-gap:1.25rem;row-gap:.25rem}
+small{font-size:.82rem}
+summary{cursor:pointer}
+[id]{scroll-margin-top:1.25rem}
+.gallery-link{display:inline-block;font-size:.82rem}
+
+:root{--main:#a33322;--sub:#e4aa5f;--ink:#302019;--paper:#f9f0df}
+body{background:var(--paper);color:var(--ink)}
+.mast,.menu,.visit{max-width:1280px;margin:auto;padding-inline:clamp(1.15rem,4vw,4rem)}
+.mast{height:76px;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.brand{font-family:var(--serif);font-weight:800;font-size:1.18rem;text-decoration:none}
+.mast nav{font-size:.9rem}
+.hero{position:relative;isolation:isolate;min-height:642px;display:grid;align-items:center;padding:clamp(1.15rem,5vw,6rem);color:#fff7e9;background:#392318}
+.hero>img{position:absolute;inset:0;z-index:-2;height:100%;object-fit:cover;object-position:center 55%}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#1b100af0,#1b100a9e 33%,transparent 65%)}
+.slip{width:min(100%,408px);padding:2.3rem 2rem 2.7rem;border:1px solid #fff5dc75;background:color-mix(in srgb,var(--main) 18%,#872f20);box-shadow:9px 10px 0 #1d100b50}
+.slip .weekday{font-size:.88rem;letter-spacing:.16em;border-bottom:1px solid #fff5dc70;padding-bottom:.8rem}
+h1{font:720 clamp(3.05rem,6.4vw,6.5rem)/1.16 var(--serif);letter-spacing:-.075em;margin-block:.65rem .9rem}
+.slip p:last-child{letter-spacing:.05em}
+.hours-band{background:#291a14;color:#f9eedc;text-align:center;padding:.9rem 1rem}
+.hours-band strong{font-size:1.25rem;margin:0 .35em}
+.menu{display:grid;grid-template-columns:1fr 1.9fr;gap:clamp(1.5rem,6vw,6rem);padding-block:clamp(3.2rem,9vw,8rem)}
+.kicker{color:#842d1d;font-weight:700;font-size:.87rem;letter-spacing:.14em}
+h2{font:650 clamp(2rem,4vw,3.6rem)/1.32 var(--serif);margin:.3rem 0 1rem}
+.menu .intro p:last-child{max-width:25em}
+.dish{border-top:1px solid #aa9780;padding:1.1rem 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.2rem 1rem;align-items:baseline}
+.dish:last-child{border-bottom:1px solid #aa9780}
+.dish h3{font-size:1.15rem}
+.dish p{grid-column:1/-1;font-size:.93rem}
+.price{font-variant-numeric:tabular-nums;font-weight:700}
+footer{background:color-mix(in srgb,var(--sub) 32%,#f2dfc7);border-top:6px double #99654c}
+.visit{padding-block:clamp(2.3rem,6vw,5.25rem);display:grid;grid-template-columns:1.2fr 1fr;align-items:end;gap:1.5rem}
+.visit dl{display:grid;grid-template-columns:auto 1fr;gap:.5rem 1rem}
+.visit dt{font-weight:700}
+.visit .gallery-link{grid-column:1/-1;margin-top:1.8rem}
+@media(min-width:721px) and (max-width:940px){
+ .hero{min-height:560px;padding-inline:clamp(1.5rem,4vw,3rem)}
+ .hero>img{object-position:42% 55%}
+ .slip{width:35vw;padding:1.5rem 1.35rem}
 }
-* {
-  box-sizing:border-box;
-}
-html {
-  scroll-behavior:smooth;
-}
-body {
-  margin:0;
-  background:var(--paper);
-  color:var(--ink);
-  font:1rem/1.8 system-ui,sans-serif;
-  overflow-wrap:anywhere;
-}
-img {
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-a {
-  color:inherit;
-  text-underline-offset:.28em;
-}
-h1,h2,h3,p,figure {
-  margin:0;
-}
-h1,h2 {
-  line-height:1.12;
-  text-wrap:balance;
-}
-h1 {
-  font-size:clamp(3.4rem,8vw,8.8rem);
-  letter-spacing:-.055em;
-}
-h2 {
-  font-size:clamp(1.75rem,4vw,3.5rem);
-}
-header,footer,.bar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:1rem;
-  flex-wrap:wrap;
-}
-header,footer,section {
-  padding:clamp(1.1rem,4vw,4rem);
-}
-header {
-  padding-block:1rem;
-  border-bottom:1px solid;
-}
-header a,footer a {
-  font-size:.9rem;
-}
-footer {
-  border-top:1px solid;
-}
-nav {
-  display:flex;
-  gap:1.2rem;
-}
-.rows {
-  margin:1.4rem 0 0;
-}
-.row {
-  padding:1.05rem 0;
-  border-top:1px solid;
-  display:flex;
-  justify-content:space-between;
-  gap:1rem;
-  align-items:baseline;
-}
-.row span {
-  max-width:65%;
-}
-.cap {
-  font:600 .8rem/1.5 system-ui;
-  letter-spacing:.13em;
-}
-.action {
-  display:inline-block;
-  margin-top:1.3rem;
-  font-weight:650;
-}
-.copy {
-  max-width:38rem;
-  margin-top:1rem;
-}
-figure {
-  overflow:hidden;
-}
-@media(prefers-reduced-motion:reduce) {
-  html {
-    scroll-behavior:auto;
-  }
-}
-.cover {
-  display:flex;
-  align-items:center;
-  justify-content:space-around;
-  background:#eee3bd;
-}
-.cover h1,#detail h2 {
-  font-family:serif;
-}
-.cover figure {
-  width:min(38vw,340px);
-  aspect-ratio:1;
-  border-radius:50%;
-}
-#detail {
-  max-width:830px;
-  margin:auto;
-}
-.row b {
-  font-family:serif;
-}
-#visit {
-  border-top:1px dashed;
+@media(max-width:720px){
+ .mast{height:64px}
+ .hero{min-height:0;display:flex;flex-direction:column;align-items:stretch;padding:0;background:#3e2118}
+ .hero>img{position:static;height:auto;aspect-ratio:1.25;object-position:53% 58%;z-index:auto}
+ .hero::after{display:none}
+ .slip{width:auto;margin:-1.25rem 1.1rem 1.1rem;position:relative;padding:1.15rem 1.35rem 1.4rem;box-shadow:none}
+ h1{font-size:clamp(2.32rem,9vw,4.25rem);letter-spacing:-.055em;margin:.4rem 0}
+ h1 br{display:none}
+ .slip .weekday{padding-bottom:.5rem}
+ .hours-band{font-size:.87rem}
+ .menu,.visit{grid-template-columns:1fr}
+ .menu{padding-top:2.45rem;gap:1.2rem}
 }
 </style>
 </head>
-<body id="top">
-<header><strong>匙と皿</strong>
-<nav><a href="#detail">献立</a><a href="#visit">営業日</a></nav>
+<body>
+<header class="mast" id="top">
+  <a class="brand" href="#top">ひと盆食堂</a>
+  <nav aria-label="食堂の案内"><a href="#menu">献立</a><a href="#visit">営業案内</a></nav>
 </header>
 <main>
-<section class="cover">
-<div>
-<p class="cap">昼の献立</p>
-<h1>匙と皿</h1>
-<p>季節をひと皿、昼だけの食堂。</p></div>
-<figure><img src="../art/salad.webp" alt="旬の野菜を合わせたひと皿"></figure>
-</section>
-<section id="detail">
-<h2>今日のおしながき</h2>
-<div class="rows">
-<div class="row"><b>焼き野菜の定食</b><span>1,200円</span></div>
-<div class="row"><b>豆と香草のスープ</b><span>650円</span></div>
-<div class="row"><b>季節のサラダ</b><span>450円</span></div></div>
-</section>
-<section id="visit">
-<h2>昼の暖簾</h2>
-<p class="copy">火曜から土曜、11:30–14:00。お一人でも、そのままお入りください。</p>
-</section>
+  <section class="hero" aria-labelledby="cover-title">
+    <img src="media/table.webp" width="1536" height="1024" alt="朱漆の盆に、鶏と大根の煮付けやごはんがのった定食">
+    <div class="slip">
+      <p class="weekday">昼の定食と小鉢</p>
+      <h1 id="cover-title">ひと盆<br>食堂</h1>
+      <p>汁ものから、あたたかく。</p>
+    </div>
+  </section>
+  <p class="hours-band">火曜〜土曜 <strong>11:30–15:00</strong> ご注文は14:30まで</p>
+  <section class="menu" id="menu">
+    <div class="intro">
+      <p class="kicker">日替わりの盆</p>
+      <h2>今日のお昼</h2>
+      <p>炊きたてのごはんと小鉢二品を、いつもの朱い盆にのせて。</p>
+    </div>
+    <div>
+      <article class="dish"><h3>鶏と大根の生姜煮</h3><span class="price">1,250円</span><p>青菜のおひたし、浅漬け、豆腐の味噌汁、ごはん。</p></article>
+      <article class="dish"><h3>焼ききのこと厚揚げ</h3><span class="price">1,150円</span><p>胡麻だれで香ばしく。小鉢二品と味噌汁、ごはん付き。</p></article>
+      <article class="dish"><h3>黒糖ほうじ茶プリン</h3><span class="price">360円</span><p>食後にちょうどいい、小さな器で。</p></article>
+    </div>
+  </section>
 </main>
-<footer><strong>匙と皿</strong><a href="#top">先頭へ ↑</a></footer>
+<footer id="visit">
+  <div class="visit">
+    <div><p class="kicker">お昼の来店案内</p><h2>お席は、着いた順に。</h2><p>カウンター6席と、テーブル8席。<br>定食が売り切れ次第、営業を終えます。</p></div>
+    <dl><dt>営業</dt><dd>火〜土 11:30–15:00<br>ラストオーダー 14:30</dd><dt>定休</dt><dd>日曜・月曜</dd><dt>入口</dt><dd>桜井通り、朱い暖簾の奥</dd></dl>
+    <a class="gallery-link" href="index.html">作例一覧</a>
+  </div>
+</footer>
 </body>
 </html>

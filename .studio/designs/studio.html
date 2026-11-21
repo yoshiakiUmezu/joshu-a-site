@@ -1,148 +1,99 @@
-<!doctype html><html lang="ja">
+<!doctype html>
+<html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>稜線建築｜建築設計</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="土地の光や素材の関係から、住宅と小さな店舗を設計する継目設計室。">
+<title>継目設計室</title>
 <style>
-:root {
-  --paper:#eae8e1;
-  --ink:#272723;
-}
-* {
-  box-sizing:border-box;
-}
-html {
-  scroll-behavior:smooth;
-}
-body {
-  margin:0;
-  background:var(--paper);
-  color:var(--ink);
-  font:1rem/1.8 system-ui,sans-serif;
-  overflow-wrap:anywhere;
-}
-img {
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-a {
-  color:inherit;
-  text-underline-offset:.28em;
-}
-h1,h2,h3,p,figure {
-  margin:0;
-}
-h1,h2 {
-  line-height:1.12;
-  text-wrap:balance;
-}
-h1 {
-  font-size:clamp(3.4rem,8vw,8.8rem);
-  letter-spacing:-.055em;
-}
-h2 {
-  font-size:clamp(1.75rem,4vw,3.5rem);
-}
-header,footer,.bar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:1rem;
-  flex-wrap:wrap;
-}
-header,footer,section {
-  padding:clamp(1.1rem,4vw,4rem);
-}
-header {
-  padding-block:1rem;
-  border-bottom:1px solid;
-}
-header a,footer a {
-  font-size:.9rem;
-}
-footer {
-  border-top:1px solid;
-}
-nav {
-  display:flex;
-  gap:1.2rem;
-}
-.rows {
-  margin:1.4rem 0 0;
-}
-.row {
-  padding:1.05rem 0;
-  border-top:1px solid;
-  display:flex;
-  justify-content:space-between;
-  gap:1rem;
-  align-items:baseline;
-}
-.row span {
-  max-width:65%;
-}
-.cap {
-  font:600 .8rem/1.5 system-ui;
-  letter-spacing:.13em;
-}
-.action {
-  display:inline-block;
-  margin-top:1.3rem;
-  font-weight:650;
-}
-.copy {
-  max-width:38rem;
-  margin-top:1rem;
-}
-figure {
-  overflow:hidden;
-}
-@media(prefers-reduced-motion:reduce) {
-  html {
-    scroll-behavior:auto;
-  }
-}
-.cover {
-  position:relative;
-  padding:0;
-  height:73vh;
-}
-.cover h1 {
-  position:absolute;
-  bottom:0;
-  background:var(--paper);
-  padding:.15em .45em;
-}
-#detail figure {
-  margin:2rem 0 0 auto;
-  width:76%;
-  height:38vh;
-}
-#visit {
-  max-width:750px;
+@font-face{font-family:"Studio Sans";src:url("media/sans.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Studio Serif";src:url("media/serif.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Space Grotesk";src:url("media/space.woff2") format("woff2");font-weight:100 900;font-display:swap}
+
+:root{--sans:"Studio Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;--serif:"Studio Serif","Yu Mincho",serif;--space:"Space Grotesk",Arial,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font:400 1rem/1.8 var(--sans);overflow-wrap:break-word}
+h1,h2,h3,p,figure,blockquote,dl,dd{margin:0}
+p{line-break:strict;text-wrap:pretty}
+img{display:block;width:100%;height:auto}
+a{color:inherit;text-underline-offset:.24em}
+a:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:5px}
+nav{display:flex;flex-wrap:wrap;column-gap:1.25rem;row-gap:.25rem}
+small{font-size:.82rem}
+summary{cursor:pointer}
+[id]{scroll-margin-top:1.25rem}
+.gallery-link{display:inline-block;font-size:.82rem}
+
+:root{--main:#354741;--sub:#c8b995;--ink:#222821;--paper:#e9eae3;--line:#899089}
+body{background:var(--paper);color:var(--ink)}
+.frame{margin-inline:auto;width:min(100% - clamp(2.25rem,8vw,8.5rem),1400px)}
+.mast{min-height:72px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:1rem;border-bottom:1px solid var(--line)}
+.mast p{font-weight:650;letter-spacing:.1em}
+nav{font-size:.88rem}
+.headline{display:flex;justify-content:space-between;align-items:end;gap:1.2rem;margin-block:clamp(1.9rem,4vw,3.6rem) 1.1rem}
+.headline h1{font:580 clamp(2.45rem,6.4vw,6.2rem)/1.02 var(--serif);letter-spacing:-.075em}
+.headline p{font-size:.9rem;white-space:nowrap;text-align:right}
+.cover img{height:clamp(415px,47vw,760px);object-fit:cover;object-position:50% 54%}
+figcaption{display:flex;justify-content:space-between;gap:1rem;padding:.65rem 0;border-bottom:1px solid var(--line);font-size:.87rem}
+.project{display:grid;grid-template-columns:1.05fr 2fr 1.1fr;gap:clamp(1.2rem,4vw,4rem);padding-block:clamp(2.6rem,7vw,6rem)}
+.label{text-transform:uppercase;font:600 .9rem/1.5 var(--space);letter-spacing:.12em}
+h2{font:650 clamp(2rem,4.1vw,3.6rem)/1.35 var(--serif);letter-spacing:-.045em;margin:0 0 1rem}
+.project article p{max-width:28em}
+.project dl{border-top:1px solid var(--line);align-self:start;font-size:.9rem}
+.project dt{font-weight:700;margin-top:.6rem}
+.project dd{border-bottom:1px solid var(--line);padding-bottom:.6rem}
+.detail{display:grid;grid-template-columns:2.2fr 1fr;background:color-mix(in srgb,var(--sub) 35%,var(--paper));align-items:stretch}
+.detail img{object-fit:cover;height:100%;aspect-ratio:1.85;object-position:50% 64%}
+.detail-copy{align-content:center;padding:clamp(1.3rem,4vw,3.5rem)}
+.detail h3{font-family:var(--serif);font-size:1.27rem;margin-bottom:.6rem}
+footer{margin-top:clamp(3.7rem,9vw,9rem);background:color-mix(in srgb,var(--main) 28%,#29372f);color:#f1f0e6}
+.contact{display:grid;grid-template-columns:1.05fr 2fr 1.1fr;gap:clamp(1.2rem,4vw,4rem);padding-block:clamp(2.6rem,6vw,6rem)}
+.contact .gallery-link{align-self:end;justify-self:end}
+@media(max-width:800px){.project,.contact{grid-template-columns:1fr 2fr}.project dl{grid-column:2}.contact .gallery-link{grid-column:2;justify-self:start}}
+@media(max-width:570px){
+ .mast{min-height:59px}
+ .headline{display:block;margin-block:1.8rem .9rem}
+ .headline p{margin-top:.65rem;text-align:left;white-space:normal}
+ .cover img{height:clamp(340px,108vw,480px)}
+ figcaption{font-size:.8rem}
+ .project,.contact,.detail{grid-template-columns:1fr}
+ .project dl,.contact .gallery-link{grid-column:auto}
+ .detail img{height:auto;aspect-ratio:1.6}
 }
 </style>
 </head>
-<body id="top">
-<header><strong>稜線建築</strong>
-<nav><a href="#detail">作品</a><a href="#visit">設計ノート</a></nav>
+<body>
+<header class="mast frame" id="top">
+  <p>継目設計室</p>
+  <nav aria-label="設計室の案内"><a href="#work">設計事例</a><a href="#contact">設計の相談</a></nav>
 </header>
 <main>
-<section class="cover"><img src="../art/architecture.webp" alt="中庭を囲む建築模型">
-<h1>稜線建築</h1>
-</section>
-<section id="detail">
-<h2>中庭にひらく家</h2>
-<p class="copy">壁の高さを少しずつ変え、歩くたびに中庭が違って見える住まいを考えました。</p>
-<figure><img src="../art/interior.webp" alt="光が差す室内"></figure>
-</section>
-<section id="visit">
-<h2>設計ノート</h2>
-<p class="copy">光の向き、風の抜け道、通りとの距離。敷地を歩き、暮らしの輪郭から設計を始めます。</p>
-</section>
+  <section class="frame" aria-labelledby="title">
+    <div class="headline"><h1 id="title">光の落ちる方へ</h1><p>住宅と小さな店の建築設計</p></div>
+    <figure class="cover">
+      <img src="media/studio.webp" width="1536" height="1024" alt="杉板とコンクリートの回廊。開口から中庭と遠くの海が見える">
+      <figcaption><span>海際の回廊</span><span>住宅 ／ 2025</span></figcaption>
+    </figure>
+  </section>
+  <section class="project frame" id="work" aria-labelledby="work-title">
+    <p class="label">設計事例</p>
+    <article>
+      <h2 id="work-title">海際の回廊</h2>
+      <p>海を正面にした小さな住まい。庭へ抜ける回廊の幅を腰掛けられるほどに広げました。朝は土間の奥まで光が入り、午後は杉の壁に細い影が伸びます。</p>
+    </article>
+    <dl><dt>用途</dt><dd>専用住宅</dd><dt>構造</dt><dd>木造平屋・一部RC造</dd><dt>主な素材</dt><dd>杉板、洗い出し、コンクリート</dd></dl>
+  </section>
+  <figure class="detail frame">
+    <img src="media/studio-detail.webp" width="1440" height="960" loading="lazy" alt="回廊の土間と砂利の庭が段差なくつながる。床に草の影が伸びている">
+    <div class="detail-copy"><h3>土間から庭へ</h3><p>床の高さをそろえ、足もとで外と内をひと続きに。見切りの線は、杉板の目地に合わせています。</p></div>
+  </figure>
 </main>
-<footer><strong>稜線建築</strong><a href="#top">先頭へ ↑</a></footer>
+<footer id="contact">
+  <div class="contact frame">
+    <p class="label">設計の相談</p>
+    <div><h2>土地の話から。</h2><p>戸建ての新築・改修、小さな店の設計を受けています。初回は約60分。敷地の写真や、おおよその予算・時期があれば、一緒に見ながらお話しできます。</p></div>
+    <a class="gallery-link" href="index.html">作例一覧</a>
+  </div>
+</footer>
 </body>
 </html>

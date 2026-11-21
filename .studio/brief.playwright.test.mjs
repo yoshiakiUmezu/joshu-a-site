@@ -53,7 +53,13 @@ test('beginners can select a genre, revise their choices and reuse earlier examp
   }
   await page.locator('#designId').selectOption('press');
   assert.equal(await page.locator('#design-page').getAttribute('href'), '/studio/designs/press.html');
-  assert.ok((await page.request.get(app.origin + '/studio/designs/press.html')).ok());
+  const showcase = await page.request.get(app.origin + '/studio/designs/press.html');
+  assert.ok(showcase.ok());
+  await page.waitForFunction(() => document.querySelector('#design-shot').naturalWidth > 0);
+  await page.locator('#visual-settings > summary').click();
+  await page.locator('#mainColor').selectOption('#275FA8');
+  await page.locator('#subColor').selectOption('#E09C52');
+  await page.locator('#visual-settings > summary').click();
   let release;
   const hold = new Promise(resolve => { release = resolve; });
   await page.route('**/api/generate', async route => {
@@ -75,8 +81,13 @@ test('beginners can select a genre, revise their choices and reuse earlier examp
   assert.equal(requests.length, 1);
   assert.equal(initial.previousHtml, '');
   assert.equal(initial.brief.designId, 'press');
-  assert.ok(requests[0].input[0].content.some(part => part.type === 'input_text' && part.text.includes('余白通信')));
-  assert.equal(initial.brief.mainColor, '');
+  const selectedSource = await showcase.text();
+  const selectedShot = await readFile(new URL('./designs/press.jpg', import.meta.url));
+  assert.ok(requests[0].input[0].content.some(part => part.type === 'input_text' && part.text.endsWith(selectedSource)));
+  assert.equal(requests[0].input[0].content.find(part => part.type === 'input_image').image_url,
+    'data:image/jpeg;base64,' + selectedShot.toString('base64'));
+  assert.equal(initial.brief.mainColor, '#275FA8');
+  assert.equal(initial.brief.subColor, '#E09C52');
   assert.equal(initial.brief.purpose, '教室・サービスの案内');
   assert.equal(initial.brief.name, '灯修理室');
   assert.equal(initial.brief.genre, 'service');

@@ -1,171 +1,96 @@
-<!doctype html><html lang="ja">
+<!doctype html>
+<html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ことのは教室｜語学スクール</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="覚えた英語を、口に出す練習から。大人の少人数英会話と体験レッスンの案内。">
+<title>となりの英語｜小さな会話教室</title>
 <style>
-:root {
-  --paper:#faf7eb;
-  --ink:#233a41;
-}
-* {
-  box-sizing:border-box;
-}
-html {
-  scroll-behavior:smooth;
-}
-body {
-  margin:0;
-  background:var(--paper);
-  color:var(--ink);
-  font:1rem/1.8 system-ui,sans-serif;
-  overflow-wrap:anywhere;
-}
-img {
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-a {
-  color:inherit;
-  text-underline-offset:.28em;
-}
-h1,h2,h3,p,figure {
-  margin:0;
-}
-h1,h2 {
-  line-height:1.12;
-  text-wrap:balance;
-}
-h1 {
-  font-size:clamp(3.4rem,8vw,8.8rem);
-  letter-spacing:-.055em;
-}
-h2 {
-  font-size:clamp(1.75rem,4vw,3.5rem);
-}
-header,footer,.bar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:1rem;
-  flex-wrap:wrap;
-}
-header,footer,section {
-  padding:clamp(1.1rem,4vw,4rem);
-}
-header {
-  padding-block:1rem;
-  border-bottom:1px solid;
-}
-header a,footer a {
-  font-size:.9rem;
-}
-footer {
-  border-top:1px solid;
-}
-nav {
-  display:flex;
-  gap:1.2rem;
-}
-.rows {
-  margin:1.4rem 0 0;
-}
-.row {
-  padding:1.05rem 0;
-  border-top:1px solid;
-  display:flex;
-  justify-content:space-between;
-  gap:1rem;
-  align-items:baseline;
-}
-.row span {
-  max-width:65%;
-}
-.cap {
-  font:600 .8rem/1.5 system-ui;
-  letter-spacing:.13em;
-}
-.action {
-  display:inline-block;
-  margin-top:1.3rem;
-  font-weight:650;
-}
-.copy {
-  max-width:38rem;
-  margin-top:1rem;
-}
-figure {
-  overflow:hidden;
-}
-@media(prefers-reduced-motion:reduce) {
-  html {
-    scroll-behavior:auto;
-  }
-}
-.lesson {
-  text-align:center;
-  padding-block:7vw;
-}
-.lesson h1 {
-  font-size:clamp(2.8rem,7vw,7rem);
-}
-.lesson nav {
-  margin:2rem auto 0;
-  max-width:700px;
-}
-.lesson nav a {
-  flex:1;
-  background:#f3c59a;
-  padding:1.4rem .5rem;
-  text-decoration:none;
-  font-weight:700;
-}
-.lesson nav a+a {
-  background:#b2d4c8;
-}
-#detail {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:2rem;
-}
-#detail h2 {
-  grid-column:1/-1;
-}
-article {
-  border-top:2px solid;
-  padding-top:1rem;
-}
-#visit {
-  background:#233a41;
-  color:white;
+@font-face{font-family:"Studio Sans";src:url("media/sans.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Space Grotesk";src:url("media/space.woff2") format("woff2");font-weight:100 900;font-display:swap}
+
+:root{--sans:"Studio Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;--serif:"Studio Serif","Yu Mincho",serif;--space:"Space Grotesk",Arial,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font:400 1rem/1.8 var(--sans);overflow-wrap:break-word}
+h1,h2,h3,p,figure,blockquote,dl,dd{margin:0}
+p{line-break:strict;text-wrap:pretty}
+img{display:block;width:100%;height:auto}
+a{color:inherit;text-underline-offset:.24em}
+a:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:5px}
+nav{display:flex;flex-wrap:wrap;column-gap:1.25rem;row-gap:.25rem}
+small{font-size:.82rem}
+summary{cursor:pointer}
+[id]{scroll-margin-top:1.25rem}
+.gallery-link{display:inline-block;font-size:.82rem}
+
+:root{--main:#a6adef;--sub:#eed76b;--ink:#20243e;--paper:#fbf9ef;--line:#727563}
+body{background:var(--paper);color:var(--ink)}
+.wrap{width:min(100% - clamp(2.15rem,8vw,7rem),1140px);margin:auto}
+.mast{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:.6rem}
+.mast p{font-weight:850;letter-spacing:-.055em;font-size:1.23rem}
+.mast a{font-size:.9rem;font-weight:650}
+.hero{background:color-mix(in srgb,var(--main) 28%,#d1d1ff);border-block:1px solid #555994;overflow:hidden}
+.board{position:relative;text-align:center;padding:clamp(2.6rem,6vw,6rem) 0 clamp(3.1rem,7vw,6.75rem)}
+.board h1{position:relative;font:850 clamp(2.55rem,7.3vw,6.1rem)/1.12 var(--sans);letter-spacing:-.08em;text-wrap:balance}
+.board h1 span{display:inline-block}
+.board .intro{margin:.85rem 0 2rem;font-weight:550}
+.dialogue{max-width:670px;margin:auto;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:.6rem}
+.voice{background:#f9f7ed;position:relative;width:max-content;max-width:92%;border:2px solid #292c4e;border-radius:32px 32px 32px 3px;padding:.85rem 1.5rem .9rem;box-shadow:5px 6px #28294d;transform:rotate(-4deg)}
+.voice:last-child{align-self:flex-end;border-radius:32px 32px 3px 32px;margin-top:.9rem;transform:rotate(3deg);background:color-mix(in srgb,var(--sub) 30%,#f2e188)}
+.voice p:first-child{font:700 clamp(1.45rem,4vw,2.7rem)/1.1 var(--space);letter-spacing:-.057em}
+.voice p:last-child{font-size:.9rem;margin-top:.26rem}
+.lesson{padding-block:clamp(3.3rem,8vw,7rem);display:grid;grid-template-columns:.8fr 1.2fr;gap:1.5rem clamp(2rem,8vw,9rem);align-items:start}
+h2{font:800 clamp(1.9rem,4.4vw,4rem)/1.24 var(--sans);letter-spacing:-.07em;text-wrap:balance;margin-bottom:.9rem}
+.lesson header p{max-width:25em}
+details{border-top:1px solid #81849b}
+details:last-child{border-bottom:1px solid #81849b}
+summary{padding:.85rem 0;font-weight:750;font-size:1.12rem}
+details p{margin:0 0 1.15rem 1.3rem;max-width:35em}
+footer{padding:1rem 0 clamp(2.4rem,6vw,5rem);color:#20243e}
+.trial{display:grid;grid-template-columns:.88fr 1.12fr;gap:clamp(1rem,6vw,6rem);background:color-mix(in srgb,var(--sub) 31%,#f5f1d4);border:1px solid #737154;padding:clamp(1.5rem,5vw,4.5rem);box-shadow:7px 7px 0 #c1bb95}
+.trial h2{margin-bottom:.65rem}
+.trial dl{display:grid;grid-template-columns:auto 1fr;gap:.4rem 1rem;align-content:center}
+.trial dt{font-weight:750}
+.trial .gallery-link{grid-column:1/-1}
+@media(max-width:620px){
+ .mast{min-height:60px}
+ .board .intro{font-size:.9rem;margin:.75rem 0 1.8rem}
+ .voice{padding:.72rem 1rem}
+ .voice:last-child{margin-top:.5rem}
+ .lesson,.trial{grid-template-columns:1fr}
+ .lesson{gap:1.6rem}
+ .trial dl{font-size:.91rem}
 }
 </style>
 </head>
-<body id="top">
-<header><strong>ことのは教室</strong>
-<nav><a href="#detail">クラス</a><a href="#visit">体験</a></nav>
-</header>
+<body>
+<header class="mast wrap" id="top"><p>となりの英語</p><a href="#trial">体験レッスン</a></header>
 <main>
-<section class="lesson">
-<h1>どんな場面で<br>話したい？</h1>
-<nav><a href="#trip">旅先で話す ↘</a><a href="#life">日常で話す ↘</a></nav>
-</section>
-<section id="detail">
-<h2>ふたつのクラス</h2>
-<article id="trip">
-<h3>旅先の会話</h3>
-<p>道を尋ねる、食事を注文する。旅の場面を二人組で練習します。</p></article>
-<article id="life">
-<h3>暮らしの会話</h3>
-<p>休日の話やちょっとした相談を題材に、聞く力と返す力を育てます。</p></article>
-</section>
-<section id="visit">
-<h2>体験レッスン</h2>
-<p>土曜 10:00から45分。筆記用具だけお持ちください。</p>
-</section>
+  <section class="hero" aria-labelledby="title">
+    <div class="board wrap">
+      <h1 id="title"><span>ひとことから。</span><wbr><span>会話にしよう。</span></h1>
+      <p class="intro">大人のための、4人までの英会話教室</p>
+      <div class="dialogue" aria-label="レッスンで練習する会話">
+        <div class="voice"><p lang="en">Is this seat taken?</p><p>この席、空いていますか？</p></div>
+        <div class="voice"><p lang="en">No, go ahead!</p><p>空いてますよ、どうぞ。</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="lesson wrap" id="classes">
+    <header><h2>話したい場面から</h2><p>一回45分。短いやりとりをまねて、自分の言葉に置き換え、相手を替えてもう一度話します。</p></header>
+    <div>
+      <details open><summary>日常のひとこと</summary><p>注文したり、誘いに答えたり。まずは身の回りの話を。水曜 19:00／土曜 10:30、月4回 8,800円。</p></details>
+      <details><summary>旅先での会話</summary><p>チェックインや乗り換えを練習。聞き返す言い方も身につけます。土曜 13:30、月4回 8,800円。</p></details>
+      <details><summary>英語に触れるのが久しぶり</summary><p>講師と一対一で、口を慣らすところから。木曜 18:30、全3回 9,900円。</p></details>
+    </div>
+  </section>
 </main>
-<footer><strong>ことのは教室</strong><a href="#top">先頭へ ↑</a></footer>
+<footer id="trial">
+  <div class="trial wrap">
+    <div><h2>最初の30分</h2><p>10分で目標を話し、15分の会話を体験。最後にご自分に合うクラスを選べます。</p></div>
+    <dl><dt>日時</dt><dd>土曜 15:00（30分）</dd><dt>体験料</dt><dd>1,000円</dd><dt>持ち物</dt><dd>書き留めたい方は筆記用具</dd><dt>教室</dt><dd>駅前通り、北口側の2階</dd></dl>
+    <a class="gallery-link" href="index.html">作例一覧</a>
+  </div>
+</footer>
 </body>
 </html>

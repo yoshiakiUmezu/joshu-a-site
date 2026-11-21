@@ -1,169 +1,113 @@
-<!doctype html><html lang="ja">
+<!doctype html>
+<html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>粒子観測所｜科学展示</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="光の通り道を目で追う。光の計測室のミニ実験、展示、実演の案内。">
+<title>光の計測室｜さわってわかる科学展示</title>
 <style>
-:root {
-  --paper:#151e24;
-  --ink:#c2eddb;
-}
-* {
-  box-sizing:border-box;
-}
-html {
-  scroll-behavior:smooth;
-}
-body {
-  margin:0;
-  background:var(--paper);
-  color:var(--ink);
-  font:1rem/1.8 system-ui,sans-serif;
-  overflow-wrap:anywhere;
-}
-img {
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-a {
-  color:inherit;
-  text-underline-offset:.28em;
-}
-h1,h2,h3,p,figure {
-  margin:0;
-}
-h1,h2 {
-  line-height:1.12;
-  text-wrap:balance;
-}
-h1 {
-  font-size:clamp(3.4rem,8vw,8.8rem);
-  letter-spacing:-.055em;
-}
-h2 {
-  font-size:clamp(1.75rem,4vw,3.5rem);
-}
-header,footer,.bar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:1rem;
-  flex-wrap:wrap;
-}
-header,footer,section {
-  padding:clamp(1.1rem,4vw,4rem);
-}
-header {
-  padding-block:1rem;
-  border-bottom:1px solid;
-}
-header a,footer a {
-  font-size:.9rem;
-}
-footer {
-  border-top:1px solid;
-}
-nav {
-  display:flex;
-  gap:1.2rem;
-}
-.rows {
-  margin:1.4rem 0 0;
-}
-.row {
-  padding:1.05rem 0;
-  border-top:1px solid;
-  display:flex;
-  justify-content:space-between;
-  gap:1rem;
-  align-items:baseline;
-}
-.row span {
-  max-width:65%;
-}
-.cap {
-  font:600 .8rem/1.5 system-ui;
-  letter-spacing:.13em;
-}
-.action {
-  display:inline-block;
-  margin-top:1.3rem;
-  font-weight:650;
-}
-.copy {
-  max-width:38rem;
-  margin-top:1rem;
-}
-figure {
-  overflow:hidden;
-}
-@media(prefers-reduced-motion:reduce) {
-  html {
-    scroll-behavior:auto;
-  }
-}
-.lab {
-  background-image:linear-gradient(#588a7629 1px,transparent 1px),linear-gradient(90deg,#588a7629 1px,transparent 1px);
-  background-size:32px 32px;
-  display:grid;
-  grid-template-columns:1.25fr 1fr;
-  align-items:end;
-}
-.lab .cap {
-  grid-column:1/-1;
-}
-.lab h1 {
-  margin-top:2rem;
-}
-.meter {
-  text-align:right;
-}
-.meter b {
-  display:block;
-  font:400 clamp(4rem,12vw,12rem)/1 monospace;
-  color:#fdbe71;
-}
-.row b,.cap {
-  font-family:monospace;
-}
-#visit {
-  background:#c2eddb;
-  color:#151e24;
-}
-@media(max-width:600px) {
-  .lab {
-    grid-template-columns:1fr;
-  }
-  .meter {
-    margin-top:1rem;
-  }
+@font-face{font-family:"Studio Sans";src:url("media/sans.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Space Grotesk";src:url("media/space.woff2") format("woff2");font-weight:100 900;font-display:swap}
+
+:root{--sans:"Studio Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;--serif:"Studio Serif","Yu Mincho",serif;--space:"Space Grotesk",Arial,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font:400 1rem/1.8 var(--sans);overflow-wrap:break-word}
+h1,h2,h3,p,figure,blockquote,dl,dd{margin:0}
+p{line-break:strict;text-wrap:pretty}
+img{display:block;width:100%;height:auto}
+a{color:inherit;text-underline-offset:.24em}
+a:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:5px}
+nav{display:flex;flex-wrap:wrap;column-gap:1.25rem;row-gap:.25rem}
+small{font-size:.82rem}
+summary{cursor:pointer}
+[id]{scroll-margin-top:1.25rem}
+.gallery-link{display:inline-block;font-size:.82rem}
+
+:root{--main:#305ffe;--sub:#f8dc43;--paper:#f2f2ec;--ink:#181b29;--line:#a5a7ab}
+body{background:var(--paper);color:var(--ink)}
+.wrap{width:min(100% - clamp(2.15rem,8vw,8rem),1280px);margin:auto}
+.mast{display:flex;align-items:center;justify-content:space-between;gap:.8rem;min-height:62px;border-bottom:2px solid #252637;font-size:.87rem;font-weight:650}
+.mast nav{gap:.75rem;justify-content:end}
+.sign{padding-block:clamp(1.75rem,5vw,4.5rem) clamp(.95rem,3.5vw,2.4rem);display:grid;grid-template-columns:1fr auto;gap:.55rem 1rem;align-items:end}
+h1{font:900 clamp(3.05rem,9vw,8rem)/1.07 var(--sans);letter-spacing:-.105em;margin-inline-start:-.055em}
+.sign p{border-left:2px solid #30356a;padding-left:.75rem;line-height:1.6;font-weight:650}
+.experiment{margin:0;padding:0;min-width:0;border:0;display:grid;grid-template-columns:auto auto minmax(0,1fr);background:#202336;color:#f8f7ff}
+.experiment legend{padding:0 .85rem .6rem 0;font-size:.87rem;font-weight:750;background:var(--paper);color:var(--ink)}
+.experiment input{position:absolute;width:1px;height:1px;clip-path:inset(50%)}
+.experiment label{grid-row:1;position:relative;z-index:1;padding:.6rem .9rem;border:1px solid #7b84a2;cursor:pointer;font-weight:700}
+.experiment input:focus-visible+label{outline:2px solid #fff;outline-offset:-5px}
+.experiment input:checked+label{background:color-mix(in srgb,var(--sub) 29%,#f3df76);color:#1c2030}
+.stage{grid-column:1/-1;position:relative;min-height:clamp(310px,34vw,500px);overflow:hidden;isolation:isolate;background:repeating-linear-gradient(0deg,#7c84b324 0 1px,transparent 1px 28px),repeating-linear-gradient(90deg,#7c84b324 0 1px,transparent 1px 28px),#202336}
+.beam{position:absolute;left:6%;top:54%;width:41%;height:3px;transform:rotate(-7deg);transform-origin:right center;background:#fff8ed;box-shadow:0 0 13px #ffffffb3}
+.prism{position:absolute;z-index:1;width:25%;min-width:89px;max-width:285px;aspect-ratio:1.11;top:48%;left:48%;transform:translate(-50%,-50%);background:conic-gradient(from 28deg at 47% 57%,#e1f5ffc9,#6f90dd53,#e4f4ffe8,#435aa5a1,#dceff8f0);clip-path:polygon(51% 0,100% 100%,0 100%)}
+.rays{position:absolute;left:49%;top:54.2%;width:47%;height:3px}
+.rays i{display:block;position:absolute;inset:0;background:var(--ray);transform:rotate(var(--angle));transform-origin:left center;box-shadow:0 0 7px var(--ray);transition:opacity .18s}
+#red:checked~.stage .beam{background:#ff5658;box-shadow:0 0 12px #ff5658}
+#red:checked~.stage .rays i:not(:first-child){opacity:0}
+.stage p{position:absolute;bottom:1rem;left:1.1rem;right:1.1rem;font-size:.88rem;font-weight:600}
+.stage .red-note,#red:checked~.stage .white-note{display:none}
+#red:checked~.stage .red-note{display:block}
+.deck{padding-block:clamp(3rem,8vw,7rem)}
+h2{font:850 clamp(2rem,4.5vw,3.65rem)/1.22 var(--sans);letter-spacing:-.07em;margin-bottom:.95rem}
+.deck article{display:grid;grid-template-columns:4.2rem 1fr 1.25fr;align-items:baseline;gap:.6rem 1.1rem;border-top:1px solid var(--line);padding:1rem 0}
+.deck article:last-child{border-bottom:1px solid var(--line)}
+.deck article span{font:700 1.18rem/1 var(--space)}
+.deck article h3{font-size:1.25rem}
+.deck article p{font-size:.94rem}
+footer{background:color-mix(in srgb,var(--main) 26%,#2639a2);color:#fff}
+.visit{display:grid;grid-template-columns:1fr 1.2fr;gap:1.35rem 4.5rem;padding-block:clamp(2.6rem,6vw,5.5rem)}
+.visit p{max-width:25em}
+.demo-times{display:flex;gap:.75rem;margin-bottom:.8rem}
+.demo-times time{font:700 1.3rem/1 var(--space);padding:.38rem .55rem;background:#f9e160;color:#242637}
+.visit dl{display:grid;grid-template-columns:auto 1fr;gap:.4rem 1.2rem;align-content:start;border-top:1px solid #f0f0ff9e;padding-top:.7rem}
+.visit dt{font-weight:700}
+.visit .gallery-link{grid-column:1/-1}
+@media(prefers-reduced-motion:reduce){.rays i{transition:none}}
+@media(max-width:640px){
+ .mast{min-height:55px}
+ .mast nav{gap:.55rem}
+ .sign,.visit{grid-template-columns:1fr}
+ .sign p{font-size:.9rem}
+ .stage{min-height:320px}
+ .stage p{font-size:.83rem}
+ .prism{top:50%;width:31%}
+ .deck article{grid-template-columns:2.5rem 1fr}
+ .deck article p{grid-column:2}
 }
 </style>
 </head>
-<body id="top">
-<header><strong>粒子観測所</strong>
-<nav><a href="#detail">観察手順</a><a href="#visit">開放日</a></nav>
-</header>
-<main>
-<section class="lab">
-<p class="cap">光の実験展示</p>
-<h1>影の長さを<br>測る。</h1>
-<div class="meter"><b>45°</b><span>観察台の入射角</span></div>
-</section>
-<section id="detail">
-<h2>観察手順</h2>
-<div class="rows">
-<div class="row"><b>光源を置く</b><span>目盛りの線に合わせてランプをセット。</span></div>
-<div class="row"><b>角度を変える</b><span>光の入る角度を15°ずつ傾けます。</span></div>
-<div class="row"><b>記録する</b><span>同じ棒の影がどう伸びるかを比べます。</span></div></div>
-</section>
-<section id="visit">
-<h2>実験室の開放日</h2>
-<p>土曜日 13:00–16:00。1回の観察は約15分です。</p>
-</section>
+<body>
+<header class="mast wrap" id="top"><p>体験型の科学展示</p><nav aria-label="展示の案内"><a href="#exhibits">展示台</a><a href="#visit">来場案内</a></nav></header>
+<main class="wrap">
+  <section aria-labelledby="title">
+    <div class="sign"><h1 id="title">光の計測室</h1><p>白い光を分けると、<br>何色が見えるだろう。</p></div>
+    <fieldset class="experiment">
+      <legend>プリズムに当てる光を選ぶ</legend>
+      <input type="radio" id="white" name="beam" checked><label for="white">白い光</label>
+      <input type="radio" id="red" name="beam"><label for="red">赤い光</label>
+      <div class="stage">
+        <div class="beam" aria-hidden="true"></div><div class="prism" aria-hidden="true"></div>
+        <div class="rays" aria-hidden="true">
+          <i style="--ray:#ff5759;--angle:5deg"></i><i style="--ray:#ff9f4f;--angle:8deg"></i><i style="--ray:#fcdf55;--angle:11deg"></i><i style="--ray:#8cf077;--angle:14deg"></i><i style="--ray:#60bdff;--angle:17deg"></i><i style="--ray:#ac8bff;--angle:20deg"></i>
+        </div>
+        <p class="white-note">白い光には、曲がり方の異なる色の光が混ざっています。（模式図）</p>
+        <p class="red-note">赤一色の光は、プリズムを通っても赤いままです。（模式図）</p>
+      </div>
+    </fieldset>
+  </section>
+  <section class="deck" id="exhibits">
+    <h2>手を動かす展示台</h2>
+    <article><span>A</span><h3>光を分ける</h3><p>プリズムを回して、スクリーンに落ちる色の並びを見つけます。</p></article>
+    <article><span>B</span><h3>光を重ねる</h3><p>赤・緑・青のランプを別々に動かし、重なるところの色を見比べます。</p></article>
+    <article><span>C</span><h3>影から光を読む</h3><p>物の距離を変えて、影の大きさや縁のぼけ方を記録します。</p></article>
+  </section>
 </main>
-<footer><strong>粒子観測所</strong><a href="#top">先頭へ ↑</a></footer>
+<footer id="visit">
+  <div class="visit wrap">
+    <div><h2>光を分ける実演</h2><p class="demo-times"><time datetime="11:00">11:00</time><time datetime="14:00">14:00</time></p><p>展示台Aで各10分。小学生から。未就学のお子さまは保護者と一緒にお楽しみください。</p></div>
+    <dl><dt>開室</dt><dd>土・日 10:00–17:00<br>入場は16:30まで</dd><dt>入場料</dt><dd>大人500円、中学生以下無料</dd><dt>会場</dt><dd>みなと学習館 2階、実験室B</dd></dl>
+    <a class="gallery-link" href="index.html">作例一覧</a>
+  </div>
+</footer>
 </body>
 </html>

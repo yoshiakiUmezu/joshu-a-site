@@ -1,162 +1,102 @@
-<!doctype html><html lang="ja">
+<!doctype html>
+<html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>凪の間｜宿泊施設</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="朝の湖に面した二部屋の宿。水際の二間の客室と滞在案内。">
+<title>水際の二間｜湖のほとりの小さな宿</title>
 <style>
-:root {
-  --paper:#f4f0e6;
-  --ink:#34332c;
-}
-* {
-  box-sizing:border-box;
-}
-html {
-  scroll-behavior:smooth;
-}
-body {
-  margin:0;
-  background:var(--paper);
-  color:var(--ink);
-  font:1rem/1.8 system-ui,sans-serif;
-  overflow-wrap:anywhere;
-}
-img {
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-a {
-  color:inherit;
-  text-underline-offset:.28em;
-}
-h1,h2,h3,p,figure {
-  margin:0;
-}
-h1,h2 {
-  line-height:1.12;
-  text-wrap:balance;
-}
-h1 {
-  font-size:clamp(3.4rem,8vw,8.8rem);
-  letter-spacing:-.055em;
-}
-h2 {
-  font-size:clamp(1.75rem,4vw,3.5rem);
-}
-header,footer,.bar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:1rem;
-  flex-wrap:wrap;
-}
-header,footer,section {
-  padding:clamp(1.1rem,4vw,4rem);
-}
-header {
-  padding-block:1rem;
-  border-bottom:1px solid;
-}
-header a,footer a {
-  font-size:.9rem;
-}
-footer {
-  border-top:1px solid;
-}
-nav {
-  display:flex;
-  gap:1.2rem;
-}
-.rows {
-  margin:1.4rem 0 0;
-}
-.row {
-  padding:1.05rem 0;
-  border-top:1px solid;
-  display:flex;
-  justify-content:space-between;
-  gap:1rem;
-  align-items:baseline;
-}
-.row span {
-  max-width:65%;
-}
-.cap {
-  font:600 .8rem/1.5 system-ui;
-  letter-spacing:.13em;
-}
-.action {
-  display:inline-block;
-  margin-top:1.3rem;
-  font-weight:650;
-}
-.copy {
-  max-width:38rem;
-  margin-top:1rem;
-}
-figure {
-  overflow:hidden;
-}
-@media(prefers-reduced-motion:reduce) {
-  html {
-    scroll-behavior:auto;
-  }
-}
-.room {
-  display:grid;
-  grid-template-columns:1fr auto;
-  align-items:center;
-  gap:5vw;
-  padding:4vw 9vw;
-}
-.room figure {
-  height:62vh;
-}
-.room h1 {
-  writing-mode:vertical-rl;
-  font-family:serif;
-  font-weight:400;
-  letter-spacing:.25em;
-}
-.copy {
-  font-family:serif;
-  font-size:1.2rem;
-}
-#detail,#visit {
-  max-width:800px;
-  margin:auto;
-}
-#detail {
-  text-align:center;
-}
-#detail .copy {
-  margin:2rem auto;
+@font-face{font-family:"Studio Sans";src:url("media/sans.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Studio Serif";src:url("media/serif.woff2") format("woff2");font-weight:100 900;font-display:swap}
+
+:root{--sans:"Studio Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;--serif:"Studio Serif","Yu Mincho",serif;--space:"Space Grotesk",Arial,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font:400 1rem/1.8 var(--sans);overflow-wrap:break-word}
+h1,h2,h3,p,figure,blockquote,dl,dd{margin:0}
+p{line-break:strict;text-wrap:pretty}
+img{display:block;width:100%;height:auto}
+a{color:inherit;text-underline-offset:.24em}
+a:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:5px}
+nav{display:flex;flex-wrap:wrap;column-gap:1.25rem;row-gap:.25rem}
+small{font-size:.82rem}
+summary{cursor:pointer}
+[id]{scroll-margin-top:1.25rem}
+.gallery-link{display:inline-block;font-size:.82rem}
+
+:root{--main:#374238;--sub:#baae88;--base:#252d28;--paper:#efecdd;--ink:#272f26;--line:#817f68}
+body{background:var(--paper);color:var(--ink)}
+.wrap{width:min(100% - clamp(2.3rem,10vw,10rem),1180px);margin:auto}
+.arrival{background:color-mix(in srgb,var(--main) 26%,#2b362e);color:#f8f2e3;padding:0 clamp(.95rem,4vw,4.2rem) clamp(1rem,4vw,3.3rem)}
+.mast{height:70px;display:flex;align-items:center;justify-content:space-between;gap:1rem;font-size:.92rem;letter-spacing:.07em}
+.mast p{font-family:var(--serif);font-weight:650}
+.hero{position:relative;margin:auto;min-height:clamp(510px,52vw,810px);isolation:isolate;display:grid;place-items:center;border:1px solid #e7dfbd62;background:#3b3e33}
+.hero>img{position:absolute;inset:0;height:100%;object-fit:cover;object-position:center 51%;z-index:-2}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:#151d1a58}
+.hero .vertical{display:flex;align-items:center;gap:clamp(.5rem,3vw,2.1rem);width:max-content;padding:1.4rem 1.2rem 1rem;background:#171b15a8;border:1px solid #e9e4ca8c;box-shadow:0 0 23px #171b1655}
+h1{writing-mode:vertical-rl;font:650 clamp(2.65rem,6.9vw,6.5rem)/1.05 var(--serif);letter-spacing:.11em;width:1.05em;white-space:nowrap}
+.hero p{writing-mode:vertical-rl;font:550 clamp(.85rem,1.65vw,1.25rem)/1 var(--serif);letter-spacing:.2em;width:1em;white-space:nowrap;text-wrap:nowrap}
+.rooms{padding-block:clamp(3.2rem,8vw,8rem)}
+.rooms>header{text-align:center;margin:0 auto clamp(2rem,5vw,4.25rem);max-width:48em}
+.eyebrow{font-size:.86rem;font-weight:650;letter-spacing:.18em}
+h2{font:590 clamp(2rem,4.5vw,4rem)/1.4 var(--serif);letter-spacing:-.055em;text-wrap:balance;margin:.32rem 0 1rem}
+h2 span{display:inline-block}
+.rooms .row{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.2rem,4vw,3rem)}
+.room{border-bottom:1px solid var(--line);display:grid;align-content:start;gap:.55rem;padding-bottom:1rem}
+.room img{width:100%;aspect-ratio:1.65;object-fit:cover;margin-bottom:.6rem}
+.room h3{font:650 1.55rem/1.4 var(--serif)}
+.room .rate{font-size:.9rem;font-weight:650}
+footer{color:#f3eddb;background:#252d28;border-top:7px solid color-mix(in srgb,var(--sub) 60%,#cfc3a5)}
+.stay{display:grid;grid-template-columns:.95fr 1.05fr;gap:1.2rem clamp(1.5rem,7vw,7rem);padding-block:clamp(2.8rem,7vw,6rem)}
+.stay aside{border-block-start:1px solid #9a9a85}
+.stay details{border-bottom:1px solid #9a9a85}
+.stay summary{padding:.7rem 0;font-weight:650}
+.stay details p{padding:0 0 .8rem .95rem}
+.stay .gallery-link{grid-column:1/-1}
+@media(max-width:620px){
+ .mast{height:57px;font-size:.83rem;letter-spacing:.035em}
+ .mast nav{gap:.7rem}
+ .hero{min-height:clamp(490px,131vw,640px)}
+ .hero .vertical{position:absolute;right:7%;top:50%;transform:translateY(-50%);padding:.85rem .7rem;gap:.65rem}
+ .hero>img{object-position:51% center}
+ .rooms .row,.stay{grid-template-columns:1fr}
+ .rooms>header{text-align:left}
+ .rooms .row{gap:1.85rem}
 }
 </style>
 </head>
-<body id="top">
-<header><strong>凪の間</strong>
-<nav><a href="#detail">客室</a><a href="#visit">滞在案内</a></nav>
+<body>
+<header class="arrival" id="top">
+  <div class="mast"><p>湖のほとりの小さな宿</p><nav aria-label="宿の案内"><a href="#rooms">客室</a><a href="#stay">滞在の前に</a></nav></div>
+  <div class="hero">
+    <img src="media/still.webp" width="1536" height="1024" alt="畳の客室の窓から、朝もやがかかる静かな湖が見える">
+    <div class="vertical"><p>湖がしずまる方へ</p><h1>水際の二間</h1></div>
+  </div>
 </header>
 <main>
-<section class="room">
-<figure><img src="../art/interior.webp" alt="光の入る静かな室内"></figure>
-<h1>凪の間</h1>
-</section>
-<section id="detail">
-<h2>泊まるという余白</h2>
-<p class="copy">窓を開けて、風の音を聞く。木の床と小さな机を備えた、一組のための部屋です。</p>
-</section>
-<section id="visit">
-<h2>滞在のしおり</h2>
-<div class="rows">
-<div class="row"><b>到着</b><span>15:00–18:00</span></div>
-<div class="row"><b>出発</b><span>翌朝 10:00まで</span></div>
-<div class="row"><b>朝食</b><span>土間のテーブルで 8:00から</span></div></div>
-</section>
+  <section class="rooms wrap" id="rooms">
+    <header><p class="eyebrow">客室</p><h2><span>二部屋だけの、</span><wbr><span>湖の朝。</span></h2><p>障子を引くと、窓の向こうに湖面。朝は番茶と小さなおむすびを、お部屋へお届けします。</p></header>
+    <div class="row">
+      <article class="room">
+        <img src="media/still-water.webp" width="1440" height="960" loading="lazy" alt="窓が湖に正面を向き、背の低い机に湯呑みが置いてある水鏡の間">
+        <h3>水鏡の間</h3><p>湖に正面を向く八畳の間。低い机を窓辺に置きました。二人で朝の景色を見たい方に。</p><p class="rate">1〜2名 ／ 1室 24,000円から（朝食つき）</p>
+      </article>
+      <article class="room">
+        <img src="media/still-grove.webp" width="1440" height="960" loading="lazy" alt="障子の奥に木々が見え、畳に低い読書椅子を置いた木立の間">
+        <h3>木立の間</h3><p>庭の木々と湖を斜めに見る六畳の間。ひとりで本を読むための椅子と机を置きました。</p><p class="rate">1〜2名 ／ 1室 19,000円から（朝食つき）</p>
+      </article>
+    </div>
+  </section>
 </main>
-<footer><strong>凪の間</strong><a href="#top">先頭へ ↑</a></footer>
+<footer id="stay">
+  <div class="stay wrap">
+    <div><p class="eyebrow">滞在の前に</p><h2><span>湖には、</span><wbr><span>日が暮れる前に。</span></h2><p>チェックイン 15:00–18:00<br>チェックアウト 10:00</p></div>
+    <aside aria-label="滞在前の質問">
+      <details open><summary>夕食はどうする？</summary><p>朝食をご用意します。夕食は湖へ入る前に町でお取りいただくか、お持ち込みください。</p></details>
+      <details><summary>車は停められる？</summary><p>入口の砂利敷きに各室1台分。日没後は湖畔の道に街灯が少ないため、明るいうちの到着がおすすめです。</p></details>
+      <details><summary>お風呂の使い方は？</summary><p>貸切風呂が1か所。チェックイン時に、16:00〜22:00の間で使いたい時間をお選びください。</p></details>
+    </aside>
+    <a class="gallery-link" href="index.html">作例一覧</a>
+  </div>
+</footer>
 </body>
 </html>
