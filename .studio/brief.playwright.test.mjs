@@ -51,6 +51,9 @@ test('beginners can select a genre, revise their choices and reuse earlier examp
     assert.ok(payload.instructions.includes(marker + '/' + (input.brief.genre || 'legacy')));
     return input;
   }
+  await page.locator('#designId').selectOption('press');
+  assert.equal(await page.locator('#design-page').getAttribute('href'), '/studio/designs/press.html');
+  assert.ok((await page.request.get(app.origin + '/studio/designs/press.html')).ok());
   let release;
   const hold = new Promise(resolve => { release = resolve; });
   await page.route('**/api/generate', async route => {
@@ -71,6 +74,9 @@ test('beginners can select a genre, revise their choices and reuse earlier examp
   assert.ok(await page.locator('#revision').evaluate(field => field === document.activeElement));
   assert.equal(requests.length, 1);
   assert.equal(initial.previousHtml, '');
+  assert.equal(initial.brief.designId, 'press');
+  assert.ok(requests[0].input[0].content.some(part => part.type === 'input_text' && part.text.includes('余白通信')));
+  assert.equal(initial.brief.mainColor, '');
   assert.equal(initial.brief.purpose, '教室・サービスの案内');
   assert.equal(initial.brief.name, '灯修理室');
   assert.equal(initial.brief.genre, 'service');

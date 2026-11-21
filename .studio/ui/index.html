@@ -30,6 +30,7 @@
     <div class="workspace">
       <section class="panel brief-panel" aria-labelledby="brief-title">
         <h2 id="brief-title">どんなサイトを作りますか？</h2>
+        <p><a href="/studio/designs/" target="_blank" rel="noopener">デザイン10選を見比べる ↗</a></p>
         <form id="brief-form" autocomplete="off">
           <fieldset id="brief-fields">
             <label for="genre">ジャンル <small>必須</small></label>
@@ -46,6 +47,9 @@
               <label for="purpose">何のサイトですか？</label>
               <input id="purpose" name="purpose" maxlength="120" disabled placeholder="例）町内会のお知らせ">
             </div>
+            <label for="designId">デザイン</label>
+            <select name="designId" id="designId"><option value="">おまかせ</option></select>
+            <div id="design-preview" hidden><a id="design-page" target="_blank" rel="noopener">作例を最後まで見る ↗<img id="design-shot" alt="選んだ作例の表紙"></a></div>
             <label for="name">サイトの名前 <small>必須</small></label>
             <input id="name" name="name" maxlength="120" required placeholder="例）喫茶 灯り">
             <label for="request">載せたいこと <small>任意</small></label>

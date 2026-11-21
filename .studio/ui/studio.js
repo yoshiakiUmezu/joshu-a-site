@@ -58,8 +58,18 @@ genre.addEventListener("change", () => {
   showPurpose();
 });
 
+function showDesign() {
+  const id = byId("designId").value;
+  byId("design-preview").hidden = !id;
+  if (!id) return;
+  byId("design-page").href = "/studio/designs/" + id + ".html";
+  byId("design-shot").src = "/studio/designs/" + id + ".jpg";
+}
+byId("designId").addEventListener("change", showDesign);
+
 function showBrief(brief) {
   for (const field of briefForm.querySelectorAll("[name]")) field.value = brief[field.name] ?? "";
+  showDesign();
   if (!genre.value && brief.purpose) genre.value = "other";
   showPurpose();
   for (const id of ["mainColor", "subColor"]) {
@@ -405,6 +415,10 @@ async function refreshLedger() {
   const status = await response.json();
   limits = status.limits;
   liveEnabled = status.liveEnabled;
+  const picker = byId("designId");
+  if (picker.options.length === 1) {
+    for (const design of status.designs) picker.add(new Option(design.genre + "｜" + design.style, design.id));
+  }
   const selection = exampleList.value;
   exampleList.replaceChildren(...status.examples.map(({ id, name }) => new Option(name, id)));
   if (selection) exampleList.value = selection;

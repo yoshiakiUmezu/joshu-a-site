@@ -153,3 +153,5 @@ iframe { position: absolute; inset: 0 auto auto 0; display: block; border: 0; tr
 .working::before { margin-right: .55em; vertical-align: -.15em; }
 @keyframes studio-spin { to { transform: rotate(1turn); } }
 @media (prefers-reduced-motion: reduce) { .production-wait::before, .working::before { animation: none; } }
+
+#design-shot { display: block; width: 100%; margin-block: .5rem; border-radius: .25rem; }

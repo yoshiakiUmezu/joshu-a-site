@@ -61,3 +61,7 @@ API送信前に、入力のUTF-8バイト数と構造分の余裕、最大出力
 無課金で接続境界・保存・使用量処理を検証するコマンドは `node --test .studio/engine.test.mjs .studio/server.test.mjs` です。ブラウザでのページ内移動と確認・納品の操作は `node --test .studio/preview.playwright.test.mjs .studio/delivery.playwright.test.mjs .studio/brief.playwright.test.mjs` で確認できます。システムのChromium系ブラウザを使う場合は、その実行ファイルを `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` に指定します。モデル単価は[OpenAIのモデル仕様](https://developers.openai.com/api/docs/models/gpt-6-luna)を参照してください。
 
 表紙画像の共通寸法は既定値です。生成したCSSで構図に合わせて上書きできます。共通ナビとフッターの地色・文字色は --studio-paper と --studio-ink で指定できます。
+
+### デザイン10選
+
+認証済みの制作室から10業種の完成作例を閲覧できます。通常モードで作例を選ぶと、そのHTML・CSSと表紙画像を生成の参考にします。依頼のジャンル、メインカラー、サブカラーは独立した設定です。未選択時は従来どおりおまかせです。

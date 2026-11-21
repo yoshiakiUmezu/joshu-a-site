@@ -1,0 +1,166 @@
+<!doctype html><html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>潮路を歩く｜海辺の観光</title>
+<style>
+:root {
+  --paper:#f0f3e9;
+  --ink:#224c46;
+}
+* {
+  box-sizing:border-box;
+}
+html {
+  scroll-behavior:smooth;
+}
+body {
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font:1rem/1.8 system-ui,sans-serif;
+  overflow-wrap:anywhere;
+}
+img {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+a {
+  color:inherit;
+  text-underline-offset:.28em;
+}
+h1,h2,h3,p,figure {
+  margin:0;
+}
+h1,h2 {
+  line-height:1.12;
+  text-wrap:balance;
+}
+h1 {
+  font-size:clamp(3.4rem,8vw,8.8rem);
+  letter-spacing:-.055em;
+}
+h2 {
+  font-size:clamp(1.75rem,4vw,3.5rem);
+}
+header,footer,.bar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:1rem;
+  flex-wrap:wrap;
+}
+header,footer,section {
+  padding:clamp(1.1rem,4vw,4rem);
+}
+header {
+  padding-block:1rem;
+  border-bottom:1px solid;
+}
+header a,footer a {
+  font-size:.9rem;
+}
+footer {
+  border-top:1px solid;
+}
+nav {
+  display:flex;
+  gap:1.2rem;
+}
+.rows {
+  margin:1.4rem 0 0;
+}
+.row {
+  padding:1.05rem 0;
+  border-top:1px solid;
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  align-items:baseline;
+}
+.row span {
+  max-width:65%;
+}
+.cap {
+  font:600 .8rem/1.5 system-ui;
+  letter-spacing:.13em;
+}
+.action {
+  display:inline-block;
+  margin-top:1.3rem;
+  font-weight:650;
+}
+.copy {
+  max-width:38rem;
+  margin-top:1rem;
+}
+figure {
+  overflow:hidden;
+}
+@media(prefers-reduced-motion:reduce) {
+  html {
+    scroll-behavior:auto;
+  }
+}
+.panorama {
+  padding:0;
+  height:42vh;
+}
+.intro {
+  text-align:center;
+}
+.intro h1 {
+  font-family:serif;
+}
+#detail {
+  max-width:760px;
+  margin:auto;
+}
+.rows {
+  border-left:2px dashed;
+  padding-left:1.5rem;
+}
+.row {
+  display:block;
+  border:0;
+  position:relative;
+}
+.row:before {
+  content:"●";
+  position:absolute;
+  left:-2.05rem;
+}
+.row span {
+  display:block;
+  max-width:none;
+}
+</style>
+</head>
+<body id="top">
+<header><strong>潮路を歩く</strong>
+<nav><a href="#detail">散歩道</a><a href="#visit">持ち物</a></nav>
+</header>
+<main>
+<section class="panorama"><img src="../art/coast.webp" alt="海岸と遠くの岬">
+</section>
+<section class="intro">
+<p class="cap">海岸散歩 · 徒歩 90分</p>
+<h1>潮路を歩く</h1>
+</section>
+<section id="detail">
+<h2>海辺の散歩道</h2>
+<div class="rows">
+<div class="row"><b>港の朝市</b><span>出発。桟橋を右に見て海沿いへ。</span></div>
+<div class="row"><b>岬の踊り場</b><span>35分。坂を上がれば湾を見渡せます。</span></div>
+<div class="row"><b>浜の休憩所</b><span>90分。海沿いのベンチが終点です。</span></div></div>
+</section>
+<section id="visit">
+<h2>歩く前に</h2>
+<p>潮風を防ぐ上着と歩きやすい靴を。強風の日は海沿いを避けてください。</p>
+</section>
+</main>
+<footer><strong>潮路を歩く</strong><a href="#top">先頭へ ↑</a></footer>
+</body>
+</html>

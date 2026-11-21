@@ -10,7 +10,15 @@ import { createDeliveryStore, inspectDraft } from './delivery.mjs';
 import { reviewPage } from './review.mjs';
 
 const defaults = { maxCalls: 6, maxTotalTokens: 240_000, maxOutputTokens: MAX_OUTPUT_TOKENS, maxHtmlBytes: MAX_HTML_BYTES };
+const designs = JSON.parse(await readFile(new URL('./designs/catalog.json', import.meta.url), 'utf8'));
+const designAssets = ['salad', 'interior', 'amberwave', 'coast', 'outfit', 'denim', 'rack'];
 const files = new Map([
+  ['/studio/designs/', ['designs/index.html', 'text/html; charset=utf-8']],
+  ...designs.flatMap(({ id }) => [
+    ['/studio/designs/' + id + '.html', ['designs/' + id + '.html', 'text/html; charset=utf-8']],
+    ['/studio/designs/' + id + '.jpg', ['designs/' + id + '.jpg', 'image/jpeg']],
+  ]),
+  ...designAssets.map(id => ['/studio/art/' + id + '.webp', ['art/' + id + '.webp', 'image/webp']]),
   ['/studio/', ['ui/index.html', 'text/html; charset=utf-8']],
   ['/studio/studio.css', ['ui/studio.css', 'text/css; charset=utf-8']],
   ['/studio/studio.js', ['ui/studio.js', 'text/javascript; charset=utf-8']],
@@ -57,7 +65,7 @@ async function readInput(req) {
   const brief = {};
   for (const [key, max] of Object.entries({ purpose: 120, name: 120, mood: 160, request: 1200,
     audience: 160, action: 160, highlight: 360, direction: 16, color: 100,
-    genre: 16, mainColor: 7, subColor: 7, photoPreference: 3 })) {
+    designId: 16, genre: 16, mainColor: 7, subColor: 7, photoPreference: 3 })) {
     const value = data?.brief?.[key] ?? '';
     if (typeof value !== 'string' || value.length > max) throw fail(400, '制作条件の形式または文字数を確認してください。');
     brief[key] = value.trim();
@@ -69,6 +77,7 @@ async function readInput(req) {
       || [brief.mainColor, brief.subColor].some(color => color && !/^#[\da-f]{6}$/i.test(color))) {
     throw fail(400, 'ジャンル・色・写真の選択を確認してください。');
   }
+  if (brief.designId && !designs.some(design => design.id === brief.designId)) throw fail(400, '作例を選び直してください。');
   const instruction = data.revision ?? '';
   const previousHtml = data.previousHtml ?? '';
   if (typeof instruction !== 'string' || instruction.length > 800 || typeof previousHtml !== 'string'
@@ -138,7 +147,7 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
         return res.end(content);
       }
       if (req.method === 'GET' && req.url === '/api/status') return json(200, {
-        limits, ledger: ledger.summary(), liveEnabled: !examplesOnly,
+        limits, ledger: ledger.summary(), liveEnabled: !examplesOnly, designs,
         examples: examples.map(({ id, brief }) => ({ id, name: brief.name, brief })),
       });
       if (req.method === 'GET' && req.url === '/api/offers') return json(200, { offers: await store.list() });
@@ -191,7 +200,17 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       const previous = input.previousHtml && [...drafts.values()].find(draft => draft.html === input.previousHtml);
       const findings = previous?.layout?.issues || [];
       const direction = findings.length ? notes + '\n前の版で実測した表示上の問題も修正してください。\n' + findings.join('\n') : notes;
-      const body = buildResponseRequest(input, direction, plan.reference);
+      let reference = plan.reference;
+      let template = '';
+      const selected = designs.find(design => design.id === input.brief.designId);
+      if (selected) {
+        const base = new URL('./designs/' + selected.id, import.meta.url);
+        template = await readFile(new URL(base.href + '.html'), 'utf8');
+        reference = 'data:image/jpeg;base64,' + (await readFile(new URL(base.href + '.jpg'))).toString('base64');
+      }
+      const templateRule = selected ? '選ばれた完成作例「' + selected.style + '」の構図・余白・文字組み・情報の順序を土台にする。指定色と用途を優先し、架空の名称・料金・日時・写真URLを転載しない。使用可能な素材とHTML/CSSの範囲に合わせる。' : '';
+      const body = buildResponseRequest(input, direction + templateRule, reference);
+      if (template) body.input[0].content.push({ type: 'input_text', text: '選択された作例のソース：\n' + template });
       async function generate(request, action, privateNotes, reservation) {
         const budget = Buffer.byteLength(JSON.stringify(request)) + 1024 + MAX_OUTPUT_TOKENS;
         const id = reservation ?? ledger.reserve(action, budget);
@@ -245,8 +264,8 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
             input: plan.researchQuery }, 'research');
         }
         const planningInput = [{ role: 'user', content: [
-          { type: 'input_text', text: JSON.stringify({ brief: input.brief, material: notes, research }) },
-          { type: 'input_image', detail: 'high', image_url: plan.reference },
+          { type: 'input_text', text: JSON.stringify({ brief: input.brief, material: notes, research, templateRule }) },
+          { type: 'input_image', detail: 'high', image_url: reference },
         ] }];
         specification = await prepare({ ...base, reasoning: body.reasoning, max_output_tokens: 1800,
           instructions: plan.planning, input: planningInput }, 'design-plan');
@@ -269,7 +288,7 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
               reasoning: body.reasoning, max_output_tokens: 900, instructions: plan.critique,
               input: [{ role: 'user', content }] }, 'visual-critique');
           }
-          const reviewNotes = notes + '\n' + plan.visualReview + (specification ? '\n今回の制作仕様書\n' + specification : '');
+          const reviewNotes = notes + templateRule + '\n' + plan.visualReview + (specification ? '\n今回の制作仕様書\n' + specification : '');
           const request = buildResponseRequest({ ...input, previousHtml: result.html,
             instruction: '完成画面を確認して初稿を仕上げてください。' + layout.issues.join('。') + (critique ? '\n画面評価の指摘：\n' + critique : '') }, reviewNotes, previews[0]);
           request.input[0].content.push({ type: 'input_image', detail: 'high', image_url: previews[1] });
