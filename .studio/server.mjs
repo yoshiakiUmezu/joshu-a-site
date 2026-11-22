@@ -65,11 +65,13 @@ async function readInput(req) {
   const brief = {};
   for (const [key, max] of Object.entries({ purpose: 120, name: 120, mood: 160, request: 1200,
     audience: 160, action: 160, highlight: 360, direction: 16, color: 100,
-    designId: 16, genre: 16, mainColor: 7, subColor: 7, photoPreference: 3 })) {
+    motionVolume: 8, designId: 16, genre: 16, mainColor: 7, subColor: 7, photoPreference: 3 })) {
     const value = data?.brief?.[key] ?? '';
     if (typeof value !== 'string' || value.length > max) throw fail(400, '制作条件の形式または文字数を確認してください。');
     brief[key] = value.trim();
   }
+  brief.motionVolume ||= "strong";
+  if (!["strong", "standard", "subtle", "off"].includes(brief.motionVolume)) throw fail(400, "動きの強さを選び直してください。");
   if (!brief.purpose || !brief.name) throw fail(400, '用途と名称を入力してください。');
   if (!directions.includes(brief.direction)) throw fail(400, 'デザインの方向を選び直してください。');
   if (!['', 'food', 'portfolio', 'event', 'service', 'shop', 'other'].includes(brief.genre)
@@ -216,7 +218,7 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
         const id = reservation ?? ledger.reserve(action, budget);
         let candidate;
         try {
-          candidate = await callResponses(request, { apiKey, fetchImpl, privateNotes, material: plan, siteName: input.brief.name });
+          candidate = await callResponses(request, { apiKey, fetchImpl, privateNotes, material: plan, siteName: input.brief.name, motionVolume: input.brief.motionVolume });
         } catch (error) {
           ledger.finish(id, 'failed', error.usage ?? null, 0);
           throw Object.assign(error, { status: 502 });
