@@ -71,7 +71,7 @@ async function readInput(req) {
     brief[key] = value.trim();
   }
   brief.motionVolume ||= "strong";
-  if (!["strong", "standard", "subtle", "off"].includes(brief.motionVolume)) throw fail(400, "動きの強さを選び直してください。");
+  if (!["strong", "standard", "subtle", "off"].includes(brief.motionVolume)) throw fail(400, "アニメーションの量を選び直してください。");
   if (!brief.purpose || !brief.name) throw fail(400, '用途と名称を入力してください。');
   if (!directions.includes(brief.direction)) throw fail(400, 'デザインの方向を選び直してください。');
   if (!['', 'food', 'portfolio', 'event', 'service', 'shop', 'other'].includes(brief.genre)
@@ -200,6 +200,8 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
         throw fail(503, '非公開の参照画像と素材設定を確認してください。');
       }
       const previous = input.previousHtml && [...drafts.values()].find(draft => draft.html === input.previousHtml);
+      const volumeOnly = input.instruction === '文章・配色・構成とmotionテーマを保ち、指定したアニメーションの量に調整してください。';
+      const retainedTheme = volumeOnly && input.previousHtml.match(/<body data-motion="(soft|editorial|rhythmic)">/)?.[1];
       const findings = previous?.layout?.issues || [];
       const direction = findings.length ? notes + '\n前の版で実測した表示上の問題も修正してください。\n' + findings.join('\n') : notes;
       let reference = plan.reference;
@@ -218,7 +220,7 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
         const id = reservation ?? ledger.reserve(action, budget);
         let candidate;
         try {
-          candidate = await callResponses(request, { apiKey, fetchImpl, privateNotes, material: plan, siteName: input.brief.name, motionVolume: input.brief.motionVolume });
+          candidate = await callResponses(request, { apiKey, fetchImpl, privateNotes, material: plan, siteName: input.brief.name, motionVolume: input.brief.motionVolume, retainedTheme });
         } catch (error) {
           ledger.finish(id, 'failed', error.usage ?? null, 0);
           throw Object.assign(error, { status: 502 });

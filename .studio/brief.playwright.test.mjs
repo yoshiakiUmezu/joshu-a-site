@@ -116,7 +116,7 @@ test('beginners can select a genre, revise their choices and reuse earlier examp
   await page.locator('#motion-volume').selectOption('subtle');
   const fromExample = await submit('#revise');
   assert.equal(fromExample.brief.motionVolume, 'subtle');
-  assert.ok(fromExample.instruction.includes('動きの強さ'));
+  assert.ok(fromExample.instruction.includes('アニメーションの量'));
   assert.equal(await page.locator('#motion-volume').inputValue(), 'subtle');
   assert.ok(fromExample.brief.mood);
   assert.equal(fromExample.brief.purpose, '喫茶店の紹介');

@@ -239,10 +239,10 @@ async function generate(isRevision) {
     body.revision = revision.value.trim();
     if (!body.revision) {
       if (brief.motionVolume === (currentSite.brief.motionVolume || "strong")) {
-        showMessage(status, "動きの強さを変えるか、追加指示を入力してください。");
+        showMessage(status, "アニメーションの量を変えるか、追加指示を入力してください。");
         return;
       }
-      body.revision = "文章・配色・構成を保ち、指定した動きの強さに調整してください。";
+      body.revision = "文章・配色・構成とmotionテーマを保ち、指定したアニメーションの量に調整してください。";
     }
   }
   busy = true;
