@@ -23,7 +23,10 @@ test('revision sends the current page and receives one self-contained HTML file 
     const sent = JSON.parse(options.body);
     assert.equal(sent.model, MODEL);
     assert.equal(sent.store, false);
-    assert.deepEqual(JSON.parse(sent.input), changes);
+    const input = JSON.parse(sent.input);
+    assert.doesNotMatch(input.previousHtml, /@layer studioType/);
+    assert.ok(input.previousHtml.includes(site.html));
+    assert.deepEqual({ ...input, previousHtml }, changes);
     return Response.json(payload);
   } });
   assert.equal(result.html, previousHtml);

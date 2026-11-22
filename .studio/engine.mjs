@@ -22,7 +22,7 @@ const instructions = `入力のbriefをもとに、訪問者向けの日本語�
 
 ホストがサイト名入りの共通ヘッダー、h2から作るページ内目次、末尾の移動リンクを追加します。作品独自の終わりを設計する場合はmainの最後にfooterを1つ置き、本文と同じ美術方針で制作してください。htmlにはmainをルートに本文のみを書き、冒頭にサイトの目的とh1、その後に提供内容・判断材料・次の行動を用途に応じて構成します。主要区画には短く具体的なh2を付けてください。短い告知は区画を統合できます。
 出力のdesignは非公開の短い制作方針です。先に読者の目的、要望の素材感を画面のどこにどう見せるか、各節で新しく伝える内容を具体化し、その方針をhtmlとcssで形にしてください。h2には本文とは別に短い目次名（例 data-nav="作品"）を付けられます。
-動きの専門用語を求めず、業種の体験に合わせて文字・写真・操作の見せ場を設計する。初稿のmotionVolumeはstrong。量は演出する場面の数と種類。strongは冒頭・各節・作品紹介・開閉やリンクの反応まで、standardは冒頭と節見出し、subtleは主見出しのみ、offは演出を停止。量の変更だけでテーマや共通の演出の速さ・振幅を変えない。実装可能なホストの効果を使う。依頼に合わせてmotionを選ぶ。softは静かな浮かび上がり、editorialは印刷面が開くような登場、rhythmicは短く弾むリズム。動きを望まない依頼はstill。冒頭の主役が図や写真ならその要素にstudio-motion-lead、スクロールで見せたい作品・図やカードにstudio-motion-detailというclassを付ける。動きはホストがCSSで適用する。修正時は依頼に関係のない動きの設定を引き継ぐ。
+動きの専門用語を求めず、業種の体験に合わせて文字・写真・操作の見せ場を設計する。初稿・修正とも演出は多め。冒頭・各節・作品紹介・操作で使う演出を選ぶ。見出しは共通の細身の明朝、本文とナビは共通のゴシック。書体は制作室が固定するためモデルCSSで変更しない。実装可能なホストの効果を使う。依頼に合わせてmotionを選ぶ。softは静かな浮かび上がり、editorialは印刷面が開くような登場、rhythmicは短く弾むリズム。冒頭の主役が図や写真ならその要素にstudio-motion-lead、スクロールで見せたい作品・図やカードにstudio-motion-detailというclassを付ける。動きはホストがCSSで適用する。修正時は依頼に関係のない動きの設定を引き継ぐ。
 出力のtitleはプレーンテキスト、htmlは本文断片、cssはスタイルシートです。DOCTYPE・head・bodyはホストが用意します。
 HTML要素は ${[...elements].join(' ')} だけ。mainとh1を各1個使い、小文字で明示的に閉じてください（brとhrは空要素）。
 imgも空要素です。素材を使うときは <img src="art:coffee" alt="窓辺の珈琲とトースト"> の形式で、指定された素材を各1回、合計3点まで使えます。独自URL、base64、幅・高さ属性は使いません。
@@ -33,7 +33,7 @@ CSSのアットルールは@mediaだけ。比較はmin-widthやmax-widthを使�
 export function buildResponseRequest({ brief, instruction = '', previousHtml = '' }, designNotes = '', reference = '') {
   const textInput = JSON.stringify({ brief, instruction, previousHtml: compactPreviousHtml(previousHtml)
     .replace(/<style id="studio-motion">[\s\S]*?<\/style>/, '')
-    .replace(frameStyle, '').replace(/<div id="studio-top(?:-\d+)?"><\/div>(?=<!--studio-frame-start-->)/, '')
+    .replace(typeStyle, '').replace(frameStyle, '').replace(/<div id="studio-top(?:-\d+)?"><\/div>(?=<!--studio-frame-start-->)/, '')
     .replace(/<!--studio-frame-start-->[\s\S]*?<!--studio-frame-end-->/g, '') });
   return {
     model: MODEL,
@@ -256,7 +256,16 @@ const frameStyle = `
 body:has(.studio-follow) [id]{scroll-margin-top:4.5rem}
 @media(max-width:700px){.studio-mast nav{display:none}.studio-mast .studio-first-link{display:block;min-width:0;max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.studio-mast .studio-index-link{display:inline-block;flex:none}.studio-end{align-items:flex-start;flex-direction:column}}
 `;
-export function renderSite(site, siteName, motionVolume) {
+const typeStyle = `@layer studioType {
+  :where(body, body *) {font-family:"Noto Sans JP","Yu Gothic","Hiragino Sans",Meiryo,sans-serif!important;font-weight:400!important}
+  :where(b,strong){font-weight:600!important}
+  :is(h1,h2,h3,h4,h5,h6), :is(h1,h2,h3,h4,h5,h6) * {
+    font-family:"Noto Serif JP","Yu Mincho","Hiragino Mincho ProN",serif!important;
+    font-weight:300!important
+  }
+}`;
+
+export function renderSite(site, siteName) {
   if (!site || !['title', 'html', 'css'].every(key => typeof site[key] === 'string' && site[key].trim())) {
     throw new Error('生成結果にタイトル・HTML・CSSが揃っていません。');
   }
@@ -276,12 +285,13 @@ export function renderSite(site, siteName, motionVolume) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeText(title)}</title>
 <style>*,*::before,*::after{box-sizing:border-box}body{margin:0;overflow-wrap:anywhere}img{display:block;max-width:100%;height:auto}h1,h2,h3{text-wrap:balance;word-break:auto-phrase;line-break:strict}
+${typeStyle}
 ${css}
 ${siteName ? frameStyle : ''}
 [role="img"] > div{max-width:100%}
 @media(max-width:600px){nav{flex-wrap:wrap}nav a[href]{display:inline-flex;align-items:center;min-block-size:2rem;font-size:max(.875rem,1em)}}
 </style>
-${siteName || site.motion ? motionSheet(site.motion, motionVolume) : ''}
+${siteName || site.motion ? motionSheet(site.motion) : ''}
 </head>
 <body${siteName || site.motion ? ' data-motion="' + (motionModes.includes(site.motion) ? site.motion : 'soft') + '"' : ''}>
 ${siteName ? pageFrame(fragment, siteName) : fragment}
@@ -339,7 +349,7 @@ export async function requestText(body, { apiKey, fetchImpl = fetch }) {
     searches: data.output.filter(item => item.type === 'web_search_call' && item.status === 'completed').length, usage };
 }
 
-export async function callResponses(body, { apiKey, fetchImpl, privateNotes = '', material, siteName, motionVolume, retainedTheme }) {
+export async function callResponses(body, { apiKey, fetchImpl, privateNotes = '', material, siteName }) {
   const { text, usage } = await requestText(body, { apiKey, fetchImpl });
   let site;
   try {
@@ -352,8 +362,7 @@ export async function callResponses(body, { apiKey, fetchImpl, privateNotes = ''
     throw providerError('制作条件の文章が出力に混入したため、この版の表示を見送りました。', usage);
   }
   try {
-    if (retainedTheme) site.motion = retainedTheme;
-    return { html: renderSite(material ? applyMaterialPlan(site, material) : site, siteName, motionVolume), usage };
+    return { html: renderSite(material ? applyMaterialPlan(site, material) : site, siteName), usage };
   } catch (error) {
     throw providerError(error.message, usage);
   }

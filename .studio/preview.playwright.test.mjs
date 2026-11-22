@@ -81,9 +81,12 @@ test('exported motion follows the selected theme and the reader preference witho
   const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
   t.after(() => browser.close());
   const page = await browser.newPage({ javaScriptEnabled: false, reducedMotion: 'no-preference' });
-  for (const [motion, expected] of Object.entries({ soft: 'studio-drift', editorial: 'studio-unfold', rhythmic: 'studio-beat', still: 'none' })) {
+  for (const [motion, expected] of Object.entries({ soft: 'studio-drift', editorial: 'studio-unfold', rhythmic: 'studio-beat', still: 'studio-drift' })) {
     const html = renderSite({ title: '作品', html: '<main><h1>作品</h1><section><h2>一覧</h2></section></main>', css: 'section{margin-top:110vh;height:80vh}', motion }, '作品');
     await page.setContent(html);
+    assert.equal(await page.locator('h1').evaluate(el => getComputedStyle(el).fontWeight), '300');
+    assert.match(await page.locator('h1').evaluate(el => getComputedStyle(el).fontFamily), /^.Noto Serif JP/);
+    assert.match(await page.locator('body').evaluate(el => getComputedStyle(el).fontFamily), /^.Noto Sans JP/);
     assert.equal(await page.locator('h1').evaluate(el => getComputedStyle(el).animationName), expected);
     assert.equal(await page.locator('h2').evaluate(el => getComputedStyle(el).animationName), expected);
     await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -92,6 +95,6 @@ test('exported motion follows the selected theme and the reader preference witho
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     const body = buildResponseRequest({ brief: {}, instruction: '色を変える', previousHtml: html });
     const previous = JSON.parse(body.input).previousHtml;
-    assert.ok(!previous.includes('@keyframes') && previous.includes('data-motion="' + motion + '"'));
+    assert.ok(!previous.includes('@keyframes') && previous.includes('data-motion="' + (motion === 'still' ? 'soft' : motion) + '"'));
   }
 });

@@ -68,7 +68,6 @@ function showDesign() {
 byId("designId").addEventListener("change", showDesign);
 
 function showBrief(brief) {
-  byId("motion-volume").value = brief.motionVolume || "strong";
   for (const field of briefForm.querySelectorAll("[name]")) field.value = brief[field.name] ?? "";
   showDesign();
   if (!genre.value && brief.purpose) genre.value = "other";
@@ -105,7 +104,6 @@ function updateControls() {
   byId("generate").disabled = busy || !remaining || !liveEnabled;
   byId("brief-fields").disabled = busy;
   byId("revise").disabled = busy || !remaining || !liveEnabled || !currentSite;
-  byId("motion-volume").disabled = busy || !remaining || !liveEnabled || !currentSite;
   revision.disabled = busy || !remaining || !liveEnabled || !currentSite;
   byId("edit-draft").hidden = !currentSite || !liveEnabled || !remaining;
   byId("edit-draft").disabled = busy;
@@ -235,15 +233,8 @@ async function generate(isRevision) {
   const body = { brief };
   if (isRevision) {
     body.previousHtml = currentSite.modelHtml;
-    brief.motionVolume = byId("motion-volume").value;
     body.revision = revision.value.trim();
-    if (!body.revision) {
-      if (brief.motionVolume === (currentSite.brief.motionVolume || "strong")) {
-        showMessage(status, "アニメーションの量を変えるか、追加指示を入力してください。");
-        return;
-      }
-      body.revision = "文章・配色・構成とmotionテーマを保ち、指定したアニメーションの量に調整してください。";
-    }
+    if (!body.revision) return;
   }
   busy = true;
   updateControls();

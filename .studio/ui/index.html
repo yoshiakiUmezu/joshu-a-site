@@ -126,15 +126,8 @@
       <section class="panel revision-panel" aria-labelledby="revision-title">
         <h2 id="revision-title">デザインの修正</h2>
         <form id="revision-form" autocomplete="off">
-          <label for="motion-volume">アニメーションの量</label>
-          <select id="motion-volume" disabled>
-            <option value="strong">多め（初稿）</option>
-            <option value="standard">標準</option>
-            <option value="subtle">少なめ</option>
-            <option value="off">なし</option>
-          </select>
-          <label for="revision">追加指示（任意）</label>
-          <textarea name="revision" id="revision" rows="2" maxlength="800" disabled placeholder="例）見出しを大きくして、背景を深い緑に"></textarea>
+          <label for="revision">追加指示</label>
+          <textarea name="revision" id="revision" rows="2" maxlength="800" required disabled placeholder="例）見出しを大きくして、背景を深い緑に"></textarea>
           <p id="revision-target" class="feedback"></p>
           <button id="revise" class="secondary" type="submit" disabled>修正を反映</button>
           <p class="feedback" role="status" id="revision-status"></p>
