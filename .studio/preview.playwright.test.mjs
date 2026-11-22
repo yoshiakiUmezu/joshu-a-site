@@ -86,7 +86,7 @@ test('exported motion follows the selected theme and the reader preference witho
     await page.setContent(html);
     assert.equal(await page.locator('h1').evaluate(el => getComputedStyle(el).fontWeight), '300');
     assert.match(await page.locator('h1').evaluate(el => getComputedStyle(el).fontFamily), /^.Noto Serif JP/);
-    assert.match(await page.locator('body').evaluate(el => getComputedStyle(el).fontFamily), /^.Noto Sans JP/);
+    assert.match(await page.locator('body').evaluate(el => getComputedStyle(el).fontFamily), /^.Noto Serif JP/);
     assert.equal(await page.locator('h1').evaluate(el => getComputedStyle(el).animationName), expected);
     assert.equal(await page.locator('h2').evaluate(el => getComputedStyle(el).animationName), expected);
     await page.emulateMedia({ reducedMotion: 'reduce' });
