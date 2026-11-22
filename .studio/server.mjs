@@ -12,12 +12,20 @@ import { reviewPage } from './review.mjs';
 const defaults = { maxCalls: 6, maxTotalTokens: 240_000, maxOutputTokens: MAX_OUTPUT_TOKENS, maxHtmlBytes: MAX_HTML_BYTES };
 const designs = JSON.parse(await readFile(new URL('./designs/catalog.json', import.meta.url), 'utf8'));
 const designAssets = ['salad', 'interior', 'amberwave', 'coast', 'outfit', 'denim', 'rack'];
+const designMedia = [
+  ['sans.woff2', 'font/woff2'], ['serif.woff2', 'font/woff2'], ['space.woff2', 'font/woff2'],
+  ...['table', 'studio', 'studio-detail', 'field', 'loom', 'press', 'repair', 'still', 'still-water', 'still-grove']
+    .map(id => [id + '.webp', 'image/webp']),
+];
 const files = new Map([
   ['/studio/designs/', ['designs/index.html', 'text/html; charset=utf-8']],
+  ['/studio/designs/index.html', ['designs/index.html', 'text/html; charset=utf-8']],
   ...designs.flatMap(({ id }) => [
     ['/studio/designs/' + id + '.html', ['designs/' + id + '.html', 'text/html; charset=utf-8']],
     ['/studio/designs/' + id + '.jpg', ['designs/' + id + '.jpg', 'image/jpeg']],
   ]),
+  ...designMedia.map(([name, type]) => ['/studio/designs/media/' + name, ['designs/media/' + name, type]]),
+  ...['desktop', 'mobile'].map(id => ['/studio/designs/review/' + id + '.jpg', ['designs/review/' + id + '.jpg', 'image/jpeg']]),
   ...designAssets.map(id => ['/studio/art/' + id + '.webp', ['art/' + id + '.webp', 'image/webp']]),
   ['/studio/', ['ui/index.html', 'text/html; charset=utf-8']],
   ['/studio/studio.css', ['ui/studio.css', 'text/css; charset=utf-8']],
@@ -145,6 +153,9 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       if (req.method === 'GET' && files.has(req.url)) {
         const [name, type] = files.get(req.url);
         const content = await readFile(new URL(name, import.meta.url));
+        if (name.startsWith('designs/') && name.endsWith('.html')) {
+          res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; img-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'");
+        }
         res.writeHead(200, { 'Content-Type': type });
         return res.end(content);
       }

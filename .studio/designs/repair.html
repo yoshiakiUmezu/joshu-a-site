@@ -1,161 +1,100 @@
-<!doctype html><html lang="ja">
+<!doctype html>
+<html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>直す室｜自転車修理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="町の自転車修理店。パンクやブレーキ、異音の修理料と持ち込みの案内。">
+<title>まちの輪｜自転車修理</title>
 <style>
-:root {
-  --paper:#edf2ec;
-  --ink:#19332c;
-}
-* {
-  box-sizing:border-box;
-}
-html {
-  scroll-behavior:smooth;
-}
-body {
-  margin:0;
-  background:var(--paper);
-  color:var(--ink);
-  font:1rem/1.8 system-ui,sans-serif;
-  overflow-wrap:anywhere;
-}
-img {
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-a {
-  color:inherit;
-  text-underline-offset:.28em;
-}
-h1,h2,h3,p,figure {
-  margin:0;
-}
-h1,h2 {
-  line-height:1.12;
-  text-wrap:balance;
-}
-h1 {
-  font-size:clamp(3.4rem,8vw,8.8rem);
-  letter-spacing:-.055em;
-}
-h2 {
-  font-size:clamp(1.75rem,4vw,3.5rem);
-}
-header,footer,.bar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:1rem;
-  flex-wrap:wrap;
-}
-header,footer,section {
-  padding:clamp(1.1rem,4vw,4rem);
-}
-header {
-  padding-block:1rem;
-  border-bottom:1px solid;
-}
-header a,footer a {
-  font-size:.9rem;
-}
-footer {
-  border-top:1px solid;
-}
-nav {
-  display:flex;
-  gap:1.2rem;
-}
-.rows {
-  margin:1.4rem 0 0;
-}
-.row {
-  padding:1.05rem 0;
-  border-top:1px solid;
-  display:flex;
-  justify-content:space-between;
-  gap:1rem;
-  align-items:baseline;
-}
-.row span {
-  max-width:65%;
-}
-.cap {
-  font:600 .8rem/1.5 system-ui;
-  letter-spacing:.13em;
-}
-.action {
-  display:inline-block;
-  margin-top:1.3rem;
-  font-weight:650;
-}
-.copy {
-  max-width:38rem;
-  margin-top:1rem;
-}
-figure {
-  overflow:hidden;
-}
-@media(prefers-reduced-motion:reduce) {
-  html {
-    scroll-behavior:auto;
-  }
-}
-.service {
-  border-left:clamp(12px,3vw,38px) solid #e6a321;
-}
-.service h1 {
-  font-weight:900;
-  line-height:1.03;
-}
-.service .action {
-  padding:.6rem 1.2rem;
-  background:var(--ink);
-  color:var(--paper);
-}
-#detail {
-  background:#fff;
-}
-details {
-  padding:1rem 0;
-  border-bottom:1px solid;
-}
-summary {
-  cursor:pointer;
-  font-size:1.2rem;
-  font-weight:700;
-}
-details p {
-  margin:.8rem 0;
+@font-face{font-family:"Studio Sans";src:url("media/sans.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Space Grotesk";src:url("media/space.woff2") format("woff2");font-weight:100 900;font-display:swap}
+
+:root{--sans:"Studio Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;--serif:"Studio Serif","Yu Mincho",serif;--space:"Space Grotesk",Arial,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font:400 1rem/1.8 var(--sans);overflow-wrap:break-word}
+h1,h2,h3,p,figure,blockquote,dl,dd{margin:0}
+p{line-break:strict;text-wrap:pretty}
+img{display:block;width:100%;height:auto}
+a{color:inherit;text-underline-offset:.24em}
+a:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:5px}
+nav{display:flex;flex-wrap:wrap;column-gap:1.25rem;row-gap:.25rem}
+small{font-size:.82rem}
+summary{cursor:pointer}
+[id]{scroll-margin-top:1.25rem}
+.gallery-link{display:inline-block;font-size:.82rem}
+
+:root{--main:#34523a;--sub:#edb751;--paper:#f5eed7;--ink:#272e24;--line:#96957c}
+body{background:var(--paper);color:var(--ink)}
+.wrap{width:min(100% - clamp(2.25rem,8vw,8rem),1250px);margin:auto}
+.shop{background:color-mix(in srgb,var(--main) 20%,#294731);color:#fff5d6}
+.mast{min-height:67px;display:flex;align-items:center;justify-content:space-between;gap:.65rem;border-bottom:1px solid #f6efcf75}
+.mast p{font-size:.9rem;font-weight:650;letter-spacing:.08em}
+.mast nav{font-size:.9rem}
+.workbench{padding-block:clamp(1.6rem,4vw,3.5rem) clamp(1.7rem,4vw,3rem);display:grid;grid-template-columns:1fr 1fr auto;gap:.9rem 1.45rem;align-items:end}
+.workbench h1{grid-column:1/3;font:900 clamp(4.75rem,12vw,11rem)/.91 var(--sans);letter-spacing:-.11em;margin-left:-.08em}
+.workbench .note{grid-column:3;grid-row:1/3;align-self:end;color:#222b22;background:#f7df8c;padding:.8rem 1.2rem;transform:rotate(4deg);box-shadow:4px 5px 0 #101c1255;font-size:.87rem;font-weight:700}
+.workbench .note strong{display:block;font:690 1.6rem/1.35 var(--space)}
+.workbench .subtitle{grid-column:1/3;font-size:1.1rem;font-weight:650;letter-spacing:.15em}
+.workbench figure{grid-column:1/-1;position:relative;margin-top:.55rem}
+.workbench img{height:clamp(330px,35vw,535px);object-fit:cover;object-position:50% 52%}
+.workbench figcaption{position:absolute;bottom:0;right:0;padding:.24rem .65rem;background:#f6ebcb;color:#222c21;font-size:.85rem}
+.service{display:grid;grid-template-columns:1fr 1.34fr;gap:clamp(1.5rem,7vw,7rem);padding-block:clamp(2.8rem,7vw,6.5rem)}
+h2{font:850 clamp(1.95rem,4.3vw,3.8rem)/1.22 var(--sans);letter-spacing:-.07em;margin-bottom:.85rem}
+.service header p{max-width:23em}
+.service details{border-block-start:1px solid var(--line)}
+.service details:last-child{border-block-end:1px solid var(--line)}
+summary{padding:.95rem 0;font-size:1.03rem;font-weight:750}
+.service details p{margin:0 0 1rem 1.25rem}
+footer{background:color-mix(in srgb,var(--sub) 36%,#f4df9a);border-top:1px dashed #79714a}
+.intake{padding-block:clamp(2.6rem,6vw,5rem)}
+.intake dl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;border-block:1px dashed #777044;margin:1.5rem 0;padding:1rem 0}
+.intake dt{font-weight:850;margin-bottom:.22rem}
+@media(max-width:625px){
+ .mast{min-height:58px}
+ .mast nav{gap:.65rem}
+ .workbench{grid-template-columns:1fr auto;gap:.7rem}
+ .workbench h1{grid-column:1/-1;font-size:clamp(4.2rem,17vw,7.5rem);margin-bottom:.1rem}
+ .workbench .note{grid-area:2/2;transform:rotate(3deg);padding:.36rem .65rem;font-size:.78rem}
+ .workbench .note strong{font-size:1.1rem}
+ .workbench .subtitle{grid-column:1;font-size:.95rem;letter-spacing:.03em;align-self:center}
+ .workbench img{height:clamp(260px,76vw,399px);object-position:49%}
+ .service{grid-template-columns:1fr}
+ .intake dl{grid-template-columns:1fr 1fr;gap:.8rem 1.2rem}
 }
 </style>
 </head>
-<body id="top">
-<header><strong>直す室</strong>
-<nav><a href="#detail">症状</a><a href="#visit">受付</a></nav>
+<body>
+<header class="shop" id="top">
+  <div class="mast wrap"><p>自転車の修理と点検</p><nav aria-label="工房の案内"><a href="#service">修理料金</a><a href="#intake">持ち込み</a></nav></div>
 </header>
 <main>
-<section class="service">
-<p class="cap">自転車修理受付</p>
-<h1>どこが<br>気になる？</h1><a class="action" href="#detail">症状から探す ↓</a>
-</section>
-<section id="detail">
-<h2>修理の相談</h2>
-<details><summary>タイヤの空気が抜ける</summary>
-<p>パンクやバルブの状態を点検します。自転車を押してお持ちください。</p></details>
-<details><summary>ブレーキが鳴る</summary>
-<p>パッドの摩耗とワイヤーを確認します。</p></details>
-<details><summary>チェーンが外れる</summary>
-<p>変速機の位置やチェーンの伸びを調べます。</p></details>
-</section>
-<section id="visit">
-<h2>持ち込み受付</h2>
-<p>水曜から日曜の10:00–17:00。修理内容と見積もりをご案内してから作業します。</p>
-</section>
+  <section class="shop" aria-labelledby="title">
+    <div class="workbench wrap">
+      <h1 id="title">まちの輪</h1><p class="subtitle">走り慣れた一台を、もう一度。</p>
+      <p class="note">当日受付<strong>17:00まで</strong></p>
+      <figure><img src="media/repair.webp" width="1536" height="1024" alt="作業台で自転車の車輪を点検する職人の手元"><figcaption>工房の振れ取り台</figcaption></figure>
+    </div>
+  </section>
+  <section class="service wrap" id="service">
+    <header><h2>気になる症状は？</h2><p>通学車から小径車まで。車体を見て、作業の前に料金と、預かる時間をお伝えします。</p></header>
+    <div>
+      <details open><summary>タイヤの空気が抜ける</summary><p>パンク修理 1,400円から。穴の位置とタイヤの傷を見て、交換が必要か判断します。目安30分。</p></details>
+      <details><summary>ブレーキの効きが弱い</summary><p>前後の調整 1,600円から。シューやワイヤーを交換する場合は別途部品代。目安40分。</p></details>
+      <details><summary>漕ぐと音がする</summary><p>異音点検 1,100円から。音が出るギアや、いつ頃から鳴るかを受付で教えてください。</p></details>
+    </div>
+  </section>
 </main>
-<footer><strong>直す室</strong><a href="#top">先頭へ ↑</a></footer>
+<footer id="intake">
+  <div class="intake wrap">
+    <div><h2>持ち込み受付</h2><p>予約不要。入口の白線に自転車を置き、受付で症状をお伝えください。</p></div>
+    <dl>
+      <div><dt>営業時間</dt><dd>10:00–18:30<br>水・木定休</dd></div>
+      <div><dt>当日受付</dt><dd>17:00まで<br>混雑時はお預かり</dd></div>
+      <div><dt>持ち物</dt><dd>鍵。電動車はバッテリーも</dd></div>
+      <div><dt>工房入口</dt><dd>高架下、緑の引き戸</dd></div>
+    </dl>
+    <a class="gallery-link" href="index.html">作例一覧</a>
+  </div>
+</footer>
 </body>
 </html>

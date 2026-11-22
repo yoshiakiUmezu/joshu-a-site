@@ -1,159 +1,136 @@
-<!doctype html><html lang="ja">
+<!doctype html>
+<html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PULSE HALL｜電子音楽公演</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="音が止んだあとも残るもの。AFTER TONEの演目と入場案内。">
+<title>AFTER TONE｜一夜の電子音楽公演</title>
 <style>
-:root {
-  --paper:#10100f;
-  --ink:#ffbd53;
-}
-* {
-  box-sizing:border-box;
-}
-html {
-  scroll-behavior:smooth;
-}
-body {
-  margin:0;
-  background:var(--paper);
-  color:var(--ink);
-  font:1rem/1.8 system-ui,sans-serif;
-  overflow-wrap:anywhere;
-}
-img {
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-a {
-  color:inherit;
-  text-underline-offset:.28em;
-}
-h1,h2,h3,p,figure {
-  margin:0;
-}
-h1,h2 {
-  line-height:1.12;
-  text-wrap:balance;
-}
-h1 {
-  font-size:clamp(3.4rem,8vw,8.8rem);
-  letter-spacing:-.055em;
-}
-h2 {
-  font-size:clamp(1.75rem,4vw,3.5rem);
-}
-header,footer,.bar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:1rem;
-  flex-wrap:wrap;
-}
-header,footer,section {
-  padding:clamp(1.1rem,4vw,4rem);
-}
-header {
-  padding-block:1rem;
-  border-bottom:1px solid;
-}
-header a,footer a {
-  font-size:.9rem;
-}
-footer {
-  border-top:1px solid;
-}
-nav {
-  display:flex;
-  gap:1.2rem;
-}
-.rows {
-  margin:1.4rem 0 0;
-}
-.row {
-  padding:1.05rem 0;
-  border-top:1px solid;
-  display:flex;
-  justify-content:space-between;
-  gap:1rem;
-  align-items:baseline;
-}
-.row span {
-  max-width:65%;
-}
-.cap {
-  font:600 .8rem/1.5 system-ui;
-  letter-spacing:.13em;
-}
-.action {
-  display:inline-block;
-  margin-top:1.3rem;
-  font-weight:650;
-}
-.copy {
-  max-width:38rem;
-  margin-top:1rem;
-}
-figure {
-  overflow:hidden;
-}
-@media(prefers-reduced-motion:reduce) {
-  html {
-    scroll-behavior:auto;
-  }
-}
-.poster {
-  position:relative;
-  isolation:isolate;
-  min-height:65vh;
-  display:grid;
-  align-content:center;
-}
-.poster:before {
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index:-1;
-  background:linear-gradient(90deg,#1119,transparent),url(../art/amberwave.webp) center/cover;
-}
-.poster h1 {
-  font:900 clamp(5rem,14vw,14rem)/.78 Arial,sans-serif;
-  letter-spacing:-.08em;
-  margin:.2em 0;
-  color:#fff;
-}
-#detail {
-  background:#ffbd53;
-  color:#171713;
-}
-.row b {
-  font:700 1.7rem monospace;
+@font-face{font-family:"Studio Sans";src:url("media/sans.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Space Grotesk";src:url("media/space.woff2") format("woff2");font-weight:100 900;font-display:swap}
+
+:root{--sans:"Studio Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;--serif:"Studio Serif","Yu Mincho",serif;--space:"Space Grotesk",Arial,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font:400 1rem/1.8 var(--sans);overflow-wrap:break-word}
+h1,h2,h3,p,figure,blockquote,dl,dd{margin:0}
+p{line-break:strict;text-wrap:pretty}
+img{display:block;width:100%;height:auto}
+a{color:inherit;text-underline-offset:.24em}
+a:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:5px}
+nav{display:flex;flex-wrap:wrap;column-gap:1.25rem;row-gap:.25rem}
+small{font-size:.82rem}
+summary{cursor:pointer}
+[id]{scroll-margin-top:1.25rem}
+.gallery-link{display:inline-block;font-size:.82rem}
+
+:root{--main:#dbf946;--sub:#d73d7d;--light:#e4ff71;--paper:#14151a;--line:#656957}
+body{color:#f3f4eb;background:var(--paper)}
+.wrap{width:min(100% - clamp(2.2rem,9vw,9rem),1300px);margin:auto}
+.mast{display:flex;align-items:center;justify-content:space-between;min-height:67px;border-bottom:1px solid var(--line);gap:.8rem}
+.mast p{font-weight:650;font-size:.88rem;letter-spacing:.1em}
+nav{font-size:.88rem}
+.poster{position:relative;isolation:isolate;min-height:clamp(510px,49vw,704px);display:grid;align-content:center;padding:clamp(1.1rem,5.8vw,6rem) 0;overflow:hidden}
+.poster::before{content:"";position:absolute;z-index:-2;inset:8% 0 4%;background:repeating-linear-gradient(0deg,#e4ff710d 0 1px,transparent 1px 33px),repeating-linear-gradient(90deg,#e4ff710c 0 1px,transparent 1px 33px)}
+.signal{position:absolute;z-index:-1;right:1%;top:7%;width:64%;height:82%;overflow:hidden;isolation:isolate}
+.signal i{position:absolute;left:9%;top:21%;width:76%;height:58%;border:1px solid color-mix(in srgb,var(--main) 75%,white);border-radius:50%;transform:translate(var(--x),var(--y)) rotate(var(--angle));box-shadow:0 0 11px color-mix(in srgb,var(--sub) 56%,transparent),inset 0 0 5px color-mix(in srgb,var(--sub) 32%,transparent)}
+.poster h1{color:var(--light);font:650 clamp(6rem,15.5vw,15.5rem)/.75 var(--space);letter-spacing:-.105em;margin-left:-.07em;text-shadow:3px 6px 0 #14151a}
+.poster h1 span{display:block;margin-left:.77em}
+.poster .caption{align-self:end;margin-top:2.25rem;font-weight:650;letter-spacing:.12em;text-shadow:0 1px 5px #14151a}
+.datebar{display:grid;grid-template-columns:1fr 1fr auto;align-items:center;gap:.7rem 1.2rem;border-block:1px solid var(--line);padding:.9rem 0;font-weight:600}
+.datebar time{font:650 clamp(1.5rem,3.6vw,3rem)/1 var(--space)}
+.datebar a{color:var(--light)}
+.program{padding-block:clamp(3.5rem,8vw,7.5rem)}
+h2{font:700 clamp(2rem,4.3vw,4rem)/1.18 var(--sans);letter-spacing:-.06em;margin-bottom:1.3rem}
+.program header{display:grid;grid-template-columns:1fr 1fr;gap:1.05rem;padding-bottom:1.5rem}
+.program header p{max-width:30em}
+.set{display:grid;grid-template-columns:minmax(4.7rem,18%) minmax(0,1fr) minmax(0,35%);gap:.3rem 1rem;align-items:baseline;border-top:1px solid var(--line);padding:1.05rem 0}
+.set:last-child{border-bottom:1px solid var(--line)}
+.set time{font:600 1.3rem/1.5 var(--space);color:var(--light)}
+.set h3{font:650 clamp(1.42rem,2.8vw,2.5rem)/1.2 var(--space)}
+.set p{font-size:.92rem}
+footer{background:color-mix(in srgb,var(--main) 28%,#e0f69c);color:#191e10}
+.ticket{padding-block:clamp(2.6rem,7vw,6rem);display:grid;grid-template-columns:1.35fr .85fr;gap:1.2rem 4rem}
+.ticket h2{margin-bottom:.6rem;text-wrap:balance}
+.ticket h2 span{display:inline-block}
+.ticket .gallery-link{grid-column:1/-1}
+.ticket ul{list-style:none;padding:0;margin:0}
+.ticket li{border-top:1px dashed #536130;padding:.45rem 0}
+@media(max-width:600px){
+ .mast{min-height:58px}
+ .mast p{font-size:.81rem;letter-spacing:.04em}
+ .mast nav{gap:.75rem}
+ .poster{min-height:460px;align-content:center}
+ .poster h1{font-size:clamp(4.5rem,19vw,7rem)}
+ .poster h1 span{margin-left:.4em}
+ .signal{width:100%;height:80%;right:-11%;top:3%;opacity:.74}
+ .caption{font-size:.89rem}
+ .datebar{grid-template-columns:1fr auto}
+ .datebar span{grid-row:2}
+ .datebar a{grid-area:1/2/3/3}
+ .program header,.ticket{grid-template-columns:1fr}
+ .program h2{margin:0}
+ .set{grid-template-columns:4.2rem 1fr}
+ .set p{grid-column:2}
 }
 </style>
 </head>
-<body id="top">
-<header><strong>PULSE HALL</strong>
-<nav><a href="#detail">時刻表</a><a href="#visit">入場案内</a></nav>
+<body>
+<header class="mast wrap" id="top">
+  <p>一夜の電子音楽公演</p>
+  <nav aria-label="公演の案内"><a href="#program">演目</a><a href="#entry">入場案内</a></nav>
 </header>
 <main>
-<section class="poster">
-<p class="cap">LIVE ELECTRONICS</p>
-<h1>PULSE<br>HALL</h1><strong>12.12 SAT　19:00</strong>
-</section>
-<section id="detail">
-<h2>TIMETABLE</h2>
-<div class="rows">
-<div class="row"><b>18:30</b><span>開場・受付</span></div>
-<div class="row"><b>19:00</b><span>ライブセット</span></div>
-<div class="row"><b>20:30</b><span>終演予定</span></div></div>
-</section>
-<section id="visit">
-<h2>当日の入口</h2>
-<p>自由席 2,000円。倉庫ホール正面の受付でお求めください。</p>
-</section>
+  <section class="poster wrap" aria-labelledby="title">
+    <div class="signal" aria-hidden="true">
+      <i style="--angle:-65deg;--x:0.00%;--y:15.00%"></i>
+      <i style="--angle:-57.2deg;--x:2.62%;--y:14.64%"></i>
+      <i style="--angle:-49.4deg;--x:5.11%;--y:13.57%"></i>
+      <i style="--angle:-41.6deg;--x:7.36%;--y:11.85%"></i>
+      <i style="--angle:-33.8deg;--x:9.25%;--y:9.56%"></i>
+      <i style="--angle:-26deg;--x:10.69%;--y:6.80%"></i>
+      <i style="--angle:-18.200000000000003deg;--x:11.62%;--y:3.72%"></i>
+      <i style="--angle:-10.399999999999999deg;--x:11.99%;--y:0.46%"></i>
+      <i style="--angle:-2.6000000000000014deg;--x:11.79%;--y:-2.82%"></i>
+      <i style="--angle:5.200000000000003deg;--x:11.01%;--y:-5.97%"></i>
+      <i style="--angle:13deg;--x:9.70%;--y:-8.83%"></i>
+      <i style="--angle:20.799999999999997deg;--x:7.93%;--y:-11.26%"></i>
+      <i style="--angle:28.599999999999994deg;--x:5.77%;--y:-13.15%"></i>
+      <i style="--angle:36.39999999999999deg;--x:3.33%;--y:-14.41%"></i>
+      <i style="--angle:44.2deg;--x:0.74%;--y:-14.97%"></i>
+      <i style="--angle:52deg;--x:-1.89%;--y:-14.81%"></i>
+      <i style="--angle:59.8deg;--x:-4.43%;--y:-13.94%"></i>
+      <i style="--angle:67.6deg;--x:-6.76%;--y:-12.39%"></i>
+      <i style="--angle:75.4deg;--x:-8.76%;--y:-10.25%"></i>
+      <i style="--angle:83.19999999999999deg;--x:-10.34%;--y:-7.61%"></i>
+      <i style="--angle:91deg;--x:-11.42%;--y:-4.61%"></i>
+      <i style="--angle:98.79999999999998deg;--x:-11.95%;--y:-1.38%"></i>
+      <i style="--angle:106.6deg;--x:-11.90%;--y:1.91%"></i>
+      <i style="--angle:114.4deg;--x:-11.28%;--y:5.11%"></i>
+      <i style="--angle:122.19999999999999deg;--x:-10.12%;--y:8.06%"></i>
+      <i style="--angle:130deg;--x:-8.47%;--y:10.63%"></i>
+      <i style="--angle:137.79999999999998deg;--x:-6.41%;--y:12.68%"></i>
+      <i style="--angle:145.6deg;--x:-4.04%;--y:14.13%"></i>
+      <i style="--angle:153.4deg;--x:-1.47%;--y:14.89%"></i>
+      <i style="--angle:161.2deg;--x:1.16%;--y:14.93%"></i>
+      <i style="--angle:169deg;--x:3.74%;--y:14.25%"></i>
+    </div>
+    <h1 id="title" lang="en">AFTER <span>TONE</span></h1>
+    <p class="caption">ひとつの音が、夜にほどけていく。</p>
+  </section>
+  <div class="datebar wrap"><time datetime="2027-06-19">06.19 SAT</time><span>湾岸第六倉庫　開場 18:00</span><a href="#entry">当日の入場方法</a></div>
+  <section class="program wrap" id="program">
+    <header><h2>演目</h2><p>磁気テープ、アナログ回路、低域と光。三つの音がひと続きになる、休憩を挟んだ約2時間の公演です。</p></header>
+    <article class="set"><time datetime="18:30">18:30</time><h3 lang="en">Reel Drift</h3><p>テープループとフィールド録音</p></article>
+    <article class="set"><time datetime="19:15">19:15</time><h3 lang="en">Silt Circuit</h3><p>アナログシンセによるライブ</p></article>
+    <article class="set"><time datetime="20:05">20:05</time><h3 lang="en">Low Atlas</h3><p>低域のための音響と投影</p></article>
+  </section>
 </main>
-<footer><strong>PULSE HALL</strong><a href="#top">先頭へ ↑</a></footer>
+<footer id="entry">
+  <div class="ticket wrap">
+    <div><p>2027年6月19日（土）</p><h2>18時、<wbr><span>北側の搬入口へ。</span></h2><p>湾岸第六倉庫の北側で受付。<br>終演予定 20:45。</p></div>
+    <ul><li>当日受付 3,500円（現金）</li><li>全席自由。立見スペースあり</li><li>大きな音と点滅する光を使用します</li></ul>
+    <a class="gallery-link" href="index.html">作例一覧</a>
+  </div>
+</footer>
 </body>
 </html>
