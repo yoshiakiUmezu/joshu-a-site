@@ -58,7 +58,7 @@ API送信前に、入力のUTF-8バイト数と構造分の余裕、最大出力
 
 時刻・操作・予約量・成否・トークン数・HTMLバイト数をローカルの `usage.json` に記録します。入力本文、生成HTML、認証情報は含めません。Windowsの保存先は `%LOCALAPPDATA%\joshu-a-studio\usage.json`、他のOSでは `$XDG_STATE_HOME/joshu-a-studio/usage.json`（既定 `~/.local/state/joshu-a-studio/usage.json`）です。再起動後も同じ枠を使います。次の検証枠を用意する場合は、費用の承認後、サーバーを停止し、既存の台帳を保管してから開始してください。
 
-初稿・修正ともアニメーションの量は多めに固定します。端末の動きを減らす設定を尊重します。書体は案件ごとに選定し、見出し・本文・ナビをページ内で統一します。端末にない場合はその案件の代替書体を使います。
+初稿はスマホの冒頭から来訪者が作品や判断材料に触れられる構図を目指します。詳細を開く動きには折り込み・横からの差し込みも選べます。修正では構図変更の指定がある場合を除き、選んだ入口を引き継ぎます。初稿・修正ともアニメーションの量は多めに固定します。端末の動きを減らす設定を尊重します。書体は案件ごとに選定し、見出し・本文・ナビをページ内で統一します。端末にない場合はその案件の代替書体を使います。
 
 無課金で接続境界・保存・使用量処理を検証するコマンドは `node --test .studio/engine.test.mjs .studio/server.test.mjs` です。ブラウザでのページ内移動と確認・納品の操作は `node --test .studio/preview.playwright.test.mjs .studio/delivery.playwright.test.mjs .studio/brief.playwright.test.mjs` で確認できます。システムのChromium系ブラウザを使う場合は、その実行ファイルを `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` に指定します。モデル単価は[OpenAIのモデル仕様](https://developers.openai.com/api/docs/models/gpt-6-luna)を参照してください。
 
