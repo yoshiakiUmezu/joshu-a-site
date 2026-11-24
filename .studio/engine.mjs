@@ -64,8 +64,11 @@ function escapeText(value) {
   return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 }
 
-function invalidMarkup() {
-  throw new Error('生成されたHTMLの要素・属性・ページ内リンクを確認できませんでした。');
+function invalidMarkup(html, offset, reason) {
+  const before = html.slice(0, offset);
+  const line = before.split('\n').length;
+  const column = offset - before.lastIndexOf('\n');
+  throw new Error(`HTMLの${line}行${column}列：${reason}`);
 }
 
 // Downloaded documents carry the pixels. Revision requests carry only the catalog
@@ -96,68 +99,75 @@ function checkedFragment(html) {
   let headingCount = 0;
   let images = 0;
   const result = [];
-  for (const [token] of html.matchAll(/<[^<>]*>|[^<]+|</g)) {
+  for (const tokenMatch of html.matchAll(/<[^<>]*>|[^<]+|</g)) {
+    const [token] = tokenMatch;
+    const offset = tokenMatch.index;
     if (!token.startsWith('<')) {
       result.push(token);
       continue;
     }
     const closing = /^<\/([a-z][a-z0-9]*)>$/.exec(token);
     if (closing) {
-      if (stack.pop() !== closing[1]) invalidMarkup();
+      if (stack.pop() !== closing[1]) invalidMarkup(html, offset, '閉じタグの対応が一致しません。');
       result.push(token);
       continue;
     }
     const opening = /^<([a-z][a-z0-9]*)([\s\S]*?)\s*(\/?)>$/.exec(token);
-    if (!opening || !elements.has(opening[1])) invalidMarkup();
+    if (!opening || !elements.has(opening[1])) invalidMarkup(html, offset, '未対応の要素またはタグの書式です。');
     const [, name, attributes, slash] = opening;
     const isVoid = name === 'br' || name === 'hr' || name === 'img';
-    if (slash && !isVoid) invalidMarkup();
+    if (slash && !isVoid) invalidMarkup(html, offset, 'この要素には閉じタグが必要です。');
     if (!isVoid) stack.push(name);
     if (name === 'main') mainCount++;
     if (name === 'h1') headingCount++;
     const seen = new Set();
-    const attr = /\s+([a-z][a-z-]*)\s*=\s*(?:"([^"<>]*)"|'([^'<>]*)')/y;
+    const attr = /\s+([a-z][a-z-]*)\s*=\s*(?:"([^"<>]*)"|'([^'<>]*)'|([A-Za-z][A-Za-z0-9_-]*)(?=\s|$))/y;
     result.push('<' + name);
     let pos = 0;
+    const invalidAttribute = reason => invalidMarkup(html, offset + name.length + 1 + pos, reason);
     while (pos < attributes.length) {
       attr.lastIndex = pos;
       const match = attr.exec(attributes);
-      if (!match || seen.has(match[1])) invalidMarkup();
+      if (!match || seen.has(match[1])) invalidAttribute('属性の書式または重複を確認してください。');
       const key = match[1];
-      const value = match[2] ?? match[3];
+      const value = match[2] ?? match[3] ?? match[4];
       seen.add(key);
-      pos = attr.lastIndex;
+
       if (key === 'id') {
-        if (!/^[A-Za-z][\w-]*$/.test(value) || ids.has(value)) invalidMarkup();
+        if (!/^[A-Za-z][\w-]*$/.test(value) || ids.has(value)) invalidAttribute('idの書式または重複を確認してください。');
         ids.add(value);
       } else if (key === 'href' && name === 'a') {
-        if (!/^#[A-Za-z][\w-]*$/.test(value)) invalidMarkup();
-        links.push(value.slice(1));
+        if (!/^#[A-Za-z][\w-]*$/.test(value)) invalidAttribute('hrefにはページ内のidを指定してください。');
+        links.push({ id: value.slice(1), offset });
       } else if (key === 'aria-labelledby') {
-        if (!/^[A-Za-z][\w-]*$/.test(value)) invalidMarkup();
-        links.push(value);
+        if (!/^[A-Za-z][\w-]*$/.test(value)) invalidAttribute('aria-labelledbyの参照形式が不正です。');
+        links.push({ id: value, offset });
       } else if (key === 'src' && name === 'img') {
-        if (!art.has(value)) throw new Error('生成画像の参照先が制作室の素材一覧にありません。');
+        if (!art.has(value)) invalidAttribute('生成画像の参照先が制作室の素材一覧にありません。');
       } else if ((key === 'alt' && name === 'img') || (key === 'datetime' && name === 'time')) {
-        if (!value.trim()) invalidMarkup();
+        if (!value.trim()) invalidAttribute('属性値が空です。');
       } else if (key === 'data-nav' && name === 'h2') {
-        if (!value.trim()) invalidMarkup();
+        if (!value.trim()) invalidAttribute('目次名が空です。');
       } else if (key === 'role') {
-        if (value !== 'img' || !['div', 'span', 'figure'].includes(name)) invalidMarkup();
+        if (value !== 'img' || !['div', 'span', 'figure'].includes(name)) invalidAttribute('未対応のroleです。');
       } else if (key === 'aria-hidden') {
-        if (!['true', 'false'].includes(value)) invalidMarkup();
+        if (!['true', 'false'].includes(value)) invalidAttribute('aria-hiddenの値が不正です。');
       } else if (!['class', 'aria-label'].includes(key)) {
-        invalidMarkup();
+        invalidAttribute('この要素には指定できない属性です。');
       }
       // Keep model-authored HTML entities, quoting only the delimiter we emit.
+      pos = attr.lastIndex;
       result.push(' ' + key + '="' + value.replaceAll('"', '&quot;') + '"');
     }
     if (name === 'img') {
-      if (++images > MAX_IMAGES || !seen.has('alt') || !seen.has('src')) throw new Error('画像は代替テキスト付きの制作室素材を3点まで使用できます。');
+      if (++images > MAX_IMAGES || !seen.has('alt') || !seen.has('src')) invalidMarkup(html, offset, '画像は代替テキスト付きの制作室素材を3点まで使用できます。');
     }
     result.push('>');
   }
-  if (stack.length || mainCount !== 1 || headingCount !== 1 || links.some(id => !ids.has(id))) invalidMarkup();
+  if (stack.length) invalidMarkup(html, html.length, '閉じていない要素があります。');
+  if (mainCount !== 1 || headingCount !== 1) invalidMarkup(html, html.length, 'mainとh1をそれぞれ1個にしてください。');
+  const missing = links.find(link => !ids.has(link.id));
+  if (missing) invalidMarkup(html, missing.offset, '参照先のidが見つかりません。');
   return result.join('');
 }
 
@@ -364,6 +374,6 @@ export async function callResponses(body, { apiKey, fetchImpl, privateNotes = ''
   try {
     return { html: renderSite(material ? applyMaterialPlan(site, material) : site, siteName), usage };
   } catch (error) {
-    throw providerError(error.message, usage);
+    throw Object.assign(providerError(error.message, usage), { rejectedSite: site });
   }
 }

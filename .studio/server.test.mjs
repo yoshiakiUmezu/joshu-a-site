@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { startStudio } from './server.mjs';
 import { fixturePlan } from './test-plan.mjs';
@@ -187,4 +189,34 @@ test('legacy rows preserve totals and mixed ledgers distinguish untracked cache 
   const ledger = openLedger(file, {});
   assert.deepEqual(ledger.summary(), { calls: 2, inputTokens: 200, cachedInputTokens: 20, write30mTokens: 30,
     write12hTokens: 20, unknownCacheWriteCalls: 1, outputTokens: 100, totalTokens: 300, reservedTokens: 0 });
+});
+
+test('rejected markup retains its source for metered-once offline recovery', async t => {
+  const fixture = structuredClone(response);
+  const content = fixture.output[0].content[0];
+  const site = JSON.parse(content.text);
+  site.html = '<main><h1>切符座</h1>\n<a href="#schedule">上映時間</a></main>';
+  content.text = JSON.stringify(site);
+  let calls = 0;
+  const app = await setup(t, () => { calls++; return Response.json(fixture); });
+  const failed = await send(app.origin);
+  assert.equal(failed.status, 502);
+  const { error, ledger } = await failed.json();
+  assert.match(error, /2行1列：参照先/);
+  assert.equal(ledger.totalTokens, usage.total_tokens);
+  const dir = dirname(app.options.ledgerPath);
+  const source = join(dir, error.match(/recovery\/[a-f0-9-]+\.json/)[0]);
+  const record = JSON.parse(await readFile(source, 'utf8'));
+  assert.equal(record.site.html, site.html);
+  const output = join(dir, 'preview.html');
+  const recover = () => execFileSync(process.execPath,
+    [fileURLToPath(new URL('./recover.mjs', import.meta.url)), source, output], { stdio: 'pipe' });
+  assert.throws(recover);
+  await assert.rejects(readFile(output), { code: 'ENOENT' });
+  record.site.html = site.html.replace('<h1>', '<h1 id=schedule>');
+  await writeFile(source, JSON.stringify(record));
+  recover();
+  assert.match(await readFile(output, 'utf8'), /<h1 id="schedule">切符座/);
+  assert.throws(recover);
+  assert.equal(calls, 1);
 });

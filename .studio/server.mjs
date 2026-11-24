@@ -1,5 +1,5 @@
 import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
-import { readFile, realpath } from 'node:fs/promises';
+import { readFile, realpath, mkdir, writeFile } from 'node:fs/promises';
 import http from 'node:http';
 import { homedir } from 'node:os';
 import { dirname, isAbsolute, join, relative, sep } from 'node:path';
@@ -219,6 +219,20 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
           candidate = await callResponses(request, { apiKey, fetchImpl, privateNotes, material: plan, siteName: input.brief.name });
         } catch (error) {
           ledger.finish(id, 'failed', error.usage ?? null, 0);
+          if (error.rejectedSite) {
+            const directory = join(dirname(ledgerPath), 'recovery');
+            const filename = randomUUID() + '.json';
+            const { art, supporting, placement, position } = plan;
+            const record = { reason: error.message, siteName: input.brief.name,
+              material: { art, supporting, placement, position }, site: error.rejectedSite };
+            try {
+              await mkdir(directory, { recursive: true, mode: 0o700 });
+              await writeFile(join(directory, filename), JSON.stringify(record, null, 2), { flag: 'wx', mode: 0o600 });
+              error.message += ' ローカル検査用原稿：recovery/' + filename;
+            } catch {
+              error.message += ' ローカル検査用原稿を保存できませんでした。';
+            }
+          }
           throw Object.assign(error, { status: 502 });
         }
         ledger.finish(id, 'ok', candidate.usage, Buffer.byteLength(candidate.html));
