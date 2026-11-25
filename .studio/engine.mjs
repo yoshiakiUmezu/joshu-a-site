@@ -28,7 +28,7 @@ HTML要素は ${[...elements].join(' ')} だけ。mainとh1を各1個使い、�
 imgも空要素です。素材を使うときは <img src="art:coffee" alt="窓辺の珈琲とトースト"> の形式で、指定された素材を各1回、合計3点まで使えます。独自URL、base64、幅・高さ属性は使いません。
 h2のdata-nav以外の属性は引用符付きのclass、id、aria-label、aria-hidden、図版のrole="img"、aのhref、timeのdatetimeだけ。idは英字で始まる英数字・ハイフン・アンダースコア、hrefは存在する#idだけです。
 外部フォント・外部参照・インラインstyle・スクリプト・フォーム・HTMLコメントは使えません。
-CSSのアットルールは@mediaだけ。比較はmin-widthやmax-widthを使い、CSSエスケープ、URL、山括弧は使わないでください。`;
+案件固有の動きは@keyframes scene-英小文字名で定義できる。冒頭・中盤・終盤を一続きの演出として設計する。冒頭は素材と題字の登場順、中盤はスクロールで主役と次の素材が入れ替わる動き、終盤は余韻から次の行動への着地を具体化する。各場面で同じフェードを繰り返さず、読む位置では文字を静止させる。CSSのアットルールは@mediaとこの形式の@keyframesのみ。独自の動きは@media(prefers-reduced-motion:no-preference)内で適用し、動きなしでも全内容が読める初期状態にする。スクロールにanimation-timeline:view()を使うときは未対応環境でも本文を隠さない。比較はmin-widthやmax-widthを使い、CSSエスケープ、URL、山括弧は使わないでください。`;
 
 export function buildResponseRequest({ brief, instruction = '', previousHtml = '' }, designNotes = '', reference = '') {
   const textInput = JSON.stringify({ brief, instruction, previousHtml: compactPreviousHtml(previousHtml)
@@ -283,7 +283,7 @@ export function renderSite(site, siteName) {
   if (Buffer.byteLength(title + html + css) > MAX_SOURCE_BYTES) throw new Error('HTML・CSSの生成結果が48 KiBを超えました。');
   // CSP also blocks subresources when the saved HTML is opened outside the studio.
   const cssTokens = css.replace(/\/\*[\s\S]*?\*\//g, '');
-  if (/[<\\]/.test(css) || /@(?!media\b)|(?:url|src|image|image-set|paint)\s*\(/i.test(cssTokens)) {
+  if (/[<\\]/.test(css) || /@(?!media\b|keyframes\s+scene-[a-z][a-z0-9-]*\s*\{)|(?:url|src|image|image-set|paint)\s*\(/i.test(cssTokens)) {
     throw new Error('生成されたCSSに外部参照または未対応の記法が含まれます。');
   }
   const fragment = checkedFragment(html);

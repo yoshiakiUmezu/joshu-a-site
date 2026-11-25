@@ -71,12 +71,50 @@ async function screenshot(browser, html, viewport) {
   });
 }
 
+// Sample visible CSS animations during a no-click scroll. Progress alone does
+// not rate design quality; give the reviewer the observed names and locations.
+async function inspectMotion(page) {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  try {
+    const distance = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight);
+    const steps = Math.min(60, Math.max(12, Math.ceil(distance / 90)));
+    const bands = [new Set(), new Set(), new Set()];
+    const previous = await page.evaluateHandle(() => new Map());
+    for (let i = 0; i <= steps; i++) {
+      await page.evaluate(y => scrollTo({ top: y, behavior: 'instant' }), distance * i / steps);
+      await page.waitForTimeout(45);
+      const changing = await page.evaluate(last => {
+        const names = [];
+        for (const animation of document.getAnimations()) {
+          const target = animation.effect?.target;
+          if (!(target instanceof Element) || !animation.animationName) continue;
+          const rect = target.getBoundingClientRect();
+          if (!rect.width || !rect.height || rect.bottom <= 0 || rect.top >= innerHeight ||
+              rect.right <= 0 || rect.left >= innerWidth) continue;
+          const progress = animation.effect.getComputedTiming().progress;
+          if (progress !== null && last.has(animation) && last.get(animation) !== progress) names.push(animation.animationName);
+          last.set(animation, progress);
+        }
+        return names;
+      }, previous);
+      const band = bands[Math.min(2, Math.floor(i * 3 / (steps + 1)))];
+      for (const name of changing) band.add(name);
+    }
+    await previous.dispose();
+    return bands.map(band => [...band].slice(0, 10));
+  } finally {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+  }
+}
+
 // Diagnostic only: an unavailable browser must not discard a paid draft.
 export async function inspectDraft(html, previews, captureEnding = false) {
   let browser;
   try {
     browser = await launchBrowser();
     const issues = [];
+    let motion;
     for (const width of [1440, 768, 390]) {
       const findings = await withRenderedPage(browser, html, { width, height: 844 }, async page => {
         const notes = await page.evaluate(() => {
@@ -92,6 +130,7 @@ export async function inspectDraft(html, previews, captureEnding = false) {
           return notes;
         });
         if (width === 390) {
+          if (previews) motion = await inspectMotion(page);
           const disclosures = await page.locator('details > summary:first-child').all();
           for (const summary of disclosures.slice(0, 6)) {
             if (!await summary.isVisible()) continue;
@@ -123,7 +162,7 @@ export async function inspectDraft(html, previews, captureEnding = false) {
       }, previews && width === 1440 ? 0.5 : 1);
       issues.push(...findings.map(note => width + 'px幅：' + note));
     }
-    return { checked: true, issues };
+    return motion ? { checked: true, issues, motion } : { checked: true, issues };
   } catch {
     return { checked: false, issues: [] };
   } finally {

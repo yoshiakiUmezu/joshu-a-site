@@ -294,15 +294,16 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       if (previews) {
         review = '画面を取得できず、生成した版を表示しています。';
         if (layout.checked && previews.length >= 2) {
+          const motionNotes = layout.motion ? '\nスマホを無操作でスクロールしたとき画面内で進行したCSSアニメーション名（冒頭・中盤・終盤順）：' + JSON.stringify(layout.motion) + '。空欄は未観測。静止希望を尊重し、それ以外では設計上の見せ場が届くよう原因と配置を確認する。' : '';
           let critique = '';
           if (plan.critique && previews.length === 3 && ledger.summary().calls + 2 <= limits.maxCalls) {
-            const content = [{ type: 'input_text', text: JSON.stringify({ brief: input.brief, specification }) },
+            const content = [{ type: 'input_text', text: JSON.stringify({ brief: input.brief, specification, motionNotes }) },
               ...previews.map(image_url => ({ type: 'input_image', detail: 'high', image_url }))];
             critique = await prepare({ model: body.model, store: false, service_tier: body.service_tier,
               reasoning: body.reasoning, max_output_tokens: 900, instructions: plan.critique,
               input: [{ role: 'user', content }] }, 'visual-critique');
           }
-          const reviewNotes = notes + templateRule + '\n' + plan.visualReview + (specification ? '\n今回の制作仕様書\n' + specification : '');
+          const reviewNotes = notes + templateRule + '\n' + plan.visualReview + motionNotes + (specification ? '\n今回の制作仕様書\n' + specification : '');
           const request = buildResponseRequest({ ...input, previousHtml: result.html,
             instruction: '完成画面を確認して初稿を仕上げてください。' + layout.issues.join('。') + (critique ? '\n画面評価の指摘：\n' + critique : '') }, reviewNotes, previews[0]);
           request.input[0].content.push({ type: 'input_image', detail: 'high', image_url: previews[1] });
