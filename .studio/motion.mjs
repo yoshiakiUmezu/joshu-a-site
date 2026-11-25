@@ -123,12 +123,15 @@ main h2.studio-orbit::before{background:radial-gradient(circle at 52% 46%,#f7d38
 main h2.studio-orbit::after{width:52%;height:calc(var(--stage)*.28);left:26%;top:calc(var(--stage)*.33);border:3px double #efd7ac;border-radius:50%;transform:rotate(-18deg)}
 main ul.studio-roll{padding:1rem clamp(1rem,5vw,3rem);background:#28282b;color:#fff2d4;border-block:.6rem dotted #b8ab96;list-style:none}
 main ul.studio-roll li{padding:.9em 0;border-bottom:1px dashed #b8ab96}
-@supports(animation-timeline:view()){
- @media(prefers-reduced-motion:no-preference){
- main h2:is(.studio-leaves,.studio-water,.studio-letter,.studio-orbit)::after,main ul.studio-roll li{animation:var(--scene) linear both;animation-timeline:view();animation-range:entry 0% cover 70%}
- main .studio-leaves{--scene:studio-leaf-turn}main .studio-water{--scene:studio-swell}main .studio-letter{--scene:studio-post}main .studio-orbit{--scene:studio-ring}main .studio-roll{--scene:studio-feed}
- }
+main .studio-projector{position:relative;isolation:isolate}
+main .studio-projector::after{content:"";display:block;width:100%;height:clamp(2.2rem,6vw,4rem);grid-column:1/-1;pointer-events:none;background:repeating-linear-gradient(90deg,#28272b 0 6px,transparent 6px 48px),repeating-linear-gradient(115deg,#ce8f59 0 12px,#e3b777 13px 22px,#596b61 23px 37px,#a45a43 38px 48px);background-size:48px 100%;border-block:6px dotted #2a282c}
+@media(prefers-reduced-motion:no-preference){
+ main .studio-projector::after{animation:studio-project 1.8s linear infinite}
+ main h2:is(.studio-leaves,.studio-water,.studio-letter,.studio-orbit)::after{animation:var(--scene) var(--period,3.6s) ease-in-out infinite alternate}
+ main .studio-leaves{--scene:studio-leaf-turn}main .studio-water{--scene:studio-swell;--period:2.8s}main .studio-letter{--scene:studio-post;--period:3.1s}main .studio-orbit{--scene:studio-ring}
+ @supports(animation-timeline:view()){main ul.studio-roll li{animation:studio-feed linear both;animation-timeline:view();animation-range:entry 0% cover 70%}}
 }
+@keyframes studio-project{to{background-position:48px 0,48px 0}}
 @keyframes studio-leaf-turn{from{transform:perspective(35rem) rotateY(-80deg) rotate(-14deg)}to{transform:perspective(35rem) rotateY(20deg) rotate(6deg)}}
 @keyframes studio-swell{from{background-position:0 90%}to{background-position:100% 0}}
 @keyframes studio-post{from{transform:translate(-110%,40%) rotate(-29deg)}to{transform:translate(32%,-6%) rotate(6deg)}}
