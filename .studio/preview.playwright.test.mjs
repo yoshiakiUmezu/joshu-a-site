@@ -99,3 +99,20 @@ test('exported motion follows the selected theme and the reader preference witho
     assert.ok(!previous.includes('@keyframes') && previous.includes('data-motion="' + (motion === 'still' ? 'soft' : motion) + '"'));
   }
 });
+
+test('a scene caption progresses when its illustration clips overflow', async t => {
+  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
+  t.after(() => browser.close());
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: 'no-preference' });
+  await page.setContent(renderSite({ title: '上映', motion: 'editorial',
+    html: '<main><h1>上映</h1><section class="studio-feature"><h2 class="studio-letter"><span class="studio-scene-caption">手紙</span></h2></section></main>',
+    css: 'section{margin-top:100vh;margin-bottom:100vh}' }));
+  const caption = page.locator('.studio-scene-caption');
+  const top = await caption.evaluate(el => el.getBoundingClientRect().top);
+  async function clipAt(y) {
+    await page.evaluate(y => scrollTo({ top: y, behavior: 'instant' }), y);
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    return caption.evaluate(el => getComputedStyle(el).clipPath);
+  }
+  assert.notEqual(await clipAt(top - 830), await clipAt(top - 480));
+});

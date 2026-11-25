@@ -110,7 +110,7 @@ ${withScenes ? sceneStyles : ''}
 }
 
 const sceneStyles = `
-main h2:is(.studio-leaves,.studio-water,.studio-letter,.studio-orbit){--stage:clamp(9rem,26vh,18rem);display:block;position:relative;isolation:isolate;overflow:hidden;padding:calc(var(--stage) + 1rem) .65rem .7rem;line-height:1.3;animation:none}
+main h2:is(.studio-leaves,.studio-water,.studio-letter,.studio-orbit){--stage:clamp(9rem,26vh,18rem);display:block;position:relative;isolation:isolate;overflow:clip;padding:calc(var(--stage) + 1rem) .65rem .7rem;line-height:1.3;animation:none}
 main h2:is(.studio-leaves,.studio-water,.studio-letter,.studio-orbit)::before,
 main h2:is(.studio-leaves,.studio-water,.studio-letter,.studio-orbit)::after{content:"";display:block;position:absolute;pointer-events:none;top:0;left:0;width:100%;height:var(--stage)}
 main h2.studio-leaves::before{background:linear-gradient(125deg,#253d36,#516253)}
@@ -128,6 +128,7 @@ main .studio-projector{position:relative;isolation:isolate}
 main .studio-projector::after{content:"";display:block;width:100%;height:clamp(2.2rem,6vw,4rem);grid-column:1/-1;pointer-events:none;background:repeating-linear-gradient(90deg,#28272b 0 6px,transparent 6px 48px),repeating-linear-gradient(115deg,#ce8f59 0 12px,#e3b777 13px 22px,#596b61 23px 37px,#a45a43 38px 48px);background-size:48px 100%;border-block:6px dotted #2a282c}
 @media(prefers-reduced-motion:no-preference){
  main .studio-projector h1,main .studio-projector h1+p{animation:studio-type-lift 1s cubic-bezier(.18,.7,.25,1) backwards}
+ main .studio-projector h1{animation:studio-title-focus 1.25s cubic-bezier(.2,.65,.25,1) both;transform-origin:left center}
  main .studio-projector h1+p{animation-delay:.18s}
  main .studio-projector::after{animation:studio-project 1.8s linear infinite}
  main h2:is(.studio-leaves,.studio-water,.studio-letter,.studio-orbit)::after{animation:var(--scene) var(--period,3.6s) ease-in-out infinite alternate}
@@ -135,8 +136,18 @@ main .studio-projector::after{content:"";display:block;width:100%;height:clamp(2
  @supports(animation-timeline:view()){
  main .studio-feature .studio-scene-caption,main .studio-feature:has(.studio-scene-caption)>p{animation:studio-type-lift linear both;animation-timeline:view();animation-range:entry 0% cover 26%}
  main .studio-feature:has(.studio-scene-caption)>p{animation-range:entry 0% cover 32%}
+ main h2.studio-leaves .studio-scene-caption{animation-name:studio-type-unfold;transform-origin:50% 100%}
+ main h2.studio-water .studio-scene-caption{animation-name:studio-title-focus}
+ main h2.studio-letter .studio-scene-caption{animation-name:studio-ink-reveal}
+ main h2.studio-orbit .studio-scene-caption{animation-name:studio-type-arc;transform-origin:0 100%}
+ main ul.studio-roll li time{display:inline-block;transform-origin:center bottom;animation:studio-clock-flip linear both;animation-timeline:view();animation-range:entry 0% cover 22%}
  main ul.studio-roll li{animation:studio-feed linear both;animation-timeline:view();animation-range:entry 0% cover 70%}}
 }
+@keyframes studio-type-unfold{from{transform:perspective(25rem) rotateX(-74deg);opacity:.22}to{transform:perspective(25rem) rotateX(0);opacity:1}}
+@keyframes studio-title-focus{from{filter:blur(6px);opacity:.18;transform:scale(.9)}to{filter:blur(0);opacity:1;transform:scale(1)}}
+@keyframes studio-ink-reveal{from{clip-path:inset(0 96% 0 0);translate:-.4em 0}to{clip-path:inset(0);translate:0 0}}
+@keyframes studio-type-arc{from{transform:translateX(1em) rotate(8deg);opacity:.25}to{transform:none;opacity:1}}
+@keyframes studio-clock-flip{from{transform:perspective(14rem) rotateX(76deg);opacity:.35}to{transform:perspective(14rem) rotateX(0);opacity:1}}
 @keyframes studio-type-lift{from{opacity:.16;translate:0 2.4rem}to{opacity:1;translate:0 0}}
 @keyframes studio-project{to{background-position:48px 0,48px 0}}
 @keyframes studio-leaf-turn{from{transform:perspective(35rem) rotateY(-80deg) rotate(-14deg)}to{transform:perspective(35rem) rotateY(20deg) rotate(6deg)}}
