@@ -109,12 +109,13 @@ async function inspectMotion(page) {
 }
 
 // Diagnostic only: an unavailable browser must not discard a paid draft.
-export async function inspectDraft(html, previews, captureEnding = false) {
+export async function inspectDraft(html, previews, captureEnding = false, measure = Boolean(previews)) {
   let browser;
   try {
     browser = await launchBrowser();
     const issues = [];
     let motion;
+    let visibleChars;
     for (const width of [1440, 768, 390]) {
       const findings = await withRenderedPage(browser, html, { width, height: 844 }, async page => {
         const notes = await page.evaluate(() => {
@@ -130,7 +131,16 @@ export async function inspectDraft(html, previews, captureEnding = false) {
           return notes;
         });
         if (width === 390) {
-          if (previews) motion = await inspectMotion(page);
+          if (measure) {
+            motion = await inspectMotion(page);
+            visibleChars = await page.locator('main').evaluate(main => {
+              const hidden = [...main.querySelectorAll('footer,nav')].map(node => [node, node.style.display]);
+              for (const [node] of hidden) node.style.display = 'none';
+              const count = Array.from(main.innerText.replace(/\s/g, '')).length;
+              for (const [node, display] of hidden) node.style.display = display;
+              return count;
+            });
+          }
           const disclosures = await page.locator('details > summary:first-child').all();
           for (const summary of disclosures.slice(0, 6)) {
             if (!await summary.isVisible()) continue;
@@ -162,7 +172,7 @@ export async function inspectDraft(html, previews, captureEnding = false) {
       }, previews && width === 1440 ? 0.5 : 1);
       issues.push(...findings.map(note => width + 'px幅：' + note));
     }
-    return motion ? { checked: true, issues, motion } : { checked: true, issues };
+    return motion ? { checked: true, issues, motion, visibleChars } : { checked: true, issues };
   } catch {
     return { checked: false, issues: [] };
   } finally {

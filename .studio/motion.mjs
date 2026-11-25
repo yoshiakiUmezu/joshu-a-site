@@ -23,6 +23,28 @@ main .studio-gallery>:last-child{scroll-snap-align:end}
   main .studio-gallery details[open] .studio-card-art{transform:scale(.93) rotate(-2deg)}
   @media(hover:hover){main .studio-gallery summary:hover .studio-card-art{transform:scale(1.04) rotate(1deg)}}
 }
+main .studio-feature{padding-block:clamp(2rem,6vw,5rem);border-block-start:1px solid currentColor}
+main .studio-feature p{max-inline-size:42em;line-height:1.85}
+@media screen and (prefers-reduced-motion:no-preference){
+  @supports(animation-timeline:view()){
+    main .studio-feature::before{content:"";display:block;height:.22rem;background:currentColor;transform-origin:left;animation:studio-feature-line linear both;animation-timeline:view();animation-range:entry 0% cover 40%}
+    main .studio-feature p{animation:studio-feature-rise linear backwards;animation-timeline:view();animation-range:entry 0% entry 85%}
+  }
+}
+@keyframes studio-feature-line{from{transform:scaleX(.04)}to{transform:scaleX(1)}}
+@keyframes studio-feature-rise{from{translate:0 1.5rem;opacity:.65}to{translate:0 0;opacity:1}}
+main .studio-closeup{background:var(--studio-ink,CanvasText);color:var(--studio-paper,Canvas);padding-inline:clamp(1rem,5vw,4rem)}
+main .studio-sequence p{border-inline-start:2px solid currentColor;padding-inline-start:1.2em}
+@media(min-width:720px){main .studio-spread{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);column-gap:5vw}main .studio-spread h2{grid-column:1;grid-row:2 / span 3}main .studio-spread p{grid-column:2}main .studio-spread::before{grid-column:1/-1}}
+@media screen and (prefers-reduced-motion:no-preference){
+  @supports(animation-timeline:view()){
+    main .studio-spread p{animation-name:studio-spread-in}
+    main .studio-closeup h2{animation:studio-iris linear both;animation-timeline:view();animation-range:entry 0% entry 100%}
+    main .studio-sequence::before{height:.5rem;background:repeating-linear-gradient(90deg,currentColor 0 2px,transparent 2px 12px)}
+  }
+}
+@keyframes studio-spread-in{from{translate:1.5rem 0;clip-path:inset(0 12% 0 0)}to{translate:0 0;clip-path:inset(0)}}
+@keyframes studio-iris{from{clip-path:inset(0 35% 0 0);translate:0 .5em}to{clip-path:inset(0);translate:0 0}}
 /* Decorative graphics live in their own empty spans and never cover copy. */
 .studio-reel,.studio-tide,.studio-track{display:block;position:relative;overflow:hidden;color:inherit}
 .studio-reel{height:clamp(5rem,10vw,8rem);background:repeating-linear-gradient(90deg,currentColor 0 9px,transparent 9px 18px) left bottom/100% 5px no-repeat}

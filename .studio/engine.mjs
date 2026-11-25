@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { validUsage } from './ledger.mjs';
 
 export const MODEL = 'gpt-6-luna';
-export const MAX_OUTPUT_TOKENS = 6000;
+export const MAX_OUTPUT_TOKENS = 10000;
 export const MAX_SOURCE_BYTES = 48 * 1024;
 export const MAX_HTML_BYTES = 300 * 1024;
 
@@ -20,7 +20,7 @@ const instructions = `入力のbriefをもとに、訪問者向けの日本語�
 入力にない価格、住所、受賞、予約手段や実績を作らないでください。画像は同梱の見本素材です。使える素材と用途は制作設定に従ってください。
 制作上の指示や判断過程はサイトの本文・CSS・コメントに含めず、最終的なデザインだけを返してください。
 
-ホストがサイト名入りの共通ヘッダー、h2から作るページ内目次、末尾の移動リンクを追加します。作品独自の終わりを設計する場合はmainの最後にfooterを1つ置き、本文と同じ美術方針で制作してください。htmlにはmainをルートに本文のみを書き、冒頭にサイトの目的とh1、その後に提供内容・判断材料・次の行動を用途に応じて構成します。主要区画には短く具体的なh2を付けてください。日本語の通常LPは、操作せずに読める本文を約1600字（目次・フッター・空白・閉じた補足を除く）目安に設計する。区画数は固定せず、原稿量と用途に合わせて編集する。スクロールだけで具体例と違いが読めるよう、代表例の紹介、選ぶための比較、使い方や体験の順序など、入力から裏付けられる内容を本文に展開する。detailsには深く読みたい補足を置く。同一情報の再掲や空白で長くしない。短い告知や簡潔なページを希望された場合は区画を統合する。
+ホストがサイト名入りの共通ヘッダー、h2から作るページ内目次、末尾の移動リンクを追加します。作品独自の終わりを設計する場合はmainの最後にfooterを1つ置き、本文と同じ美術方針で制作してください。htmlにはmainをルートに本文のみを書き、冒頭にサイトの目的とh1、その後に提供内容・判断材料・次の行動を用途に応じて構成します。主要区画には短く具体的なh2を付けてください。仕様書に掲載用本文がある場合は各節に全文を配し、通常表示の原稿を要約しない。時系列の装飾や見出しにも終盤まで題材固有の動きを実装し、既定の登場効果だけで済ませない。日本語の通常LPは、操作せずに読める本文を約1600字（目次・フッター・空白・閉じた補足を除く）目安に設計する。区画数は固定せず、原稿量と用途に合わせて編集する。スクロールだけで具体例と違いが読めるよう、代表例の紹介、選ぶための比較、使い方や体験の順序など、入力から裏付けられる内容を本文に展開する。detailsには深く読みたい補足を置く。同一情報の再掲や空白で長くしない。短い告知や簡潔なページを希望された場合は区画を統合する。
 出力のdesignは非公開の短い制作方針です。先に読者の目的、要望の素材感を画面のどこにどう見せるか、各節で新しく伝える内容を具体化し、その方針をhtmlとcssで形にしてください。h2には本文とは別に短い目次名（例 data-nav="作品"）を付けられます。
 動きの専門用語を求めず、業種の体験に合わせて文字・写真・操作の見せ場を設計する。初稿・修正とも演出は多め。冒頭・各節・作品紹介・操作で使う演出を選ぶ。案件の雰囲気に似合う和文書体を自分で選び、bodyのfont-familyに端末用の代替候補とともに指定する。ページ内の見出し・本文・操作・フッターは同じ書体でまとめる。無骨な極太字、見出しの機械的な太字、意図しない書体の混在を避ける。修正では書体の変更依頼がない限り選定を維持する。初稿では、読者が見比べる・選ぶ・深く読む場面を一つ決め、その対象と操作の入口をスマホの最初の画面に置く。見せ場にdetailsを使うときは、内容に合わせてclass="studio-fold"（折り込み記事）またはclass="studio-slip"（横から差し込む明細）を選べる。summaryには開くと得られる内容を書き、展開後に具体的な比較材料を示す。修正時は選ばれた構図と入口を維持する。ただし構図変更の依頼を優先する。操作・スクロール・眺めている間の各場面に、題材に沿った異なる演出を配分する。空のspanにaria-hidden="true"を指定し、studio-reel（転がるリール）、studio-tide（交差する波）、studio-track（進む目盛り）から用途に合うものを使える。比較記事にstudio-pageを付けると紙面が回り込む。スクロール連動要素の祖先で横はみ出しを切る場合はoverflow:clipを使う。作品・商品をめくって比較する構図には、div.studio-galleryにid付きdetailsを並べ、各summaryに作品固有の図版.studio-card-artと名称を置く。直前に各カードへの#idリンクを添え、スワイプとキーボードの両方で選べるようにする。開くと図版から解説へ視線が移る。文章を増やして演出の代用をしない。依頼に合わせてmotionを選ぶ。softは静かな浮かび上がり、editorialは印刷面が開くような登場、rhythmicは短く弾むリズム。冒頭の主役が図や写真ならその要素にstudio-motion-lead、スクロールで見せたい作品・図やカードにstudio-motion-detailというclassを付ける。動きはホストがCSSで適用する。修正時は依頼に関係のない動きの設定を引き継ぐ。
 出力のtitleはプレーンテキスト、htmlは本文断片、cssはスタイルシートです。DOCTYPE・head・bodyはホストが用意します。
@@ -39,7 +39,7 @@ export function buildResponseRequest({ brief, instruction = '', previousHtml = '
     model: MODEL,
     store: false,
     service_tier: 'default',
-    reasoning: { effort: 'none' },
+    reasoning: { effort: 'low' },
     max_output_tokens: MAX_OUTPUT_TOKENS,
     instructions: designNotes ? instructions + '\n\n' + designNotes : instructions,
     input: reference ? [{ role: 'user', content: [
@@ -126,6 +126,14 @@ function checkedFragment(html) {
     let pos = 0;
     const invalidAttribute = reason => invalidMarkup(html, offset + name.length + 1 + pos, reason);
     while (pos < attributes.length) {
+      const openFlag = name === 'details' && /^\s+open(?=\s|$)/.exec(attributes.slice(pos));
+      if (openFlag) {
+        if (seen.has('open')) invalidAttribute('open属性が重複しています。');
+        seen.add('open');
+        result.push(' open=""');
+        pos += openFlag[0].length;
+        continue;
+      }
       attr.lastIndex = pos;
       const match = attr.exec(attributes);
       if (!match || seen.has(match[1])) invalidAttribute('属性の書式または重複を確認してください。');
@@ -150,6 +158,8 @@ function checkedFragment(html) {
         if (!value.trim()) invalidAttribute('目次名が空です。');
       } else if (key === 'role') {
         if (value !== 'img' || !['div', 'span', 'figure'].includes(name)) invalidAttribute('未対応のroleです。');
+      } else if (key === 'open' && name === 'details') {
+        if (value !== '' && value !== 'open') invalidAttribute('open属性の値が不正です。');
       } else if (key === 'aria-hidden') {
         if (!['true', 'false'].includes(value)) invalidAttribute('aria-hiddenの値が不正です。');
       } else if (!['class', 'aria-label'].includes(key)) {
@@ -184,7 +194,31 @@ export function validMaterialSet(selected, supporting = []) {
     && ids.length <= MAX_IMAGES && new Set(ids).size === ids.length && ids.every(id => ART_IDS.includes(id));
 }
 
-export function applyMaterialPlan(site, { art: selected, supporting = [], placement, position }) {
+// Editorial copy comes from the planning response. Its text stays passive and
+// survives a shorter implementation response, including a missing layout slot.
+function placeEditorial(html, sections) {
+  // A model can wrap a managed slot in its own article and heading.
+  // Keep the navigation attributes when taking ownership of that heading.
+  const headingAttributes = new Map();
+  html = html.replace(/<section class="studio-feature(?: studio-[a-z]+)?">\s*<h2([^>]*)>((?:(?!<\/h2>)[\s\S])*)<\/h2>\s*(<div class="studio-copy-(\d+)"><\/div>)\s*<\/section>/g,
+    (match, attrs, _label, slot, number) => {
+      if (!sections[Number(number) - 1]) return match;
+      headingAttributes.set(Number(number), attrs);
+      return slot;
+    });
+  const missing = [];
+  for (const [index, section] of sections.entries()) {
+    const slot = '<div class="studio-copy-' + (index + 1) + '"></div>';
+    const presentation = ['spread', 'sequence', 'closeup'].includes(section.presentation) ? ' studio-' + section.presentation : '';
+    const body = '<section class="studio-feature' + presentation + ' studio-article-' + (index + 1) + '"><h2' + (headingAttributes.get(index + 1) || '') + '>' + escapeText(section.heading) + '</h2>'
+      + section.paragraphs.map(text => '<p>' + escapeText(text) + '</p>').join('') + '</section>';
+    if (html.includes(slot)) html = html.replace(slot, () => body);
+    else missing.push(body);
+  }
+  return html.replace(/(<footer\b|<\/main>)/, match => missing.join('') + match);
+}
+
+export function applyMaterialPlan(site, { art: selected, supporting = [], placement, position, sections = [] }) {
   if (!Object.hasOwn(crops, placement) || !/^(?:100|[1-9]?\d)% (?:100|[1-9]?\d)%$/.test(position)) throw new Error('素材の配置設定を確認してください。');
   if (!validMaterialSet(selected, supporting)) throw new Error('未登録の制作素材です。');
   const missing = new Set(selected === null ? [] : [selected, ...supporting]);
@@ -194,6 +228,7 @@ export function applyMaterialPlan(site, { art: selected, supporting = [], placem
     const id = tag.match(/\sid="([^"]+)"/);
     return id ? '<span id="' + id[1] + '"></span>' : '';
   });
+  if (sections.length) html = placeEditorial(html, sections);
   if (selected === null) return { ...site, html };
   const photo = id => '<img src="art:' + id + '" alt="' + captions[id] + '">';
   if (missing.delete(selected)) {
@@ -256,7 +291,7 @@ function pageFrame(fragment, name) {
 
 const frameStyle = `
 .studio-mast,.studio-end{box-sizing:border-box;margin:0;padding:.65rem clamp(1rem,4vw,4rem);background:var(--studio-paper,Canvas);color:var(--studio-ink,CanvasText);font:500 1rem/1.4 system-ui,sans-serif;display:flex;align-items:center;gap:1rem;justify-content:space-between}
-.studio-closing-links,.studio-closing-links nav{display:flex;align-items:center;flex-wrap:wrap;gap:.8em}.studio-closing-links{margin-top:1.25rem}.studio-closing-links a{color:inherit}
+.studio-closing-links,.studio-closing-links nav{display:flex;align-items:center;flex-wrap:wrap;gap:.8em}footer:has(>.studio-closing-links){flex-wrap:wrap}.studio-closing-links{margin-top:1.25rem;flex-basis:100%;grid-column:1/-1;min-width:0}.studio-closing-links a{color:inherit}
 .studio-mast{border-bottom:1px solid currentColor}.studio-mast.studio-follow{position:sticky;top:0;z-index:10}
 .studio-mast>a:first-child{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .studio-mast nav,.studio-end nav{display:flex;align-items:center;gap:1em}.studio-mast nav{min-width:0}
@@ -264,7 +299,7 @@ const frameStyle = `
 .studio-mast a,.studio-end a{color:inherit;padding:.3em 0;text-underline-offset:.2em}
 .studio-mast .studio-index-link,.studio-mast .studio-first-link{display:none}.studio-end{flex-wrap:wrap;border-top:1px solid currentColor}.studio-end nav{flex-wrap:wrap}
 body:has(.studio-follow) [id]{scroll-margin-top:4.5rem}
-@media(max-width:700px){.studio-mast nav{display:none}.studio-mast .studio-first-link{display:block;min-width:0;max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.studio-mast .studio-index-link{display:inline-block;flex:none}.studio-end{align-items:flex-start;flex-direction:column}}
+@media(max-width:900px){.studio-mast nav{display:none}.studio-mast .studio-first-link{display:block;min-width:0;max-width:42%;overflow-wrap:anywhere;white-space:normal}.studio-mast .studio-index-link{display:inline-block;flex:none}.studio-end{align-items:flex-start;flex-direction:column}}
 `;
 const typeStyle = `@layer studioType {
   :where(body *) {font-family:inherit!important}

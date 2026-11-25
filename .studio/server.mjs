@@ -185,7 +185,7 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       if (req.method !== 'POST') throw fail(405, 'POSTで送信してください。');
       if (examplesOnly) throw fail(403, '作例モードです。実際のAI生成は通常の制作室で利用できます。');
       const input = await readInput(req);
-      const plan = designInstructions(input.brief, { instruction: input.instruction });
+      const plan = { ...designInstructions(input.brief, { instruction: input.instruction }) };
       const notes = plan?.notes;
       if (typeof notes !== 'string' || !notes.trim() || Buffer.byteLength(notes) > 16 * 1024) {
         throw fail(503, '非公開の制作設定を確認してください。');
@@ -210,9 +210,11 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       }
       const templateRule = selected ? '選ばれた完成作例「' + selected.style + '」の構図・余白・文字組み・情報の順序を土台にする。指定色と用途を優先し、架空の名称・料金・日時・写真URLを転載しない。使用可能な素材とHTML/CSSの範囲に合わせる。' : '';
       const body = buildResponseRequest(input, direction + templateRule, reference);
+      body.max_output_tokens = Math.min(body.max_output_tokens, limits.maxOutputTokens ?? MAX_OUTPUT_TOKENS);
       if (template) body.input[0].content.push({ type: 'input_text', text: '選択された作例のソース：\n' + template });
       async function generate(request, action, privateNotes, reservation) {
-        const budget = Buffer.byteLength(JSON.stringify(request)) + 1024 + MAX_OUTPUT_TOKENS;
+        request.max_output_tokens = body.max_output_tokens;
+        const budget = Buffer.byteLength(JSON.stringify(request)) + 1024 + request.max_output_tokens;
         const id = reservation ?? ledger.reserve(action, budget);
         let candidate;
         try {
@@ -222,9 +224,9 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
           if (error.rejectedSite) {
             const directory = join(dirname(ledgerPath), 'recovery');
             const filename = randomUUID() + '.json';
-            const { art, supporting, placement, position } = plan;
+            const { art, supporting, placement, position, sections } = plan;
             const record = { reason: error.message, siteName: input.brief.name,
-              material: { art, supporting, placement, position }, site: error.rejectedSite };
+              material: { art, supporting, placement, position, sections }, site: error.rejectedSite };
             try {
               await mkdir(directory, { recursive: true, mode: 0o700 });
               await writeFile(join(directory, filename), JSON.stringify(record, null, 2), { flag: 'wx', mode: 0o600 });
@@ -269,10 +271,10 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
       }
       if (!input.previousHtml && plan.planning) {
         // Protect the implementation call before spending any allowance on optional preparation.
-        reservation = ledger.reserve('generate', Buffer.byteLength(JSON.stringify(body)) + MAX_OUTPUT_TOKENS + 13000);
+        reservation = ledger.reserve('generate', Buffer.byteLength(JSON.stringify(body)) + body.max_output_tokens + 13000);
         const base = { model: body.model, store: false, service_tier: body.service_tier, reasoning: { effort: 'low' } };
         let research = '';
-        if (ledger.summary().calls + 2 <= limits.maxCalls) {
+        if (ledger.summary().calls + (plan.visualReview ? 3 : 2) <= limits.maxCalls) {
           research = await prepare({ ...base, max_output_tokens: 700, tools: [{ type: 'web_search' }],
             tool_choice: { type: 'web_search' }, max_tool_calls: 1,
             input: plan.researchQuery }, 'research');
@@ -281,14 +283,31 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
           { type: 'input_text', text: JSON.stringify({ brief: input.brief, material: notes, research, templateRule }) },
           { type: 'input_image', detail: 'high', image_url: reference },
         ] }];
-        specification = await prepare({ ...base, reasoning: body.reasoning, max_output_tokens: 1800,
-          instructions: plan.planning, input: planningInput }, 'design-plan');
+        const editorialFormat = { format: { type: 'json_schema', name: 'editorial_plan', strict: true, schema: {
+          type: 'object', additionalProperties: false, required: ['direction','sections'],
+          properties: { direction: { type: 'string' }, sections: { type: 'array', items: {
+            type: 'object', additionalProperties: false, required: ['heading','presentation','paragraphs'],
+            properties: { heading: { type: 'string' }, presentation: { type: 'string', enum: ['spread','sequence','closeup'] }, paragraphs: { type: 'array', items: { type: 'string' } } }
+          } } }
+        } } };
+        specification = await prepare({ ...base, ...(plan.visibleTarget ? { text: editorialFormat } : {}), reasoning: body.reasoning, max_output_tokens: 4200,
+          instructions: plan.planning + (plan.visibleTarget ? '\nJSONのdirectionは非公開。sectionsには訪問者が直接読める完成原稿のみを5本。指示・仕様・内部用ラベルは禁止。spreadは対比の見開き、sequenceは順を追う場面、closeupは一つに迫る特集。題材に応じて選んで組み合わせる。' : ''), input: planningInput }, 'design-plan');
+        if (plan.visibleTarget && specification) {
+          const editorial = JSON.parse(specification);
+          plan.sections = editorial.sections.filter(section =>
+            !/制作仕様|掲載用本文|^中盤[｜：]|^終盤[｜：]|アートディレクション/.test(section.heading));
+          if (plan.sections.length !== editorial.sections.length) stages.push('editorial-filter');
+          specification = editorial.direction + '\n'
+            + plan.sections.map((item, i) => item.heading + 'の掲載位置に <div class="studio-copy-' + (i + 1) + '"></div>').join('\n')
+            + '\n見出しと完成原稿は制作室が配置する。枠はmainの通常表示に分散し、記事の再執筆は不要。各記事はstudio-featureに加えてstudio-spread / studio-sequence / studio-closeupのclassを持つ。作品固有の色・幕・活字・シルエットがスクロール中に交代する大胆な構図をCSSで設計する。';
+        }
         if (!specification && research) body.instructions += '\n参考例の観察メモ（掲載用の文章ではありません）\n' + research;
         if (specification) body.instructions += '\n内部の制作仕様書。公開ページには設計メモを表示しない。\n' + specification;
       }
       let result = await generate(body, input.previousHtml ? 'revise' : 'generate', notes, reservation);
       const previews = !input.previousHtml && plan.visualReview ? [] : undefined;
       let layout = await inspectDraft(result.html, previews, Boolean(plan.critique));
+      let comparison;
       let review = '';
       let reviewTokens = 0;
       if (previews) {
@@ -303,20 +322,27 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
               reasoning: body.reasoning, max_output_tokens: 900, instructions: plan.critique,
               input: [{ role: 'user', content }] }, 'visual-critique');
           }
-          const reviewNotes = notes + templateRule + '\n' + plan.visualReview + motionNotes + (specification ? '\n今回の制作仕様書\n' + specification : '');
-          const request = buildResponseRequest({ ...input, previousHtml: result.html,
+          const textNotes = '\n通常表示の本文は実測' + layout.visibleChars + '字。通常LPでは短縮せず約1600字へ。仕様書の原稿を実際の可視段落・特集・比較に展開する。detailsやフッターに移して削らない。各区間に異なるスクロール場面を完成させる。短い告知・静止の希望は優先する。';
+          const reviewNotes = notes + textNotes + templateRule + '\n' + plan.visualReview + motionNotes + (specification ? '\n今回の制作仕様書\n' + specification : '');
+          const request = buildResponseRequest({ ...input, previousHtml: plan.sections?.length ? result.html.replace(/<section class="studio-feature(?: studio-[a-z]+)? studio-article-(\d+)"><h2[^>]*>[\s\S]*?<\/section>/g, '<div class="studio-copy-$1"></div>') : result.html,
             instruction: '完成画面を確認して初稿を仕上げてください。' + layout.issues.join('。') + (critique ? '\n画面評価の指摘：\n' + critique : '') }, reviewNotes, previews[0]);
           request.input[0].content.push({ type: 'input_image', detail: 'high', image_url: previews[1] });
           try {
             const polished = await generate(request, 'visual-review', reviewNotes);
             reviewTokens = polished.usage.totalTokens;
-            const checked = await inspectDraft(polished.html);
-            if (checked.checked && !checked.issues.length) {
+            const checked = await inspectDraft(polished.html, undefined, false, true);
+            const minimum = plan.visibleTarget || 0;
+            const acceptableVolume = checked.visibleChars >= Math.min(minimum, layout.visibleChars)
+              && checked.visibleChars >= layout.visibleChars * 0.9;
+            const preservesMotion = layout.motion.every((band, i) => !band.length || checked.motion?.[i]?.length);
+            comparison = { initial: layout, candidate: checked };
+            const variedMotion = !plan.motionTarget || new Set(checked.motion?.flat()).size >= new Set(layout.motion.flat()).size;
+            if (checked.checked && !checked.issues.length && acceptableVolume && preservesMotion && variedMotion) {
               result = { ...result, html: polished.html };
               layout = checked;
               review = '画面を見て仕上げた版です。';
             } else {
-              review = '仕上げ版の表示検査を通過しなかったため、元の版を表示しています。';
+              review = '仕上げ候補で表示・本文量・動きの保持を確認できず、初稿を保持しました。';
             }
           } catch (error) {
             if (![429, 502].includes(error.status)) throw error;
@@ -326,9 +352,14 @@ export async function startStudio({ password, apiKey, ledgerPath, port = 0, fetc
           }
         }
       }
+      if (previews && layout.checked && ((plan.visibleTarget && layout.visibleChars < plan.visibleTarget)
+          || (plan.motionTarget && layout.motion?.some(band => !band.length)))) {
+        review = '要調整の下書きです。' + (plan.visibleTarget && layout.visibleChars < plan.visibleTarget ? ' 本文' + layout.visibleChars + '字。' : '')
+          + (plan.motionTarget && layout.motion?.some(band => !band.length) ? ' 動きを観測できなかった区間があります。' : '');
+      }
       const draftId = randomUUID();
       drafts.set(draftId, { name: input.brief.name, html: result.html, layout });
-      return json(200, { ...result, draftId, layout, review, reviewTokens, preparationTokens, stages, ledger: ledger.summary() });
+      return json(200, { ...result, draftId, layout, comparison, review, reviewTokens, preparationTokens, stages, ledger: ledger.summary() });
     } catch (error) {
       const message = error.status ? error.message : '制作サーバーの処理に失敗しました。';
       return json(error.status ?? 500, [429, 502].includes(error.status) ? { error: message, ledger: ledger.summary() } : { error: message });

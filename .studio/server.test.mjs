@@ -220,3 +220,37 @@ test('rejected markup retains its source for metered-once offline recovery', asy
   assert.throws(recover);
   assert.equal(calls, 1);
 });
+test('visual finishing keeps the fuller draft when the candidate collapses the visible text', async t => {
+  let calls = 0;
+  const { origin } = await setup(t, () => {
+    const fixture = structuredClone(response);
+    const paragraph = '二本の見どころを比べる。'.repeat(++calls === 1 ? 30 : 1);
+    fixture.output[0].content[0].text = JSON.stringify({ title: '上映', html: '<main><h1>上映</h1><p>' + paragraph + '</p></main>', css: 'main{padding:1em}' });
+    return Response.json(fixture);
+  }, { maxCalls: 2, maxTotalTokens: 240000 }, () => ({ ...fixturePlan(), visualReview: 'review', visibleTarget: 1440 }));
+  const draft = await (await send(origin)).json();
+  assert.ok(draft.comparison.initial.visibleChars > draft.comparison.candidate.visibleChars);
+  assert.equal(draft.layout.visibleChars, draft.comparison.initial.visibleChars);
+  assert.match(draft.review, /要調整/);
+  assert.equal(calls, 2);
+});
+test('editorial copy from planning survives missing implementation slots and visual polish', async t => {
+  const text = '映画の短い感想を持ち帰る。'.repeat(29);
+  const sections = Array.from({ length: 5 }, (_, i) => ({ heading: '特集' + i, paragraphs: [text] }));
+  const { origin } = await setup(t, async (_url, options) => {
+    const body = JSON.parse(options.body);
+    const fixture = structuredClone(response);
+    fixture.output[0].content[0].text = body.text?.format?.name === 'editorial_plan'
+      ? JSON.stringify({ direction: '紙の映画誌', sections })
+      : JSON.stringify({ title: '映画', html: '<main><h1>映画</h1><section class="studio-feature studio-sequence"><h2 id="story">余分な見出し</h2><div class="studio-copy-1"></div></section><details open><summary>時間</summary><p>正午</p></details></main>', css: 'main{padding:1rem}' });
+    return Response.json(fixture);
+  }, { maxCalls: 3, maxTotalTokens: 240000 }, () => ({ ...fixturePlan(), visibleTarget: 1440, planning: 'plan', visualReview: 'review' }));
+  const draft = await (await send(origin)).json();
+  assert.equal(draft.ledger.calls, 3);
+  assert.doesNotMatch(draft.html, /余分な見出し/);
+  assert.match(draft.html, /<h2 id="story">特集0/);
+  assert.equal(draft.html.split(text).length - 1, 5);
+  assert.ok(draft.comparison.initial.visibleChars >= 1600);
+  assert.equal(draft.comparison.candidate.visibleChars, draft.layout.visibleChars);
+  assert.ok(draft.layout.motion.every(band => band.length));
+});
