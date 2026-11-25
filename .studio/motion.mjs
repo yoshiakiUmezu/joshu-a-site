@@ -11,7 +11,28 @@ export function motionSheet(mode = 'soft') {
   const entrance = `animation:${name} ${duration} cubic-bezier(.2,.7,.25,1) backwards`;
   return `<style id="studio-motion">
 @keyframes ${name}{from{${from}}${accent}to{opacity:1;translate:0 0;scale:1;clip-path:inset(0)}}
+/* Decorative graphics live in their own empty spans and never cover copy. */
+.studio-reel,.studio-tide,.studio-track{display:block;position:relative;overflow:hidden;color:inherit}
+.studio-reel{height:clamp(5rem,10vw,8rem);background:repeating-linear-gradient(90deg,currentColor 0 9px,transparent 9px 18px) left bottom/100% 5px no-repeat}
+.studio-reel::after{content:"";position:absolute;width:4.4rem;aspect-ratio:1;bottom:8px;left:0;border-radius:50%;
+  background:radial-gradient(circle,currentColor 0 7%,transparent 8% 62%,currentColor 63% 67%,transparent 68%),repeating-conic-gradient(from 10deg,transparent 0 17deg,currentColor 18deg 36deg,transparent 37deg 60deg);border:2px solid currentColor}
+.studio-tide{height:clamp(4rem,8vw,7rem);background:linear-gradient(transparent 48%,currentColor 49% 50%,transparent 51%)}
+.studio-tide::after,.studio-tide::before{content:"";position:absolute;inset:0 -80px;background:radial-gradient(ellipse at 50% 100%,transparent 61%,currentColor 63% 65%,transparent 67%) 0 50%/80px 52px repeat-x}
+.studio-tide::after{opacity:.45;background-size:64px 34px}
+.studio-track{height:.7rem;border-bottom:1px solid currentColor;background:repeating-linear-gradient(90deg,currentColor 0 1px,transparent 1px 5%)}
+@keyframes studio-roll{from{transform:translateX(0) rotate(0)}to{transform:translateX(7rem) rotate(180deg)}}
+@keyframes studio-wave{to{background-position:80px 50%}}
+@keyframes studio-wave-back{to{background-position:-64px 50%}}
+@keyframes studio-track-in{from{clip-path:inset(0 94% 0 0)}to{clip-path:inset(0)}}
+@keyframes studio-page-in{from{transform:perspective(650px) rotateY(-12deg);opacity:.7}to{transform:none;opacity:1}}
 @media screen and (prefers-reduced-motion:no-preference){
+  .studio-reel::after{animation:studio-roll 3s cubic-bezier(.45,0,.55,1) infinite alternate}
+  .studio-tide::before{animation:studio-wave 4s linear infinite}
+  .studio-tide::after{animation:studio-wave-back 3s linear infinite}
+  @supports (animation-timeline:view()){
+    .studio-track,.studio-page{animation:studio-track-in linear both;animation-timeline:view();animation-range:entry 0% cover 45%}
+    .studio-page{animation-name:studio-page-in;transform-origin:left center;animation-range:entry 0% entry 100%}
+  }
   main h1{${entrance}}
   html{scroll-behavior:smooth}
   main :is(.studio-hero-visual,.studio-motion-lead){${entrance};animation-delay:80ms}
