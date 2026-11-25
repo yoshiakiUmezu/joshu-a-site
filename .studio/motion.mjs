@@ -6,7 +6,7 @@ const themes = {
 };
 export const motionModes = Object.keys(themes);
 
-export function motionSheet(mode = 'soft') {
+export function motionSheet(mode = 'soft', withScenes = false) {
   const { name, duration, from, accent = '' } = Object.hasOwn(themes, mode) ? themes[mode] : themes.soft;
   const entrance = `animation:${name} ${duration} cubic-bezier(.2,.7,.25,1) backwards`;
   return `<style id="studio-motion">
@@ -104,6 +104,34 @@ main .studio-sequence p{border-inline-start:2px solid currentColor;padding-inlin
   @keyframes studio-answer{from{opacity:.4;translate:0 .65rem}to{opacity:1;translate:0 0}}
   @media(hover:hover){main :is(a,summary):hover{translate:0 -2px;transition:translate .2s ease}}
 }
+${withScenes ? sceneStyles : ''}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>`;
 }
+
+const sceneStyles = `
+main h2:is(.studio-leaves,.studio-water,.studio-letter,.studio-orbit){--stage:clamp(9rem,26vh,18rem);display:block;position:relative;isolation:isolate;overflow:hidden;padding:calc(var(--stage) + 1rem) .65rem .7rem;line-height:1.3;animation:none}
+main h2:is(.studio-leaves,.studio-water,.studio-letter,.studio-orbit)::before,
+main h2:is(.studio-leaves,.studio-water,.studio-letter,.studio-orbit)::after{content:"";display:block;position:absolute;pointer-events:none;top:0;left:0;width:100%;height:var(--stage)}
+main h2.studio-leaves::before{background:linear-gradient(125deg,#253d36,#516253)}
+main h2.studio-leaves::after{width:46%;height:calc(var(--stage)*.72);left:28%;top:calc(var(--stage)*.14);background:repeating-linear-gradient(0deg,#f9eac7 0 12%,#918977 13%,#f9eac7 14%);border-left:.35rem solid #8d664b;box-shadow:10px 6px #aa9d7f,18px 10px #cfba93;transform:rotate(-8deg);transform-origin:left center}
+main h2.studio-water::before{background:linear-gradient(#183d53,#206a76 60%,#b0d9c4)}
+main h2.studio-water::after{background:repeating-radial-gradient(ellipse at 38% 116%,transparent 0 7%,#d1f3df 7.5% 8%,transparent 9% 12%);background-size:125% 140%}
+main h2.studio-letter::before{background:repeating-linear-gradient(140deg,#e4ac95 0 3%,#f3e1bc 3% 6%,#57686b 6% 9%,#f3e1bc 9% 12%);border-block:.65rem solid #ece3cc}
+main h2.studio-letter::after{width:42%;height:calc(var(--stage)*.57);top:calc(var(--stage)*.21);left:28%;background:linear-gradient(32deg,transparent 49%,#b49677 50%,transparent 51%) left top/50% 100%,linear-gradient(-32deg,transparent 49%,#b49677 50%,transparent 51%) right top/50% 100%,#fff3d9;background-repeat:no-repeat;box-shadow:5px 9px 0 #4b3c3544;transform:rotate(-8deg)}
+main h2.studio-orbit::before{background:radial-gradient(circle at 52% 46%,#f7d38b 0 8%,#be8055 9% 13%,transparent 14%),radial-gradient(circle at 21% 25%,#fff 0 1px,transparent 2px),radial-gradient(circle at 84% 62%,#ffe4bc 0 2px,transparent 3px),#292843}
+main h2.studio-orbit::after{width:52%;height:calc(var(--stage)*.28);left:26%;top:calc(var(--stage)*.33);border:3px double #efd7ac;border-radius:50%;transform:rotate(-18deg)}
+main ul.studio-roll{padding:1rem clamp(1rem,5vw,3rem);background:#28282b;color:#fff2d4;border-block:.6rem dotted #b8ab96;list-style:none}
+main ul.studio-roll li{padding:.9em 0;border-bottom:1px dashed #b8ab96}
+@supports(animation-timeline:view()){
+ @media(prefers-reduced-motion:no-preference){
+ main h2:is(.studio-leaves,.studio-water,.studio-letter,.studio-orbit)::after,main ul.studio-roll li{animation:var(--scene) linear both;animation-timeline:view();animation-range:entry 0% cover 70%}
+ main .studio-leaves{--scene:studio-leaf-turn}main .studio-water{--scene:studio-swell}main .studio-letter{--scene:studio-post}main .studio-orbit{--scene:studio-ring}main .studio-roll{--scene:studio-feed}
+ }
+}
+@keyframes studio-leaf-turn{from{transform:perspective(35rem) rotateY(-80deg) rotate(-14deg)}to{transform:perspective(35rem) rotateY(20deg) rotate(6deg)}}
+@keyframes studio-swell{from{background-position:0 90%}to{background-position:100% 0}}
+@keyframes studio-post{from{transform:translate(-110%,40%) rotate(-29deg)}to{transform:translate(32%,-6%) rotate(6deg)}}
+@keyframes studio-ring{from{transform:rotate(-42deg) scaleX(.65)}to{transform:rotate(23deg) scaleX(1.15)}}
+@keyframes studio-feed{from{opacity:.68;transform:translateY(-.7em)}to{opacity:1;transform:translateY(0)}}
+`;
