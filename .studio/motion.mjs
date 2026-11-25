@@ -121,16 +121,23 @@ main h2.studio-letter::before{background:repeating-linear-gradient(140deg,#e4ac9
 main h2.studio-letter::after{width:42%;height:calc(var(--stage)*.57);top:calc(var(--stage)*.21);left:28%;background:linear-gradient(32deg,transparent 49%,#b49677 50%,transparent 51%) left top/50% 100%,linear-gradient(-32deg,transparent 49%,#b49677 50%,transparent 51%) right top/50% 100%,#fff3d9;background-repeat:no-repeat;box-shadow:5px 9px 0 #4b3c3544;transform:rotate(-8deg)}
 main h2.studio-orbit::before{background:radial-gradient(circle at 52% 46%,#f7d38b 0 8%,#be8055 9% 13%,transparent 14%),radial-gradient(circle at 21% 25%,#fff 0 1px,transparent 2px),radial-gradient(circle at 84% 62%,#ffe4bc 0 2px,transparent 3px),#292843}
 main h2.studio-orbit::after{width:52%;height:calc(var(--stage)*.28);left:26%;top:calc(var(--stage)*.33);border:3px double #efd7ac;border-radius:50%;transform:rotate(-18deg)}
+main .studio-scene-caption{display:block}
 main ul.studio-roll{padding:1rem clamp(1rem,5vw,3rem);background:#28282b;color:#fff2d4;border-block:.6rem dotted #b8ab96;list-style:none}
 main ul.studio-roll li{padding:.9em 0;border-bottom:1px dashed #b8ab96}
 main .studio-projector{position:relative;isolation:isolate}
 main .studio-projector::after{content:"";display:block;width:100%;height:clamp(2.2rem,6vw,4rem);grid-column:1/-1;pointer-events:none;background:repeating-linear-gradient(90deg,#28272b 0 6px,transparent 6px 48px),repeating-linear-gradient(115deg,#ce8f59 0 12px,#e3b777 13px 22px,#596b61 23px 37px,#a45a43 38px 48px);background-size:48px 100%;border-block:6px dotted #2a282c}
 @media(prefers-reduced-motion:no-preference){
+ main .studio-projector h1,main .studio-projector h1+p{animation:studio-type-lift 1s cubic-bezier(.18,.7,.25,1) backwards}
+ main .studio-projector h1+p{animation-delay:.18s}
  main .studio-projector::after{animation:studio-project 1.8s linear infinite}
  main h2:is(.studio-leaves,.studio-water,.studio-letter,.studio-orbit)::after{animation:var(--scene) var(--period,3.6s) ease-in-out infinite alternate}
  main .studio-leaves{--scene:studio-leaf-turn}main .studio-water{--scene:studio-swell;--period:2.8s}main .studio-letter{--scene:studio-post;--period:3.1s}main .studio-orbit{--scene:studio-ring}
- @supports(animation-timeline:view()){main ul.studio-roll li{animation:studio-feed linear both;animation-timeline:view();animation-range:entry 0% cover 70%}}
+ @supports(animation-timeline:view()){
+ main .studio-feature .studio-scene-caption,main .studio-feature:has(.studio-scene-caption)>p{animation:studio-type-lift linear both;animation-timeline:view();animation-range:entry 0% cover 26%}
+ main .studio-feature:has(.studio-scene-caption)>p{animation-range:entry 0% cover 32%}
+ main ul.studio-roll li{animation:studio-feed linear both;animation-timeline:view();animation-range:entry 0% cover 70%}}
 }
+@keyframes studio-type-lift{from{opacity:.16;translate:0 2.4rem}to{opacity:1;translate:0 0}}
 @keyframes studio-project{to{background-position:48px 0,48px 0}}
 @keyframes studio-leaf-turn{from{transform:perspective(35rem) rotateY(-80deg) rotate(-14deg)}to{transform:perspective(35rem) rotateY(20deg) rotate(6deg)}}
 @keyframes studio-swell{from{background-position:0 90%}to{background-position:100% 0}}

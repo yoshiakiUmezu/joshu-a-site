@@ -210,7 +210,12 @@ function placeEditorial(html, sections) {
   for (const [index, section] of sections.entries()) {
     const slot = '<div class="studio-copy-' + (index + 1) + '"></div>';
     const presentation = ['spread', 'sequence', 'closeup'].includes(section.presentation) ? ' studio-' + section.presentation : '';
-    const body = '<section class="studio-feature' + presentation + ' studio-article-' + (index + 1) + '"><h2' + (headingAttributes.get(index + 1) || '') + '>' + escapeText(section.heading) + '</h2>'
+    const attrs = headingAttributes.get(index + 1) || '';
+    const heading = escapeText(section.heading);
+    // Scene illustrations are painted on h2. Animate their caption independently.
+    const caption = /\bstudio-(?:leaves|water|letter|orbit)\b/.test(attrs)
+      ? '<span class="studio-scene-caption">' + heading + '</span>' : heading;
+    const body = '<section class="studio-feature' + presentation + ' studio-article-' + (index + 1) + '"><h2' + attrs + '>' + caption + '</h2>'
       + section.paragraphs.map(text => '<p>' + escapeText(text) + '</p>').join('') + '</section>';
     if (html.includes(slot)) html = html.replace(slot, () => body);
     else missing.push(body);
