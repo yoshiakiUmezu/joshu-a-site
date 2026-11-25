@@ -11,6 +11,18 @@ export function motionSheet(mode = 'soft') {
   const entrance = `animation:${name} ${duration} cubic-bezier(.2,.7,.25,1) backwards`;
   return `<style id="studio-motion">
 @keyframes ${name}{from{${from}}${accent}to{opacity:1;translate:0 0;scale:1;clip-path:inset(0)}}
+/* Keep each card in the tab order; native scrolling and fragment links work offline. */
+main .studio-gallery{display:flex;align-items:flex-start;gap:clamp(.75rem,2vw,1.5rem);overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:.4rem;padding:.4rem .4rem 1rem;scrollbar-width:thin}
+main .studio-gallery>*{box-sizing:border-box;flex:0 0 min(82%,33rem);min-width:0;scroll-snap-align:start;scroll-margin-block-start:5rem}
+main .studio-gallery>:last-child{scroll-snap-align:end}
+@keyframes studio-caption-in{from{opacity:.4;translate:0 .8rem}to{opacity:1;translate:0 0}}
+@media screen and (prefers-reduced-motion:no-preference){
+  main .studio-gallery{scroll-behavior:smooth}
+  main .studio-gallery details[open]>:not(summary){animation:studio-caption-in .46s cubic-bezier(.2,.75,.2,1) both}
+  main .studio-gallery summary .studio-card-art{transition:transform .55s cubic-bezier(.2,.75,.2,1)}
+  main .studio-gallery details[open] .studio-card-art{transform:scale(.93) rotate(-2deg)}
+  @media(hover:hover){main .studio-gallery summary:hover .studio-card-art{transform:scale(1.04) rotate(1deg)}}
+}
 /* Decorative graphics live in their own empty spans and never cover copy. */
 .studio-reel,.studio-tide,.studio-track{display:block;position:relative;overflow:hidden;color:inherit}
 .studio-reel{height:clamp(5rem,10vw,8rem);background:repeating-linear-gradient(90deg,currentColor 0 9px,transparent 9px 18px) left bottom/100% 5px no-repeat}
