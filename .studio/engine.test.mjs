@@ -132,3 +132,9 @@ test('an authored closing keeps its own content and gains working studio navigat
   const prior = JSON.parse(buildResponseRequest({ brief: {}, previousHtml: html }).input).previousHtml;
   assert.match(prior, /<footer[^>]* class="closing"><p>また明日<\/p><\/footer>/);
 });
+
+test('ticket colors accept only literal deck colors on details', () => {
+  const page = style => renderSite({ title: '券', html: '<main><h1>券</h1><details style="' + style + '"><summary>選ぶ</summary>紹介</details></main>', css: 'main{padding:1rem}' });
+  assert.match(page('--ink:#263b56;--accent:#f3c86a'), /--accent:#f3c86a/);
+  assert.throws(() => page('--ink:#263b56;background:red'));
+});

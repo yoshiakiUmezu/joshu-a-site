@@ -116,6 +116,7 @@ export async function inspectDraft(html, previews, captureEnding = false, measur
     const issues = [];
     let motion;
     let visibleChars;
+    const disclosuresTested = [];
     for (const width of [1440, 768, 390]) {
       const findings = await withRenderedPage(browser, html, { width, height: 844 }, async page => {
         const notes = await page.evaluate(() => {
@@ -147,10 +148,15 @@ export async function inspectDraft(html, previews, captureEnding = false, measur
             const details = summary.locator('..');
             const initial = await details.evaluate(node => node.open);
             try {
+              const chars = node => Array.from(node.innerText.replace(/\s/g, '')).length;
+              const before = measure && await details.evaluate(chars);
               await summary.click({ timeout: 1200 });
               if (await details.evaluate(node => node.open) === initial) throw new Error();
+              const after = measure && await details.evaluate(chars);
               await summary.click({ timeout: 1200 });
               if (await details.evaluate(node => node.open) !== initial) throw new Error();
+              if (measure) disclosuresTested.push({ label: (await summary.innerText()).trim().slice(0, 80),
+                extraCharsWhenOpen: initial ? before - after : after - before });
             } catch {
               notes.push('開閉できない案内があります');
               break;
@@ -172,7 +178,7 @@ export async function inspectDraft(html, previews, captureEnding = false, measur
       }, previews && width === 1440 ? 0.5 : 1);
       issues.push(...findings.map(note => width + 'px幅：' + note));
     }
-    return motion ? { checked: true, issues, motion, visibleChars } : { checked: true, issues };
+    return motion ? { checked: true, issues, motion, visibleChars, disclosuresTested } : { checked: true, issues };
   } catch {
     return { checked: false, issues: [] };
   } finally {

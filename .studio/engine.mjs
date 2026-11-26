@@ -158,6 +158,11 @@ function checkedFragment(html) {
         if (!value.trim()) invalidAttribute('目次名が空です。');
       } else if (key === 'role') {
         if (value !== 'img' || !['div', 'span', 'figure'].includes(name)) invalidAttribute('未対応のroleです。');
+      } else if (key === 'style' && name === 'details') {
+        // Only the two literal deck colors may appear here.
+        if (!/^\s*--(?:ink|accent)\s*:\s*#[\da-f]{6}\s*(?:;\s*--(?:ink|accent)\s*:\s*#[\da-f]{6}\s*)?;?\s*$/i.test(value)) {
+          invalidAttribute('半券の色には6桁の16進色を指定してください。');
+        }
       } else if (key === 'open' && name === 'details') {
         if (value !== '' && value !== 'open') invalidAttribute('open属性の値が不正です。');
       } else if (key === 'aria-hidden') {

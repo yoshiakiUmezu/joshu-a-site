@@ -16,7 +16,7 @@ main .studio-gallery{display:flex;align-items:flex-start;gap:clamp(.75rem,2vw,1.
 main .studio-gallery>*{box-sizing:border-box;flex:0 0 min(82%,33rem);min-width:0;scroll-snap-align:start;scroll-margin-block-start:5rem}
 main .studio-gallery>:last-child{scroll-snap-align:end}
 /* Vertically dealt deck. Each real summary remains the interactive face. */
-main .studio-gallery.studio-deck{display:block;overflow:visible;scroll-snap-type:none;isolation:isolate;padding:0 0 12vh}
+main .studio-gallery.studio-deck{display:block;overflow-x:clip;overflow-y:visible;scroll-snap-type:none;isolation:isolate;padding:0 0 12vh}
 main .studio-deck>details{--accent:#f9bc59;--ink:#1d2027;position:relative;width:100%;max-width:none;margin:0 0 8vh;padding:0;border:0;background:var(--ink);color:var(--accent);border-radius:.4rem;box-shadow:0 .55rem 1.8rem #17191b32}
 main .studio-deck>details:nth-of-type(3n + 2){--ink:#c9dfcb;--accent:#203c39}
 main .studio-deck>details:nth-of-type(3n){--ink:#663446;--accent:#ffcca2}
@@ -25,7 +25,7 @@ main .studio-deck>details>summary::before{content:"";position:absolute;z-index:-
 main .studio-deck>details>summary>*{width:fit-content;max-width:100%;background:var(--ink);color:inherit}
 main .studio-deck>details>summary>.studio-card-art{display:block;grid-column:1/-1;max-width:100%;min-height:0;height:auto;padding:0;font-size:clamp(2rem,8vw,5.2rem);line-height:1.05;font-variant-numeric:tabular-nums}
 main .studio-deck>details>summary>:nth-child(2){font-size:clamp(1.25rem,4vw,2.8rem)}
-main .studio-deck>details[open]>:not(summary){padding:1.25rem;color:inherit}
+main .studio-deck>details[open]>:not(summary){padding:1.25rem;background:var(--studio-paper,Canvas);color:var(--studio-ink,CanvasText)}
 @supports (animation-timeline:view()){
  @media(prefers-reduced-motion:no-preference) and (min-height:480px){
   main .studio-deck>details:not([open]){position:sticky;top:clamp(5rem,17svh,9rem);animation:studio-deal linear both;animation-timeline:view();animation-range:entry 0% entry 100%;transform-origin:85% 100%}
