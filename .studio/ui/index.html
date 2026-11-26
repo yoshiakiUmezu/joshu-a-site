@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>ホームページ制作室 | 助手A</title>
+  <link rel="icon" type="image/png" href="/assets/brand-mark.png">
+  <link rel="stylesheet" href="./studio.css">
+  <script type="module" src="./studio.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="shell masthead-inner">
+      <div class="brand"><img src="/assets/brand-mark.png" width="32" height="32" alt="">助手A</div>
+      <span class="private-label">開発者専用</span>
+    </div>
+  </header>
+  <main class="shell">
+    <div class="intro">
+      <div>
+        <h1>ホームページ制作室</h1>
+        <p>ジャンルを選び、名前を入れると、1ページのサイトを作れます。</p>
+      </div>
+      <dl class="meter">
+        <div><dt>生成・修正回数</dt><dd id="calls">—</dd></div>
+        <div><dt>累計トークン</dt><dd id="tokens">—</dd></div>
+      </dl>
+    </div>
+    <div class="workspace">
+      <section class="panel brief-panel" aria-labelledby="brief-title">
+        <h2 id="brief-title">どんなサイトを作りますか？</h2>
+        <p><a href="/studio/designs/" target="_blank" rel="noopener">デザイン10選を見比べる ↗</a></p>
+        <form id="brief-form" autocomplete="off">
+          <fieldset id="brief-fields">
+            <label for="genre">ジャンル <small>必須</small></label>
+            <select id="genre" name="genre" required>
+              <option value="" disabled selected>選んでください</option>
+              <option value="food">飲食店・カフェ</option>
+              <option value="portfolio">作品・活動の紹介</option>
+              <option value="event">イベント・公演</option>
+              <option value="service">教室・サービスの案内</option>
+              <option value="shop">お店・商品の紹介</option>
+              <option value="other">その他（自由に記入）</option>
+            </select>
+            <div id="custom-purpose" hidden>
+              <label for="purpose">何のサイトですか？</label>
+              <input id="purpose" name="purpose" maxlength="120" disabled placeholder="例）町内会のお知らせ">
+            </div>
+            <label for="designId">デザイン</label>
+            <select name="designId" id="designId"><option value="">おまかせ</option></select>
+            <div id="design-preview" hidden><a id="design-page" target="_blank" rel="noopener">作例を最後まで見る ↗<img id="design-shot" alt="選んだ作例の表紙"></a></div>
+            <label for="name">サイトの名前 <small>必須</small></label>
+            <input id="name" name="name" maxlength="120" required placeholder="例）喫茶 灯り">
+            <label for="request">載せたいこと <small>任意</small></label>
+            <textarea id="request" name="request" rows="2" maxlength="1200" placeholder="例）朝8時から。自家焙煎のコーヒーと厚切りトーストを紹介したい。"></textarea>
+            <details id="visual-settings">
+              <summary>色や写真の希望 <small>任意</small></summary>
+              <div class="color-fields">
+                <div>
+                  <label for="mainColor">メインの色</label>
+                  <div class="color-field"><i aria-hidden="true"></i><select id="mainColor" name="mainColor"></select></div>
+                </div>
+                <div>
+                  <label for="subColor">サブの色</label>
+                  <div class="color-field"><i aria-hidden="true"></i><select id="subColor" name="subColor"></select></div>
+                </div>
+              </div>
+              <label for="photoPreference">写真を使いますか？</label>
+              <select id="photoPreference" name="photoPreference">
+                <option value="">おまかせ</option>
+                <option value="yes">はい（合う素材があれば）</option>
+                <option value="no">いいえ、使わない</option>
+              </select>
+            </details>
+          </fieldset>
+          <button id="generate" class="primary" type="submit" disabled>サイトを生成</button>
+          <p class="feedback" id="live-mode">新規生成は実例のWeb検索1回・設計・制作・画面確認後の仕上げを含め最大5回、追加指示による修正は1回、APIを使用します。</p>
+          <p class="feedback" role="status" id="generate-status"></p>
+        </form>
+        <div class="examples" id="examples" hidden>
+          <label for="example-list">生成済みの作例を試す</label>
+          <div class="offer-picker">
+            <select id="example-list"></select>
+            <button id="load-example" class="secondary" type="button" disabled>作例を開く</button>
+          </div>
+          <p class="feedback">作例のプレビューと納品テストは無料です。</p>
+          <p class="feedback" role="status" id="example-status"></p>
+        </div>
+      </section>
+      <section class="panel preview-panel" aria-labelledby="preview-title">
+        <div class="preview-head">
+          <h2 id="preview-title">プレビュー</h2>
+          <div class="modes" role="group" aria-label="プレビューの表示幅">
+            <button type="button" data-width="1280" aria-pressed="true">PC</button>
+            <button type="button" data-width="390" aria-pressed="false">スマホ</button>
+          </div>
+        </div>
+        <div class="stage" id="stage" aria-busy="false">
+          <div id="production-wait" class="production-wait" hidden aria-hidden="true"><span id="wait-label"></span></div>
+          <div class="empty" id="empty">
+            <div class="page-shape" aria-hidden="true"><i></i><b></b><b></b></div>
+            <p>生成したサイトがここに表示されます</p>
+          </div>
+          <div class="canvas" id="canvas" hidden>
+            <div class="viewport" id="viewport">
+              <iframe id="preview" title="生成したサイトの開発者プレビュー" sandbox="" referrerpolicy="no-referrer"></iframe>
+            </div>
+          </div>
+        </div>
+        <div class="preview-foot">
+          <span class="dimension" id="dimension">表示幅 1,280 px</span>
+          <label class="cover-choice" for="artwork">表紙素材
+            <select id="artwork" disabled>
+              <option value="auto">AIの構成を使う</option>
+              <option value="coffee">珈琲とトースト</option>
+              <option value="concert">公演グラフィック</option>
+              <option value="architecture">中庭住宅の模型</option>
+            </select>
+          </label>
+          <button id="edit-draft" class="secondary" type="button" hidden>この初稿を編集</button>
+          <button id="download" class="secondary" type="button" disabled>HTMLを保存</button>
+        </div>
+        <p id="artwork-status" class="feedback cover-feedback" role="status"></p>
+      </section>
+      <section class="panel revision-panel" aria-labelledby="revision-title">
+        <h2 id="revision-title">デザインの修正</h2>
+        <form id="revision-form" autocomplete="off">
+          <label for="revision">追加指示</label>
+          <textarea name="revision" id="revision" rows="2" maxlength="800" required disabled placeholder="例）見出しを大きくして、背景を深い緑に"></textarea>
+          <p id="revision-target" class="feedback"></p>
+          <button id="revise" class="secondary" type="submit" disabled>修正を反映</button>
+          <p class="feedback" role="status" id="revision-status"></p>
+        </form>
+      </section>
+    </div>
+    <section class="panel delivery-panel" aria-labelledby="delivery-title">
+      <div class="delivery-draft">
+        <h2 id="delivery-title">購入前確認と納品</h2>
+        <p>現在のデザインを固定し、PCとスマホの確認用画像を作ります。ローカルの購入テストです。料金は発生しません。</p>
+        <button id="create-offer" class="secondary" type="button" disabled>この版の確認画面を作成</button>
+      </div>
+      <div class="delivery-history">
+        <label for="offer-list">保存した版</label>
+        <div class="offer-picker">
+          <select id="offer-list" disabled><option value="">保存した版はありません</option></select>
+          <button id="refresh-offers" class="secondary" type="button">状態を更新</button>
+        </div>
+        <p id="offer-state" class="feedback" role="status"></p>
+        <div class="delivery-actions">
+          <a id="open-review" class="action-link secondary" target="_blank" rel="noopener noreferrer" hidden>購入者の確認画面を開く<span aria-hidden="true"> ↗</span></a>
+          <button id="release-offer" class="secondary" type="button" hidden>模擬購入を確定して納品</button>
+        </div>
+      </div>
+      <p id="offer-feedback" class="feedback" role="status"></p>
+    </section>
+    <p class="limits" id="limits" role="status"></p>
+  </main>
+</body>
+</html>

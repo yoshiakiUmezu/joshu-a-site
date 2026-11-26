@@ -1,0 +1,3 @@
+# The repo root is the Pages output directory. The studio is local developer tooling.
+/.studio /404 302
+/.studio/* /404 302
